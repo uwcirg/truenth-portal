@@ -1,4 +1,4 @@
-"""Correct user_consent regression issues raised by PR #4343
+"""Remove/correct bogus user_consents as per IRONN-210
 
 Revision ID: edb52362d013
 Revises: d1f3ed8d16ef
@@ -6,15 +6,10 @@ Create Date: 2024-01-11 16:23:34.961937
 
 """
 from alembic import op
+from datetime import datetime
+from flask import current_app
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql.functions import count
 
-from portal.models.research_study import BASE_RS_ID, EMPRO_RS_ID
-from portal.models.qb_timeline import update_users_QBT
-from portal.models.questionnaire_response import (
-    capture_patient_state,
-    present_before_after_state,
-)
 from portal.models.user_consent import UserConsent
 
 # revision identifiers, used by Alembic.
@@ -22,6 +17,80 @@ revision = 'edb52362d013'
 down_revision = 'd1f3ed8d16ef'
 
 Session = sessionmaker()
+
+
+def user_consent_manual_cleanup(session):
+    # turned into a detailed situation, of obtaining original dates from MR
+    # and correcting a number of bogus rows in the user_consent table.
+    # This hand curated list comes from attachments in
+    # https://movember.atlassian.net/browse/IRONN-210
+    # run these first, then confirm everything looks clean.
+    now = datetime.utcnow()
+    version = current_app.config.metadata['version']
+
+    admin_id = session.execute(
+        "SELECT id FROM users WHERE email = '__system__'"
+    ).next()[0]
+
+    def audit_insert(subject_id, user_consent_id, acceptance_date=None):
+        msg = f"remove bogus user_consent {user_consent_id} per IRONN-210"
+        if acceptance_date:
+            msg = f"corrected user_consent {user_consent_id} to {acceptance_date} per IRONN-210"
+        print(msg)
+        insert = (
+            "INSERT INTO AUDIT"
+            " (user_id, subject_id, context, timestamp, version, comment)"
+            " VALUES"
+            f"({admin_id}, {subject_id}, 'consent',"
+            f" '{now}', '{version}', '{msg}')")
+        session.execute(insert)
+
+    def delete_user_consent(user_id, user_consent_id):
+        UserConsent.query.filter(
+            UserConsent.id == user_consent_id).filter(
+            UserConsent.user_id == user_id).delete()
+
+    def update_user_consent(user_id, user_consent_id, acceptance_date):
+        uc = UserConsent.query.filter(
+            UserConsent.id == user_consent_id).filter(
+            UserConsent.user_id == user_id).one()
+        uc.acceptance_date = acceptance_date
+
+    bogus_values = [
+        {'user_id': 101, 'user_consent_id': 219},
+        {'user_id': 145, 'user_consent_id': 1238},
+        {'user_id': 164, 'user_consent_id': 218},
+        {'user_id': 224, 'user_consent_id': 211},
+        {'user_id': 310, 'user_consent_id': 1200},
+        {'user_id': 4316, 'user_consent_id': 5033},
+        {'user_id': 4316, 'user_consent_id': 5032},
+        {'user_id': 98, 'user_consent_id': 339},
+        {'user_id': 774, 'user_consent_id': 897},
+    ]
+
+    correct_values = []
+    #    {'user_id': 719, 'user_consent_id': 544, 'acceptance_date': '2018/05/29 00:00:00'},
+    #    {'user_id': 723, 'user_consent_id': 551, 'acceptance_date': '2018/05/16 00:00:00'},
+    #]
+    for row in correct_values:
+        update_user_consent(
+            user_id=row['user_id'],
+            user_consent_id=row['user_consent_id'],
+            acceptance_date=row['acceptance_date'])
+        audit_insert(
+            subject_id=row['user_id'],
+            user_consent_id=row['user_consent_id'],
+            acceptance_date=row['acceptance_date'])
+        session.commit()
+
+    for row in bogus_values:
+        delete_user_consent(
+            user_id=row['user_id'],
+            user_consent_id=row['user_consent_id'])
+        audit_insert(
+            subject_id=row['user_id'],
+            user_consent_id=row['user_consent_id'])
+        session.commit()
 
 
 def upgrade():
@@ -59,26 +128,8 @@ def upgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
 
-    for study_id in (BASE_RS_ID, EMPRO_RS_ID):
-
-        subquery = session.query(UserConsent.user_id).distinct().filter(
-            UserConsent.research_study_id == study_id).filter(
-            UserConsent.status == 'suspended').subquery()
-        query = session.query(
-            count(UserConsent.user_id), UserConsent.user_id).filter(
-            UserConsent.research_study_id == study_id).filter(
-            UserConsent.user_id.in_(subquery)).group_by(
-            UserConsent.user_id).having(count(UserConsent.user_id) > 2)
-        for num, patient_id in query:
-            b4_state = capture_patient_state(patient_id)
-            update_users_QBT(
-                patient_id,
-                research_study_id=study_id,
-                invalidate_existing=True)
-            present_before_after_state(
-                patient_id, study_id, b4_state)
-
-    raise NotImplemented('finish me')
+    user_consent_manual_cleanup(session)
+    session.commit()
 
 
 def downgrade():
