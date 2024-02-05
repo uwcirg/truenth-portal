@@ -115,6 +115,13 @@ def load_template_args(
             '<a href="{ae_link}">{label}</a>'.format(
                 ae_link=access_link(next_step='present_needed'), label=label))
 
+    def _lookup_main_study_registry_link():
+        label = _('Learn more about the IRONMAN registry')
+        registry_link = 'https://ironmanregistry.org/'
+        return (
+            '<a href="{registry_link}">{label}</a>'.format(
+                registry_link=registry_link, label=label))
+
     def _lookup_clinic_name():
         if user.organizations:
             return _(user.organizations[0].name)
