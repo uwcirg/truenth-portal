@@ -91,11 +91,16 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
 
         row['qb'] = qbd.questionnaire_bank.name
         row['visit'] = visit_name(qbd)
-        if row['status'] == 'Completed':
+        # Withdrawn users that happened to have completed their last QB
+        # are treated as "Completed"
+        withdrawn_and_completed = (
+            row['status'] == 'Withdrawn' and qbd.completed_date(patient.id))
+        if row['status'] == 'Completed' or withdrawn_and_completed:
             row['completion_date'] = report_format(
                 qbd.completed_date(patient.id)) or ""
             row['oow_completion_date'] = report_format(
                 qbd.oow_completed_date(patient.id)) or ""
+            row['status'] = 'Completed'
         if row['status'] == 'Withdrawn':
             # visit unreliable when withdrawn - clear
             row['visit'] = ''
