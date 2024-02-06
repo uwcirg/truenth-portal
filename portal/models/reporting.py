@@ -104,6 +104,10 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         if row['status'] == 'Withdrawn':
             # visit unreliable when withdrawn - clear
             row['visit'] = ''
+            # use date of withdrawal for "completion date"
+            _, withdrawal_date = consent_withdrawal_dates(
+                user=patient, research_study_id=research_study_id)
+            row['completion_date'] = report_format(withdrawal_date)
         entry_method = QNR_results(
             patient,
             research_study_id=research_study_id,
