@@ -38,6 +38,7 @@ from ..models.research_study import (
 )
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
+from ..models.user_consent import consent_withdrawal_dates
 from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 from .crossdomain import crossdomain
 from .demographics import demographics
@@ -504,7 +505,10 @@ def patient_timeline(patient_id):
         i['visit'] = d['timepoint']
         qnr_data.append(i)
 
+    consent_date, withdrawal_date = consent_withdrawal_dates(user, research_study_id)
+    consents = {"consent_date": consent_date, "withdrawal_date": withdrawal_date}
     kwargs = {
+        "consents": consents,
         "rps": rps,
         "status": status,
         "posted": posted,
