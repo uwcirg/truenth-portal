@@ -1233,6 +1233,7 @@ def present_before_after_state(user_id, external_study_id, before_state):
     after_qnrs = QuestionnaireResponse.qnr_state(user_id)
     after_timeline = QBT.timeline_state(user_id)
     qnrs_lost_reference = []
+    any_change_noted = False
 
     def visit_from_timeline(qb_name, qb_iteration, timeline_results):
         """timeline results have computed visit name - quick lookup"""
@@ -1251,8 +1252,10 @@ def present_before_after_state(user_id, external_study_id, before_state):
         after_timeline, before_state['timeline'])
 
     if any((added_t, removed_t, modified_t, modified_q)):
+        any_change_noted = True
         print(f"\nPatient {user_id} ({external_study_id}):")
     if modified_q:
+        any_change_noted = True
         print("\tModified QNRs (old, new)")
         for mod in sorted(modified_q):
             print(f"\t\t{mod} {modified_q[mod][1]} ==>"
@@ -1268,19 +1271,22 @@ def present_before_after_state(user_id, external_study_id, before_state):
                     before_state["timeline"])
                 qnrs_lost_reference.append((visit_name, modified_q[mod][1][2]))
     if added_t:
+        any_change_noted = True
         print("\tAdditional timeline rows:")
         for item in sorted(added_t):
             print(f"\t\t{item} {after_timeline[item]}")
     if removed_t:
+        any_change_noted = True
         print("\tRemoved timeline rows:")
         for item in sorted(removed_t):
             print(
                 f"\t\t{item} "
                 f"{before_state['timeline'][item]}")
     if modified_t:
+        any_change_noted = True
         print(f"\tModified timeline rows: (old, new)")
         for item in sorted(modified_t):
             print(f"\t\t{item}")
             print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
 
-    return after_qnrs, after_timeline, qnrs_lost_reference
+    return after_qnrs, after_timeline, qnrs_lost_reference, any_change_noted
