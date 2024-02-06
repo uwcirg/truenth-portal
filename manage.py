@@ -928,7 +928,7 @@ def preview_site_update(org_id, retired):
         )
         update_users_QBT(
             patient.id, research_study_id=0, invalidate_existing=True)
-        after_qnrs, after_timeline, qnrs_lost_reference = present_before_after_state(
+        after_qnrs, after_timeline, qnrs_lost_reference, _ = present_before_after_state(
             patient.id, patient.external_study_id, patient_state[patient.id])
         total_qnrs += len(patient_state[patient.id]['qnrs'])
         total_qbs_completed_b4 += len(
