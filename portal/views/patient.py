@@ -494,7 +494,11 @@ def patient_timeline(patient_id):
         i['auth_method'] = d['encounter']['auth_method']
         i['encounter_period'] = d['encounter']['period']
         i['document_authored'] = d['authored']
-        i['ae_session'] = d['identifier']['value']
+        try:
+            i['ae_session'] = d['identifier']['value']
+        except KeyError:
+            # happens with sub-study follow up, skip ae_session
+            pass
         i['status'] = d['status']
         i['org'] = d['subject']['careProvider'][0]['display']
         i['visit'] = d['timepoint']
