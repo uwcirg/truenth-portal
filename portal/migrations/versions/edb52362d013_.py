@@ -1,7 +1,7 @@
 """Remove/correct bogus user_consents as per IRONN-210
 
 Revision ID: edb52362d013
-Revises: d1f3ed8d16ef
+Revises: 66368e673005
 Create Date: 2024-01-11 16:23:34.961937
 
 """
@@ -14,7 +14,7 @@ from portal.models.user_consent import UserConsent
 
 # revision identifiers, used by Alembic.
 revision = 'edb52362d013'
-down_revision = 'd1f3ed8d16ef'
+down_revision = '66368e673005'
 
 Session = sessionmaker()
 
@@ -46,7 +46,7 @@ def user_consent_manual_cleanup(session):
         session.execute(insert)
 
     def delete_user_consent(user_id, user_consent_id):
-        UserConsent.query.filter(
+        return UserConsent.query.filter(
             UserConsent.id == user_consent_id).filter(
             UserConsent.user_id == user_id).delete()
 
@@ -84,13 +84,13 @@ def user_consent_manual_cleanup(session):
         session.commit()
 
     for row in bogus_values:
-        delete_user_consent(
+        if  delete_user_consent(
             user_id=row['user_id'],
-            user_consent_id=row['user_consent_id'])
-        audit_insert(
-            subject_id=row['user_id'],
-            user_consent_id=row['user_consent_id'])
-        session.commit()
+            user_consent_id=row['user_consent_id']):
+            audit_insert(
+                subject_id=row['user_id'],
+                user_consent_id=row['user_consent_id'])
+            session.commit()
 
 
 def upgrade():
