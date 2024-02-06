@@ -138,7 +138,15 @@ def upgrade():
                 # special cases best left alone
                 continue
             user = User.query.get(patient_id)
-            consent_date, withdrawal_date = consent_withdrawal_dates(user, study_id)
+            if user.deleted:
+                continue
+            consent_date, withdrawal_date = consent_withdrawal_dates(
+                user, study_id)
+            if withdrawal_date is None:
+                # scenario happens with a withdrawn patient re-start
+                # i.e. as withdrawal was entered in error.
+                # no change needed in this situation
+                continue
 
             # report if dates don't match spreadsheet in IRONN-210
             cd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=consent_date)
