@@ -66,6 +66,8 @@ def user_consent_manual_cleanup(session):
         {'user_id': 4316, 'user_consent_id': 5032},
         {'user_id': 98, 'user_consent_id': 339},
         {'user_id': 774, 'user_consent_id': 897},
+        {'user_id': 723, 'user_consent_id': 551},
+        {'user_id': 653, 'user_consent_id': 820},
     ]
 
     correct_values = []
