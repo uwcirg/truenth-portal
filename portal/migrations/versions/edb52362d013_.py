@@ -53,14 +53,18 @@ def user_consent_manual_cleanup(session):
     def update_user_consent(user_id, user_consent_id, acceptance_date):
         uc = UserConsent.query.filter(
             UserConsent.id == user_consent_id).filter(
-            UserConsent.user_id == user_id).one()
-        uc.acceptance_date = acceptance_date
+            UserConsent.user_id == user_id).first()
+        if uc:
+            uc.acceptance_date = acceptance_date
+            return True
 
-    bogus_values = [
+    bogus_values = (
         {'user_id': 101, 'user_consent_id': 219},
         {'user_id': 145, 'user_consent_id': 1238},
         {'user_id': 164, 'user_consent_id': 218},
         {'user_id': 224, 'user_consent_id': 211},
+        {'user_id': 310, 'user_consent_id': 1198},
+        {'user_id': 310, 'user_consent_id': 1199},
         {'user_id': 310, 'user_consent_id': 1200},
         {'user_id': 4316, 'user_consent_id': 5033},
         {'user_id': 4316, 'user_consent_id': 5032},
@@ -68,27 +72,28 @@ def user_consent_manual_cleanup(session):
         {'user_id': 774, 'user_consent_id': 897},
         {'user_id': 723, 'user_consent_id': 551},
         {'user_id': 653, 'user_consent_id': 820},
-    ]
+        {'user_id': 563, 'user_consent_id': 5896},
+        {'user_id': 6686, 'user_consent_id': 6117},
+    )
 
-    correct_values = []
-    #    {'user_id': 719, 'user_consent_id': 544, 'acceptance_date': '2018/05/29 00:00:00'},
-    #    {'user_id': 723, 'user_consent_id': 551, 'acceptance_date': '2018/05/16 00:00:00'},
-    #]
+    correct_values = (
+        {'user_id': 986, 'user_consent_id': 7434, 'acceptance_date': '2023/06/22 18:00:00'},
+    )
     for row in correct_values:
-        update_user_consent(
-            user_id=row['user_id'],
-            user_consent_id=row['user_consent_id'],
-            acceptance_date=row['acceptance_date'])
-        audit_insert(
-            subject_id=row['user_id'],
-            user_consent_id=row['user_consent_id'],
-            acceptance_date=row['acceptance_date'])
-        session.commit()
+        if update_user_consent(
+                user_id=row['user_id'],
+                user_consent_id=row['user_consent_id'],
+                acceptance_date=row['acceptance_date']):
+            audit_insert(
+                subject_id=row['user_id'],
+                user_consent_id=row['user_consent_id'],
+                acceptance_date=row['acceptance_date'])
+            session.commit()
 
     for row in bogus_values:
-        if  delete_user_consent(
-            user_id=row['user_id'],
-            user_consent_id=row['user_consent_id']):
+        if delete_user_consent(
+                user_id=row['user_id'],
+                user_consent_id=row['user_consent_id']):
             audit_insert(
                 subject_id=row['user_id'],
                 user_consent_id=row['user_consent_id'])
