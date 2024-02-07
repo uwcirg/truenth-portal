@@ -9,14 +9,18 @@ from alembic import op
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.functions import count
 
+from portal.cache import cache
 from portal.models.research_study import BASE_RS_ID, EMPRO_RS_ID
 from portal.models.qb_timeline import update_users_QBT
+from portal.models.questionnaire_bank import trigger_date
 from portal.models.questionnaire_response import (
+    QuestionnaireResponse,
     capture_patient_state,
     present_before_after_state,
 )
 from portal.models.user import User
 from portal.models.user_consent import UserConsent, consent_withdrawal_dates
+from portal.timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 
 Session = sessionmaker()
 
@@ -69,8 +73,8 @@ verified_user_consent_dates = (
         641: ("7-Aug-18", "29-Dec-20"),
         653: ("9-Jul-18", "10-Sep-18"),
         6686: ("29-Jan-23", "12-Jun-23"),
-        719: ("29-May-18", "27-Aug-18"),
-        723: ("16-May-18", "25-Aug-23"),
+        # 719: ("29-May-18", "27-Aug-18"),  as per story, leave alone
+        # 723: ("16-May-18", "25-Aug-23"),  as per story, leave alone
         774: ("24-Oct-17", "9-Nov-17"),
         833: ("12-Sep-18", "11-Sep-23"),
         892: ("18-Sep-18", "5-Jan-20"),
@@ -134,7 +138,7 @@ def upgrade():
             UserConsent.user_id.in_(subquery)).group_by(
             UserConsent.user_id).having(count(UserConsent.user_id) > 2)
         for num, patient_id in query:
-            if patient_id in (1305,):
+            if patient_id in (719, 1186, 1305):
                 # special cases best left alone
                 continue
             user = User.query.get(patient_id)
@@ -151,7 +155,6 @@ def upgrade():
             # report if dates don't match spreadsheet in IRONN-210
             cd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=consent_date)
             wd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=withdrawal_date)
-            #wd_str = withdrawal_date.strftime('%d-%b-%y')
             try:
                 match = verified_user_consent_dates[study_id][patient_id]
                 if (cd_str, wd_str) != match:
@@ -160,19 +163,37 @@ def upgrade():
                     print(f"\t\t {match[0]} \t {match[1]}")
             except KeyError:
                 # user found to not see timeline change
-                #print(f"user_id {patient_id} NOT FOUND in verified list")
-                #print(f"\t {cd_str} \t {wd_str}")
                 pass
+
+            # fake an adherence cache run to avoid unnecessary and more
+            # important, to prevent from locking out a subsequent update
+            # needed after recognizing a real change below
+            adherence_cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                patient_id=patient_id,
+                research_study_id=study_id))
+            adherence_cache_moderation.run_now()
 
             b4_state = capture_patient_state(patient_id)
             update_users_QBT(
                 patient_id,
                 research_study_id=study_id,
                 invalidate_existing=True)
-            present_before_after_state(
+            _, _, _, any_changes = present_before_after_state(
                 patient_id, study_id, b4_state)
+            if not any_changes:
+                continue
 
-    #raise NotImplemented('finish me')
+            print(f"{patient_id} changed, purge old adherence data and relationships")
+            adherence_cache_moderation.reset()
+            QuestionnaireResponse.purge_qb_relationship(
+                subject_id=patient_id,
+                research_study_id=study_id,
+                acting_user_id=patient_id)
+            cache.delete_memoized(trigger_date)
+            update_users_QBT(
+                patient_id,
+                research_study_id=study_id,
+                invalidate_existing=True)
 
 
 def downgrade():
