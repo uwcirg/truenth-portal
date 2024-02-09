@@ -292,9 +292,13 @@ def fire_trigger_events():
         patient = User.query.get(ts.user_id)
 
         # Patient always gets mail
-        pending_emails.append((
-            patient_email(patient, soft_triggers, hard_triggers),
-            "patient thank you"))
+        if patient.email_ready():
+            pending_emails.append((
+                patient_email(patient, soft_triggers, hard_triggers),
+                "patient thank you"))
+        else:
+            current_app.logger.error(
+                f"EMPRO Patient({patient.id}) w/o email!  Can't send message")
 
         if hard_triggers:
             triggers['action_state'] = 'required'
