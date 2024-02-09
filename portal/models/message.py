@@ -116,6 +116,11 @@ class EmailMessage(db.Model):
     def recipients(self, value):
         """Set recipients_id if a user is found w/ matching email"""
 
+        if value is None:
+            self._recipients = None
+            self.recipient_id = None
+            return
+
         # As the schema only tracks a single recipient_id, capture abuse;
         # don't allow comma in recipients till schema can capture
         if ',' in value:
