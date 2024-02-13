@@ -2,9 +2,10 @@
 from datetime import datetime, timedelta
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import UniqueConstraint
+import re
 
 from ..database import db
-
+withdrawn = " post-withdrawn"
 
 class AdherenceData(db.Model):
     """ Cached adherence report data
@@ -35,16 +36,20 @@ class AdherenceData(db.Model):
         'patient_id', 'rs_id_visit', name='_adherence_unique_patient_visit'),)
 
     @staticmethod
-    def rs_visit_string(rs_id, visit_string):
+    def rs_visit_string(rs_id, visit_string, post_withdrawn = False):
         """trivial helper to build rs_id_visit string into desired format"""
         assert isinstance(rs_id, int)
         assert visit_string
+        if post_withdrawn:
+            visit_string += withdrawn
         return f"{rs_id}:{visit_string}"
 
     def rs_visit_parse(self):
         """break parts of rs_id and visit_string out of rs_id_visit field"""
         rs_id, visit_string = self.rs_id_visit.split(':')
         assert visit_string
+        if visit_string.endswith(withdrawn):
+            visit_string = visit_string[:-(len(withdrawn))]
         return int(rs_id), visit_string
 
     @staticmethod
@@ -92,15 +97,20 @@ def sort_by_visit_key(d):
 
     :returns: list of values sorted by keys
     """
+    pattern = re.compile(f"Month (\d+)({withdrawn})?")
     def sort_key(key):
         if key == 'Baseline':
             return 0, 0
         elif key == 'Indefinite':
             return 2, 0
         else:
-            month, num = key.split(" ")
-            assert month == "Month"
-            return 1, int(num)
+            match = pattern.match(key)
+            if not match.groups():
+                raise ValueError(f"couldn't parse key {key}")
+            month_num = int(match.groups()[0])
+            if match.groups()[1]:
+                month_num += 100
+            return 1, month_num
 
     sorted_keys = sorted(d.keys(), key=sort_key)
     sorted_values = [d[key] for key in sorted_keys]

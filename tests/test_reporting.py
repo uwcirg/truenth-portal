@@ -150,11 +150,22 @@ class TestQBStats(TestQuestionnaireBankFixture):
                 "completion_date ": "19 - Jun - 2023 07: 42:46 ",
                 "oow_completion_date": ""
             },
-            "Month 12": {
+            "Month 12 post-withdrawn": {
                 "qb": "CRV Baseline v2",
                 "site": "CRV",
                 "visit": "Month 12",
-                "status": "Overdue",
+                "status": "Completed",
+                "consent": "20 - May - 2023 07: 42:46 ",
+                "completion_date ": "25 - Jun - 2023 00:00:00 ",
+                "country ": None,
+                "user_id ": 3,
+                "study_id": "study user 3",
+                "site_code": ""},
+            "Month 12": {
+                "qb": "CRV Baseline v2",
+                "site": "CRV",
+                "status": "Withdrawn",
+                "completion_date ": "22 - Jun - 2023 00:00:00 ",
                 "consent": "20 - May - 2023 07: 42:46 ",
                 "country ": None,
                 "user_id ": 3,
@@ -173,10 +184,11 @@ class TestQBStats(TestQuestionnaireBankFixture):
             },
         }
         results = sort_by_visit_key(sort_me)
-        assert len(results) == 3
+        assert len(results) == 4
         assert results[0]["visit"] == "Baseline"
         assert results[1]["visit"] == "Month 3"
-        assert results[2]["visit"] == "Month 12"
+        assert results[2]["status"] == "Withdrawn"
+        assert results[3]["status"] == "Completed"
 
     def populate_adherence_cache(self, test_users):
         """helper method to bring current test user state into adherence cache"""
