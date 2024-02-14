@@ -36,7 +36,7 @@ class AdherenceData(db.Model):
         'patient_id', 'rs_id_visit', name='_adherence_unique_patient_visit'),)
 
     @staticmethod
-    def rs_visit_string(rs_id, visit_string, post_withdrawn = False):
+    def rs_visit_string(rs_id, visit_string, post_withdrawn=False):
         """trivial helper to build rs_id_visit string into desired format"""
         assert isinstance(rs_id, int)
         assert visit_string
@@ -97,7 +97,7 @@ def sort_by_visit_key(d):
 
     :returns: list of values sorted by keys
     """
-    pattern = re.compile(f"Month (\d+)({withdrawn})?")
+    pattern = re.compile(f"Month ([0-9]+)({withdrawn})?")
     def sort_key(key):
         if key == 'Baseline':
             return 0, 0

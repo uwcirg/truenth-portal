@@ -86,7 +86,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     def general_row_detail(row, patient, qbd):
         """Add general (either study) data for given (patient, qbd)"""
         # purge values that may have previous row data set and aren't certain
-        for key in "completion_date", "oow_completion_date", "entry_method", "visit":
+        for key in "oow_completion_date", "entry_method", "visit":
             row.pop(key, None)
 
         row['qb'] = qbd.questionnaire_bank.name
@@ -173,7 +173,8 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         if not exp_row or exp_row.at > as_of_date:
             row["status"] = "Not Yet Available"
 
-    ts_reporting = (TriggerStatesReporting(patient_id=patient.id)
+    ts_reporting = (
+        TriggerStatesReporting(patient_id=patient.id)
         if research_study_id == EMPRO_RS_ID else None)
     if last_viable:
         general_row_detail(row, patient, last_viable)
@@ -192,8 +193,6 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         # date of withdrawal
         if row["status"] == 'Withdrawn':
             missing_qbts = []
-            #from celery.contrib import rdb
-            #rdb.set_trace()
             completed_after_withdrawn = QBT.query.filter(
                 QBT.at > row['completion_date']).filter(
                 QBT.status == OverallStatus.completed).filter(
@@ -208,7 +207,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             # failed to write out the completed status first.
             pre_wd_visit_cd = last_viable.completed_date(patient.id)
             if pre_wd_visit_cd and not [
-                    x for x,y in missing_qbts if x == pre_wd_visit_cd]:
+                    x for x, y in missing_qbts if x == pre_wd_visit_cd]:
                 missing_qbts.append((pre_wd_visit_cd, last_viable))
 
             for at, qbd in missing_qbts:

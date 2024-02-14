@@ -1163,9 +1163,9 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                         break
                     j += 1
                 store_rows = (
-                        pending_qbts[0:j] +
-                        [QBT(at=withdrawal_date, status='withdrawn', **kwargs)] +
-                        pending_qbts[j:])
+                    pending_qbts[0:j] +
+                    [QBT(at=withdrawal_date, status='withdrawn', **kwargs)] +
+                    pending_qbts[j:])
                 check_for_overlaps(store_rows)
                 db.session.add_all(store_rows)
                 num_stored = len(store_rows)
