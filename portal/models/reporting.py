@@ -86,28 +86,22 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     def general_row_detail(row, patient, qbd):
         """Add general (either study) data for given (patient, qbd)"""
         # purge values that may have previous row data set and aren't certain
-        for key in "completion_date", "oow_completion_date", "entry_method":
+        for key in "completion_date", "oow_completion_date", "entry_method", "visit":
             row.pop(key, None)
 
         row['qb'] = qbd.questionnaire_bank.name
-        row['visit'] = visit_name(qbd)
-        # Withdrawn users that happened to have completed their last QB
-        # are treated as "Completed"
-        withdrawn_and_completed = (
-            row['status'] == 'Withdrawn' and qbd.completed_date(patient.id))
-        if row['status'] == 'Completed' or withdrawn_and_completed:
-            row['completion_date'] = report_format(
-                qbd.completed_date(patient.id)) or ""
-            row['oow_completion_date'] = report_format(
-                qbd.oow_completed_date(patient.id)) or ""
-            row['status'] = 'Completed'
+
+        # if withdrawn, include a row with that and little more
         if row['status'] == 'Withdrawn':
-            # visit unreliable when withdrawn - clear
-            row['visit'] = ''
             # use date of withdrawal for "completion date"
             _, withdrawal_date = consent_withdrawal_dates(
                 user=patient, research_study_id=research_study_id)
             row['completion_date'] = report_format(withdrawal_date)
+            return
+        row['visit'] = visit_name(qbd)
+        row['completion_date'] = (
+            report_format(qbd.completed_date(patient.id))
+            if row['status'] == 'Completed' else '')
         entry_method = QNR_results(
             patient,
             research_study_id=research_study_id,
@@ -118,6 +112,9 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
 
     def empro_row_detail(row, ts_reporting):
         """Add EMPRO specifics"""
+        if not ts_reporting:
+            return
+
         # Rename column header for EMPRO
         if 'completion_date' in row:
             row['EMPRO_questionnaire_completion_date'] = (
@@ -176,12 +173,11 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         if not exp_row or exp_row.at > as_of_date:
             row["status"] = "Not Yet Available"
 
+    ts_reporting = (TriggerStatesReporting(patient_id=patient.id)
+        if research_study_id == EMPRO_RS_ID else None)
     if last_viable:
         general_row_detail(row, patient, last_viable)
-        if research_study_id == EMPRO_RS_ID:
-            # Initialize trigger states reporting for patient
-            ts_reporting = TriggerStatesReporting(patient_id=patient.id)
-            empro_row_detail(row, ts_reporting)
+        empro_row_detail(row, ts_reporting)
 
         # latest is only valid for a day, unless the user withdrew
         valid_for = 30 if row['status'] in ('Expired', 'Withdrawn') else 1
@@ -191,6 +187,43 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             valid_for_days=valid_for,
             data=row)
         added_rows += 1
+
+        # if the last row was withdrawn, add any completed visits beyond
+        # date of withdrawal
+        if row["status"] == 'Withdrawn':
+            missing_qbts = []
+            #from celery.contrib import rdb
+            #rdb.set_trace()
+            completed_after_withdrawn = QBT.query.filter(
+                QBT.at > row['completion_date']).filter(
+                QBT.status == OverallStatus.completed).filter(
+                QBT.research_study_id == research_study_id).filter(
+                QBT.user_id == patient.id).order_by(QBT.at)
+            for qbt in completed_after_withdrawn:
+                missing_qbts.append((qbt.at, qbt.qbd()))
+
+            # one more special case!  the withdrawn visit was completed
+            # but BEFORE the user withdrew.  the qb_status accurately sees
+            # the visit as withdrawn, and wrote that to the last row, but
+            # failed to write out the completed status first.
+            pre_wd_visit_cd = last_viable.completed_date(patient.id)
+            if pre_wd_visit_cd and not [
+                    x for x,y in missing_qbts if x == pre_wd_visit_cd]:
+                missing_qbts.append((pre_wd_visit_cd, last_viable))
+
+            for at, qbd in missing_qbts:
+                row['status'] = 'Completed'
+                row['completion_date'] = report_format(at)
+                row['visit'] = visit_name(qbd)
+                empro_row_detail(row, ts_reporting)
+                rs_visit = AdherenceData.rs_visit_string(
+                    research_study_id, row['visit'], post_withdrawn=True)
+                AdherenceData.persist(
+                    patient_id=patient.id,
+                    rs_id_visit=rs_visit,
+                    valid_for_days=30,
+                    data=row)
+                added_rows += 1
 
     # as we require a full history, continue to add rows for each previous
     for qbd, status in qb_stats.older_qbds(last_viable):
@@ -204,9 +237,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         historic = row.copy()
         historic['status'] = status
         general_row_detail(historic, patient, qbd)
-
-        if research_study_id == EMPRO_RS_ID:
-            empro_row_detail(historic, ts_reporting)
+        empro_row_detail(historic, ts_reporting)
         AdherenceData.persist(
             patient_id=patient.id,
             rs_id_visit=rs_visit,
