@@ -35,7 +35,7 @@ from .user import User, UserRoles, patients_query
 from .user_consent import consent_withdrawal_dates
 
 
-def single_patient_adherence_data(patient, as_of_date, research_study_id):
+def single_patient_adherence_data(patient_id, research_study_id):
     """Update any missing (from cache) adherence data for patient
 
     NB: all changes are side effects, persisted in adherence_data table.
@@ -48,8 +48,9 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
 
     :returns: number of added rows
     """
+    as_of_date = datetime.utcnow()
     cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
-        patient_id=patient.id,
+        patient_id=patient_id,
         research_study_id=research_study_id))
     if cache_moderation.run_recently():
         return 0
@@ -141,6 +142,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         row['content_domains_accessed'] = ', '.join(da) if da else ""
 
     added_rows = 0
+    patient = User.query.get(patient_id)
     qb_stats = QB_Status(
         user=patient,
         research_study_id=research_study_id,
@@ -192,9 +194,12 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         # if the last row was withdrawn, add any completed visits beyond
         # date of withdrawal
         if row["status"] == 'Withdrawn':
+            withdrawal_date = (
+                row['completion_date'] if 'completion_date' in row
+                else row['EMPRO_questionnaire_completion_date'])
             missing_qbts = []
             completed_after_withdrawn = QBT.query.filter(
-                QBT.at > row['completion_date']).filter(
+                QBT.at > withdrawal_date).filter(
                 QBT.status == OverallStatus.completed).filter(
                 QBT.research_study_id == research_study_id).filter(
                 QBT.user_id == patient.id).order_by(QBT.at)
@@ -306,6 +311,7 @@ def cache_adherence_data(
       if limit was hit
 
     """
+    from ..tasks import cache_single_patient_adherence_data
     # For building cache, use system account; skip privilege checks
     acting_user = User.query.filter_by(email='__system__').one()
     as_of_date = datetime.utcnow()
@@ -334,11 +340,16 @@ def cache_adherence_data(
 
     added_rows = 0
     for patient in patient_generator():
-        if added_rows > limit:
+        if limit and added_rows > limit:
             current_app.logger.info(
                 "pre-mature exit caching adherence data having hit limit")
             break
-        single_patient_adherence_data(patient, as_of_date, research_study_id)
+        # queue patient's adherence cache refresh as a separate job
+        kwargs = {
+            'patient_id': patient.id,
+            'research_study_id': research_study_id}
+        cache_single_patient_adherence_data.apply_async(
+            kwargs=kwargs, retry=False)
 
     return {'added': added_rows, 'limit_hit': limit and added_rows > limit}
 

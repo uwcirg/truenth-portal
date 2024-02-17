@@ -7,8 +7,10 @@ Create Date: 2023-12-11 16:56:10.427854
 """
 from alembic import op
 from datetime import datetime
-import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
+
+from portal.models.user import User
+from portal.models.user_consent import consent_withdrawal_dates
 
 
 # revision identifiers, used by Alembic.
@@ -47,6 +49,14 @@ def upgrade():
             f" rs_id_visit = '{rs_visit}'"
         ).first()
         if status and status[0] != "Not Yet Available":
+            continue
+
+        # if the patient is withdrawn, skip over, will get picked
+        # up in migration 3c871e710277, going out in same release
+        patient = User.query.get(patient_id)
+        _, withdrawal_date = consent_withdrawal_dates(
+            patient, 1)
+        if withdrawal_date:
             continue
 
         # purge the user's EMPRO adherence rows to force refresh

@@ -30,9 +30,7 @@ from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
-from ..models.reporting import single_patient_adherence_data
 from ..models.research_study import (
-    EMPRO_RS_ID,
     ResearchStudy,
     research_study_id_from_questionnaire
 )
@@ -332,6 +330,7 @@ def patient_timeline(patient_id):
     from ..models.questionnaire_bank import visit_name
     from ..models.questionnaire_response import aggregate_responses
     from ..models.research_protocol import ResearchProtocol
+    from ..tasks import cache_single_patient_adherence_data
     from ..trace import dump_trace, establish_trace
 
     user = get_user(patient_id, permission='view')
@@ -467,9 +466,11 @@ def patient_timeline(patient_id):
     if not adherence_data:
         # immediately following a cache purge, adherence data is gone and
         # needs to be recreated.
-        now = datetime.utcnow()
-        single_patient_adherence_data(
-            user, as_of_date=now, research_study_id=EMPRO_RS_ID)
+        kwargs = {
+            "patient_id": user.id,
+            "research_study_id": research_study_id,
+        }
+        cache_single_patient_adherence_data(kwargs=kwargs)
         adherence_data = sorted_adherence_data(patient_id, research_study_id)
 
     qnr_responses = aggregate_responses(

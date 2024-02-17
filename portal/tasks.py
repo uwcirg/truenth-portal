@@ -32,6 +32,7 @@ from .models.reporting import (
     cache_adherence_data,
     generate_and_send_summaries,
     research_report,
+    single_patient_adherence_data,
 )
 from .models.research_study import ResearchStudy
 from .models.role import ROLE, Role
@@ -113,7 +114,14 @@ def info():
     queue=LOW_PRIORITY)
 @scheduled_task
 def cache_adherence_data_task(**kwargs):
+    """Queues up all patients needing a cache refresh"""
     return cache_adherence_data(**kwargs)
+
+
+@celery.task(queue=LOW_PRIORITY, ignore_results=True)
+def cache_single_patient_adherence_data(**kwargs):
+    """Populates adherence data for a single patient"""
+    return single_patient_adherence_data(**kwargs)
 
 
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)

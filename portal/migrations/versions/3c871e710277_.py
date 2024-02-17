@@ -129,21 +129,22 @@ def upgrade():
     session = Session(bind=bind)
 
     for study_id in (BASE_RS_ID, EMPRO_RS_ID):
-        subquery = session.query(UserConsent.user_id).distinct().filter(
+        # due to changes in adherence report for withdrawn users
+        # this query is now simply any withdrawn patient who isn't
+        # deleted from the system.
+        subquery = session.query(User.id).filter(
+            User.deleted_id.is_(None)).subquery()
+        query = session.query(UserConsent.user_id.distinct()).filter(
             UserConsent.research_study_id == study_id).filter(
-            UserConsent.status == 'suspended').subquery()
-        query = session.query(
-            count(UserConsent.user_id), UserConsent.user_id).filter(
-            UserConsent.research_study_id == study_id).filter(
-            UserConsent.user_id.in_(subquery)).group_by(
-            UserConsent.user_id).having(count(UserConsent.user_id) > 2)
-        for num, patient_id in query:
+            UserConsent.status == "suspended").filter(
+            UserConsent.user_id.in_(subquery))
+
+        for row in query:
+            patient_id = row[0]
             if patient_id in (719, 1186, 1305):
                 # special cases best left alone
                 continue
             user = User.query.get(patient_id)
-            if user.deleted:
-                continue
             consent_date, withdrawal_date = consent_withdrawal_dates(
                 user, study_id)
             if withdrawal_date is None:
