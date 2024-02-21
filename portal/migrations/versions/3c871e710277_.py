@@ -7,11 +7,12 @@ Create Date: 2024-01-25 20:04:48.109980
 """
 from alembic import op
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql.functions import count
+from sqlalchemy.sql.functions import func
 
 from portal.cache import cache
+from portal.models.adherence_data import AdherenceData
 from portal.models.research_study import BASE_RS_ID, EMPRO_RS_ID
-from portal.models.qb_timeline import update_users_QBT
+from portal.models.qb_timeline import QBT, update_users_QBT
 from portal.models.questionnaire_bank import trigger_date
 from portal.models.questionnaire_response import (
     QuestionnaireResponse,
@@ -139,7 +140,9 @@ def upgrade():
             UserConsent.status == "suspended").filter(
             UserConsent.user_id.in_(subquery))
 
+        delay_timeline_updates_till_after_migration = True
         slow_report_details = False
+        delete_adh_ids = []
         for row in query:
             patient_id = row[0]
             if patient_id in (719, 1186, 1305):
@@ -194,11 +197,28 @@ def upgrade():
                 research_study_id=study_id,
                 acting_user_id=patient_id)
             cache.delete_memoized(trigger_date)
-            update_users_QBT(
-                patient_id,
-                research_study_id=study_id,
-                invalidate_existing=True)
 
+            if delay_timeline_updates_till_after_migration:
+                session.query(QBT).filter(QBT.user_id == patient_id).filter(
+                    QBT.research_study_id == study_id).delete()
+                adh_ids = session.query(AdherenceData.id).filter(
+                    AdherenceData.patient_id == patient_id).filter(
+                    AdherenceData.rs_id_visit.like(f"{study_id}:%")
+                )
+                for ad_id in adh_ids:
+                    delete_adh_ids.append(ad_id)
+            else:
+                update_users_QBT(
+                    patient_id,
+                    research_study_id=study_id,
+                    invalidate_existing=True)
+
+        # SQL alchemy can't combine `like` expression with delete op.
+        for ad_id in delete_adh_ids:
+            # yes this should be possible in a single stmt,
+            # not a loop, but no dice
+            session.query(AdherenceData).filter(
+                AdherenceData.id == ad_id).delete()
 
 def downgrade():
     """no downgrade available"""
