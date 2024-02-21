@@ -139,6 +139,7 @@ def upgrade():
             UserConsent.status == "suspended").filter(
             UserConsent.user_id.in_(subquery))
 
+        slow_report_details = False
         for row in query:
             patient_id = row[0]
             if patient_id in (719, 1186, 1305):
@@ -153,39 +154,41 @@ def upgrade():
                 # no change needed in this situation
                 continue
 
-            # report if dates don't match spreadsheet in IRONN-210
-            cd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=consent_date)
-            wd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=withdrawal_date)
-            try:
-                match = verified_user_consent_dates[study_id][patient_id]
-                if (cd_str, wd_str) != match:
-                    print(f"user_id {patient_id} \t {cd_str} \t {wd_str}")
-                    print(" vs expected:")
-                    print(f"\t\t {match[0]} \t {match[1]}")
-            except KeyError:
-                # user found to not see timeline change
-                pass
+            if slow_report_details:
+                # report if dates don't match spreadsheet in IRONN-210
+                cd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=consent_date)
+                wd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=withdrawal_date)
+                try:
+                    match = verified_user_consent_dates[study_id][patient_id]
+                    if (cd_str, wd_str) != match:
+                        print(f"user_id {patient_id} \t {cd_str} \t {wd_str}")
+                        print(" vs expected:")
+                        print(f"\t\t {match[0]} \t {match[1]}")
+                except KeyError:
+                    # user found to not see timeline change
+                    pass
 
-            # fake an adherence cache run to avoid unnecessary and more
-            # important, to prevent from locking out a subsequent update
-            # needed after recognizing a real change below
-            adherence_cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
-                patient_id=patient_id,
-                research_study_id=study_id))
-            adherence_cache_moderation.run_now()
+                # fake an adherence cache run to avoid unnecessary and more
+                # important, to prevent from locking out a subsequent update
+                # needed after recognizing a real change below
+                adherence_cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                    patient_id=patient_id,
+                    research_study_id=study_id))
+                adherence_cache_moderation.run_now()
 
-            b4_state = capture_patient_state(patient_id)
-            update_users_QBT(
-                patient_id,
-                research_study_id=study_id,
-                invalidate_existing=True)
-            _, _, _, any_changes = present_before_after_state(
-                patient_id, study_id, b4_state)
-            if not any_changes:
-                continue
+                b4_state = capture_patient_state(patient_id)
+                update_users_QBT(
+                    patient_id,
+                    research_study_id=study_id,
+                    invalidate_existing=True)
+                _, _, _, any_changes = present_before_after_state(
+                    patient_id, study_id, b4_state)
+                if not any_changes:
+                    continue
 
-            print(f"{patient_id} changed, purge old adherence data and relationships")
-            adherence_cache_moderation.reset()
+                print(f"{patient_id} changed, purge old adherence data and relationships")
+                adherence_cache_moderation.reset()
+
             QuestionnaireResponse.purge_qb_relationship(
                 subject_id=patient_id,
                 research_study_id=study_id,
