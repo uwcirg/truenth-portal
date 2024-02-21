@@ -3,6 +3,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+from time import sleep
 
 from portal.cache import cache
 from portal.extensions import db
@@ -310,6 +311,7 @@ class TestQBStats(TestQuestionnaireBankFixture):
         self.consent_with_org(org_id=org_id)
         self.login()
         self.populate_adherence_cache(test_users=(user2, user3, user4))
+        sleep(5)  # as adherence jobs run independently, give em time
         response = self.results_from_async_call(
             "/api/report/questionnaire_status", timeout=10)
 
