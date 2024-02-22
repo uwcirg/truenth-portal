@@ -101,8 +101,12 @@ def sort_by_visit_key(d):
     def sort_key(key):
         if key == 'Baseline':
             return 0, 0
+        elif key == f"Baseline{withdrawn}":
+            return 0, 1
         elif key == 'Indefinite':
             return 2, 0
+        elif key == f'Indefinite{withdrawn}':
+            return 2, 1
         else:
             match = pattern.match(key)
             if not match.groups():

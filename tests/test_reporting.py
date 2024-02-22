@@ -165,6 +165,7 @@ class TestQBStats(TestQuestionnaireBankFixture):
             "Month 12": {
                 "qb": "CRV Baseline v2",
                 "site": "CRV",
+                "visit": "Month 12",
                 "status": "Withdrawn",
                 "completion_date ": "22 - Jun - 2023 00:00:00 ",
                 "consent": "20 - May - 2023 07: 42:46 ",
@@ -172,6 +173,18 @@ class TestQBStats(TestQuestionnaireBankFixture):
                 "user_id ": 3,
                 "study_id": "study user 3",
                 "site_code": ""},
+            "Baseline post-withdrawn": {
+                "qb": "CRV Baseline v2",
+                "site": "CRV",
+                "visit": "Baseline",
+                "status": "Completed",
+                "completion_date ": "22 - Jun - 2023 00:00:00 ",
+                "consent": "19 - Jun - 2023 07: 42:46",
+                "country ": None,
+                "user_id ": 2,
+                "study_id": "study user 2",
+                "site_code": ""
+            },
             "Baseline": {
                 "qb": "CRV Baseline v2",
                 "site": "CRV",
@@ -185,11 +198,17 @@ class TestQBStats(TestQuestionnaireBankFixture):
             },
         }
         results = sort_by_visit_key(sort_me)
-        assert len(results) == 4
+        assert len(results) == 5
         assert results[0]["visit"] == "Baseline"
-        assert results[1]["visit"] == "Month 3"
-        assert results[2]["status"] == "Withdrawn"
-        assert results[3]["status"] == "Completed"
+        assert results[0]["status"] == "Due"
+        assert results[1]["visit"] == "Baseline"
+        assert results[1]["status"] == "Completed"
+        assert results[2]["visit"] == "Month 3"
+        assert results[2]["status"] == "Completed"
+        assert results[3]["visit"] == "Month 12"
+        assert results[3]["status"] == "Withdrawn"
+        assert results[4]["visit"] == "Month 12"
+        assert results[4]["status"] == "Completed"
 
     def populate_adherence_cache(self, test_users):
         """helper method to bring current test user state into adherence cache"""
