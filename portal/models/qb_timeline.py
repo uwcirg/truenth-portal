@@ -14,7 +14,7 @@ from ..cache import cache, TWO_HOURS
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
 from ..set_tools import left_center_right
-from ..timeout_lock import TimeoutLock
+from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration, TimeoutLock
 from ..trace import trace
 from .adherence_data import AdherenceData
 from .overall_status import OverallStatus
@@ -760,6 +760,14 @@ def invalidate_users_QBT(user_id, research_study_id):
         # SQL alchemy can't combine `like` expression with delete op.
         for ad in adh_data:
             db.session.delete(ad)
+
+        # clear the timeout lock as well, since we need a refresh
+        # after deletion of the adherence data
+        cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+            patient_id=user_id,
+            research_study_id=research_study_id))
+        cache_moderation.reset()
+
 
     # args have to match order and values - no wild carding avail
     as_of = QB_StatusCacheKey().current()
