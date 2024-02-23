@@ -470,7 +470,7 @@ def patient_timeline(patient_id):
             "patient_id": user.id,
             "research_study_id": research_study_id,
         }
-        cache_single_patient_adherence_data(kwargs=kwargs)
+        cache_single_patient_adherence_data(**kwargs)
         adherence_data = sorted_adherence_data(patient_id, research_study_id)
 
     qnr_responses = aggregate_responses(
