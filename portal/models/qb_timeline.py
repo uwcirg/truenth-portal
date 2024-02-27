@@ -1166,7 +1166,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     if qbt.at > withdrawal_date:
                         break
                     j += 1
-                if j > 1:
+                if j > 0:
                     # include visit in withdrawn for qb_status functionality
                     kwargs['qb_id'] = pending_qbts[j-1].qb_id
                     kwargs['qb_iteration'] = pending_qbts[j-1].qb_iteration
