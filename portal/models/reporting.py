@@ -216,9 +216,8 @@ def single_patient_adherence_data(patient_id, research_study_id):
                 missing_qbts.append((pre_wd_visit_cd, last_viable))
 
             for at, qbd in missing_qbts:
-                row['status'] = 'Completed'
-                row['completion_date'] = report_format(at)
-                row['visit'] = visit_name(qbd)
+                row['status'] = 'Completed'  # overwrite withdrawn state
+                general_row_detail(row, patient, qbd)
                 empro_row_detail(row, ts_reporting)
                 rs_visit = AdherenceData.rs_visit_string(
                     research_study_id, row['visit'], post_withdrawn=True)
