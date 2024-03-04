@@ -4,7 +4,6 @@ from time import sleep
 
 from dateutil.relativedelta import relativedelta
 from flask import current_app
-import redis
 from redis.exceptions import ConnectionError
 from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
@@ -13,6 +12,7 @@ from ..audit import auditable_event
 from ..cache import cache, TWO_HOURS
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
+from ..factories.redis import create_redis
 from ..set_tools import left_center_right
 from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration, TimeoutLock
 from ..trace import trace
@@ -761,12 +761,13 @@ def invalidate_users_QBT(user_id, research_study_id):
         for ad in adh_data:
             db.session.delete(ad)
 
-        # clear the timeout lock as well, since we need a refresh
-        # after deletion of the adherence data
-        cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
-            patient_id=user_id,
-            research_study_id=research_study_id))
-        cache_moderation.reset()
+        if current_app.config.get("TESTING", "false").lower() != "true":
+            # clear the timeout lock as well, since we need a refresh
+            # after deletion of the adherence data
+            cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                patient_id=user_id,
+                research_study_id=research_study_id))
+            cache_moderation.reset()
 
 
     # args have to match order and values - no wild carding avail
@@ -1241,8 +1242,7 @@ class QB_StatusCacheKey(object):
         # Lookup the configured expiration of the matching cache
         # container ("DOGPILE_CACHE_REGIONS" -> "assessment_cache_region")
         if self.redis is None:
-            self.redis = redis.StrictRedis.from_url(
-                current_app.config['REDIS_URL'])
+            self.redis = create_redis(current_app.config['REDIS_URL'])
         regions = current_app.config['DOGPILE_CACHE_REGIONS']
         for region_name, duration in regions:
             if region_name == self.region_name:

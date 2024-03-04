@@ -1,8 +1,7 @@
 """Configuration"""
 import os
 
-import redis
-
+from portal.factories.redis import create_redis
 from portal.models.role import ROLE
 
 SITE_CFG = 'site.cfg'
@@ -152,7 +151,7 @@ class BaseConfig(object):
         REDIS_URL
     )
 
-    SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
+    SESSION_REDIS = create_redis(SESSION_REDIS_URL)
 
     UPDATE_PATIENT_TASK_BATCH_SIZE = int(
         os.environ.get('UPDATE_PATIENT_TASK_BATCH_SIZE', 16)
