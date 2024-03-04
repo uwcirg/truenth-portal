@@ -761,7 +761,7 @@ def invalidate_users_QBT(user_id, research_study_id):
         for ad in adh_data:
             db.session.delete(ad)
 
-        if current_app.config.get("TESTING", "false").lower() != "true":
+        if not current_app.config.get("TESTING", False):
             # clear the timeout lock as well, since we need a refresh
             # after deletion of the adherence data
             cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
