@@ -3,12 +3,12 @@ from datetime import datetime
 from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
 from flask import Blueprint, current_app
-import redis
 from redis.exceptions import ConnectionError
 from sqlalchemy import text
 
 from ..database import db
 from ..factories.celery import create_celery
+from ..factories.redis import create_redis
 
 HEALTHCHECK_FAILURE_STATUS_CODE = 200
 
@@ -23,7 +23,7 @@ def celery_beat_ping():
     This allows us to monitor whether celery beat tasks are running
     """
     try:
-        rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
+        rs = create_redis(current_app.config['REDIS_URL'])
         rs.setex(
             name='last_celery_beat_ping',
             time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
@@ -64,7 +64,7 @@ def celery_available():
 def celery_beat_available():
     """Determines whether celery beat is available"""
     try:
-        rs = redis.from_url(current_app.config['REDIS_URL'])
+        rs = create_redis(current_app.config['REDIS_URL'])
 
         # Celery beat feeds scheduled jobs (a la cron) to the respective
         # job queues (standard and low priority).  As a monitor, a job
@@ -109,7 +109,7 @@ def redis_available():
     # is available. Otherwise we assume
     # it's not available
     try:
-        rs = redis.from_url(current_app.config["REDIS_URL"])
+        rs = create_redis(current_app.config["REDIS_URL"])
         rs.ping()
         return True, 'Redis is available.'
     except Exception as e:
