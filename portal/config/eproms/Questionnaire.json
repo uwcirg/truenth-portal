@@ -5851,6 +5851,42 @@
                 "display": "Other",
                 "code": "irondemog_v3.26.8"
               }
+            },
+            {
+              "valueCoding": {
+                "display": "African",
+                "code": "irondemog_v3.26.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Black",
+                "code": "irondemog_v3.26.10"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Coloured",
+                "code": "irondemog_v3.26.11"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Indian",
+                "code": "irondemog_v3.26.12"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "White / Caucasian",
+                "code": "irondemog_v3.26.13"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Other",
+                "code": "irondemog_v3.26.14"
+              }
             }
           ]
         },

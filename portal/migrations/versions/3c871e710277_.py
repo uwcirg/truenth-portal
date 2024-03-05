@@ -7,11 +7,12 @@ Create Date: 2024-01-25 20:04:48.109980
 """
 from alembic import op
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql.functions import count
+from sqlalchemy.sql.functions import func
 
 from portal.cache import cache
+from portal.models.adherence_data import AdherenceData
 from portal.models.research_study import BASE_RS_ID, EMPRO_RS_ID
-from portal.models.qb_timeline import update_users_QBT
+from portal.models.qb_timeline import QBT, update_users_QBT
 from portal.models.questionnaire_bank import trigger_date
 from portal.models.questionnaire_response import (
     QuestionnaireResponse,
@@ -129,21 +130,25 @@ def upgrade():
     session = Session(bind=bind)
 
     for study_id in (BASE_RS_ID, EMPRO_RS_ID):
-        subquery = session.query(UserConsent.user_id).distinct().filter(
+        # due to changes in adherence report for withdrawn users
+        # this query is now simply any withdrawn patient who isn't
+        # deleted from the system.
+        subquery = session.query(User.id).filter(
+            User.deleted_id.is_(None)).subquery()
+        query = session.query(UserConsent.user_id.distinct()).filter(
             UserConsent.research_study_id == study_id).filter(
-            UserConsent.status == 'suspended').subquery()
-        query = session.query(
-            count(UserConsent.user_id), UserConsent.user_id).filter(
-            UserConsent.research_study_id == study_id).filter(
-            UserConsent.user_id.in_(subquery)).group_by(
-            UserConsent.user_id).having(count(UserConsent.user_id) > 2)
-        for num, patient_id in query:
+            UserConsent.status == "suspended").filter(
+            UserConsent.user_id.in_(subquery))
+
+        delay_timeline_updates_till_after_migration = True
+        slow_report_details = False
+        delete_adh_ids = []
+        for row in query:
+            patient_id = row[0]
             if patient_id in (719, 1186, 1305):
                 # special cases best left alone
                 continue
             user = User.query.get(patient_id)
-            if user.deleted:
-                continue
             consent_date, withdrawal_date = consent_withdrawal_dates(
                 user, study_id)
             if withdrawal_date is None:
@@ -152,49 +157,68 @@ def upgrade():
                 # no change needed in this situation
                 continue
 
-            # report if dates don't match spreadsheet in IRONN-210
-            cd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=consent_date)
-            wd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=withdrawal_date)
-            try:
-                match = verified_user_consent_dates[study_id][patient_id]
-                if (cd_str, wd_str) != match:
-                    print(f"user_id {patient_id} \t {cd_str} \t {wd_str}")
-                    print(" vs expected:")
-                    print(f"\t\t {match[0]} \t {match[1]}")
-            except KeyError:
-                # user found to not see timeline change
-                pass
+            if slow_report_details:
+                # report if dates don't match spreadsheet in IRONN-210
+                cd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=consent_date)
+                wd_str = '{dt.day}-{dt:%b}-{dt:%y}'.format(dt=withdrawal_date)
+                try:
+                    match = verified_user_consent_dates[study_id][patient_id]
+                    if (cd_str, wd_str) != match:
+                        print(f"user_id {patient_id} \t {cd_str} \t {wd_str}")
+                        print(" vs expected:")
+                        print(f"\t\t {match[0]} \t {match[1]}")
+                except KeyError:
+                    # user found to not see timeline change
+                    pass
 
-            # fake an adherence cache run to avoid unnecessary and more
-            # important, to prevent from locking out a subsequent update
-            # needed after recognizing a real change below
-            adherence_cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
-                patient_id=patient_id,
-                research_study_id=study_id))
-            adherence_cache_moderation.run_now()
+                # fake an adherence cache run to avoid unnecessary and more
+                # important, to prevent from locking out a subsequent update
+                # needed after recognizing a real change below
+                adherence_cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                    patient_id=patient_id,
+                    research_study_id=study_id))
+                adherence_cache_moderation.run_now()
 
-            b4_state = capture_patient_state(patient_id)
-            update_users_QBT(
-                patient_id,
-                research_study_id=study_id,
-                invalidate_existing=True)
-            _, _, _, any_changes = present_before_after_state(
-                patient_id, study_id, b4_state)
-            if not any_changes:
-                continue
+                b4_state = capture_patient_state(patient_id)
+                update_users_QBT(
+                    patient_id,
+                    research_study_id=study_id,
+                    invalidate_existing=True)
+                _, _, _, any_changes = present_before_after_state(
+                    patient_id, study_id, b4_state)
+                if not any_changes:
+                    continue
 
-            print(f"{patient_id} changed, purge old adherence data and relationships")
-            adherence_cache_moderation.reset()
+                print(f"{patient_id} changed, purge old adherence data and relationships")
+                adherence_cache_moderation.reset()
+
             QuestionnaireResponse.purge_qb_relationship(
                 subject_id=patient_id,
                 research_study_id=study_id,
                 acting_user_id=patient_id)
             cache.delete_memoized(trigger_date)
-            update_users_QBT(
-                patient_id,
-                research_study_id=study_id,
-                invalidate_existing=True)
 
+            if delay_timeline_updates_till_after_migration:
+                session.query(QBT).filter(QBT.user_id == patient_id).filter(
+                    QBT.research_study_id == study_id).delete()
+                adh_ids = session.query(AdherenceData.id).filter(
+                    AdherenceData.patient_id == patient_id).filter(
+                    AdherenceData.rs_id_visit.like(f"{study_id}:%")
+                )
+                for ad_id in adh_ids:
+                    delete_adh_ids.append(ad_id)
+            else:
+                update_users_QBT(
+                    patient_id,
+                    research_study_id=study_id,
+                    invalidate_existing=True)
+
+        # SQL alchemy can't combine `like` expression with delete op.
+        for ad_id in delete_adh_ids:
+            # yes this should be possible in a single stmt,
+            # not a loop, but no dice
+            session.query(AdherenceData).filter(
+                AdherenceData.id == ad_id).delete()
 
 def downgrade():
     """no downgrade available"""

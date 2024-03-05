@@ -3,6 +3,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+from time import sleep
 
 from portal.cache import cache
 from portal.extensions import db
@@ -150,16 +151,40 @@ class TestQBStats(TestQuestionnaireBankFixture):
                 "completion_date ": "19 - Jun - 2023 07: 42:46 ",
                 "oow_completion_date": ""
             },
+            "Month 12 post-withdrawn": {
+                "qb": "CRV Baseline v2",
+                "site": "CRV",
+                "visit": "Month 12",
+                "status": "Completed",
+                "consent": "20 - May - 2023 07: 42:46 ",
+                "completion_date ": "25 - Jun - 2023 00:00:00 ",
+                "country ": None,
+                "user_id ": 3,
+                "study_id": "study user 3",
+                "site_code": ""},
             "Month 12": {
                 "qb": "CRV Baseline v2",
                 "site": "CRV",
                 "visit": "Month 12",
-                "status": "Overdue",
+                "status": "Withdrawn",
+                "completion_date ": "22 - Jun - 2023 00:00:00 ",
                 "consent": "20 - May - 2023 07: 42:46 ",
                 "country ": None,
                 "user_id ": 3,
                 "study_id": "study user 3",
                 "site_code": ""},
+            "Baseline post-withdrawn": {
+                "qb": "CRV Baseline v2",
+                "site": "CRV",
+                "visit": "Baseline",
+                "status": "Completed",
+                "completion_date ": "22 - Jun - 2023 00:00:00 ",
+                "consent": "19 - Jun - 2023 07: 42:46",
+                "country ": None,
+                "user_id ": 2,
+                "study_id": "study user 2",
+                "site_code": ""
+            },
             "Baseline": {
                 "qb": "CRV Baseline v2",
                 "site": "CRV",
@@ -173,10 +198,17 @@ class TestQBStats(TestQuestionnaireBankFixture):
             },
         }
         results = sort_by_visit_key(sort_me)
-        assert len(results) == 3
+        assert len(results) == 5
         assert results[0]["visit"] == "Baseline"
-        assert results[1]["visit"] == "Month 3"
-        assert results[2]["visit"] == "Month 12"
+        assert results[0]["status"] == "Due"
+        assert results[1]["visit"] == "Baseline"
+        assert results[1]["status"] == "Completed"
+        assert results[2]["visit"] == "Month 3"
+        assert results[2]["status"] == "Completed"
+        assert results[3]["visit"] == "Month 12"
+        assert results[3]["status"] == "Withdrawn"
+        assert results[4]["visit"] == "Month 12"
+        assert results[4]["status"] == "Completed"
 
     def populate_adherence_cache(self, test_users):
         """helper method to bring current test user state into adherence cache"""
@@ -298,6 +330,7 @@ class TestQBStats(TestQuestionnaireBankFixture):
         self.consent_with_org(org_id=org_id)
         self.login()
         self.populate_adherence_cache(test_users=(user2, user3, user4))
+        sleep(5)  # as adherence jobs run independently, give em time
         response = self.results_from_async_call(
             "/api/report/questionnaire_status", timeout=10)
 

@@ -4,7 +4,6 @@ from time import sleep
 
 from dateutil.relativedelta import relativedelta
 from flask import current_app
-import redis
 from redis.exceptions import ConnectionError
 from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
@@ -13,13 +12,9 @@ from ..audit import auditable_event
 from ..cache import cache, TWO_HOURS
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
-from ..factories.celery import create_celery
+from ..factories.redis import create_redis
 from ..set_tools import left_center_right
-from ..timeout_lock import (
-    ADHERENCE_DATA_KEY,
-    CacheModeration,
-    TimeoutLock,
-)
+from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration, TimeoutLock
 from ..trace import trace
 from .adherence_data import AdherenceData
 from .overall_status import OverallStatus
@@ -106,25 +101,6 @@ class QBT(db.Model):
             results[f"{i.at} {i.status}"] = [
                 vn, name_map[i.qb_id], i.qb_iteration]
         return results
-
-    @staticmethod
-    def withdrawn_qbd(user_id, research_study_id):
-        """Returns active QBD at time of user's withdrawal if applicable
-
-        :returns: a QBD representing the visit active at point of withdrawal
-          from given study, using `relative_start` to hold date-time of
-          withdrawal; or None if n/a
-        """
-        qbt = QBT.query.filter(QBT.user_id == user_id).filter(
-            QBT.research_study_id == research_study_id).filter(
-            QBT.status == OverallStatus.withdrawn).first()
-        if not qbt:
-            return None
-        return QBD(
-            relative_start=qbt.at,
-            iteration=qbt.qb_iteration,
-            recur_id=qbt.qb_recur_id,
-            qb_id=qbt.qb_id)
 
 
 class AtOrderedList(list):
@@ -291,6 +267,8 @@ def calc_and_adjust_start(user, research_study_id, qbd, initial_trigger):
         return qbd.relative_start
 
     delta = users_trigger - initial_trigger
+    # this case should no longer be possible; raise the alarm
+    raise RuntimeError("found initial trigger to differ by: %s", str(delta))
     current_app.logger.debug("calc_and_adjust_start delta: %s", str(delta))
     return qbd.relative_start + delta
 
@@ -606,7 +584,7 @@ def ordered_qbs(user, research_study_id, classification=None):
     This does NOT include the indefinite classification unless requested,
      as it plays by a different set of rules.
 
-    :param user: the user to lookup
+    :param user: the user to look up
     :param research_study_id: the research study being processed
     :param classification: set to ``indefinite`` for that special handling
     :returns: QBD for each (QB, iteration, recur)
@@ -725,11 +703,6 @@ def ordered_qbs(user, research_study_id, classification=None):
                 if transition_now:
                     rp_flyweight.transition()
 
-            # done if user withdrew before QB starts
-            if withdrawal_date and withdrawal_date < rp_flyweight.cur_start:
-                trace("withdrawn as of {}".format(withdrawal_date))
-                break
-
             rp_flyweight.adjust_start()
             yield rp_flyweight.cur_qbd
 
@@ -787,6 +760,17 @@ def invalidate_users_QBT(user_id, research_study_id):
         # SQL alchemy can't combine `like` expression with delete op.
         for ad in adh_data:
             db.session.delete(ad)
+
+        if not current_app.config.get("TESTING", False):
+            # clear the timeout lock as well, since we need a refresh
+            # after deletion of the adherence data
+            # otherwise, we experience a deadlock situation where tables can't be dropped 
+            # between test runs, as postgres believes a deadlock condition exists
+            cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                patient_id=user_id,
+                research_study_id=research_study_id))
+            cache_moderation.reset()
+
 
     # args have to match order and values - no wild carding avail
     as_of = QB_StatusCacheKey().current()
@@ -888,6 +872,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
     def attempt_update(user_id, research_study_id, invalidate_existing):
         """Updates user's QBT or raises if lock is unattainable"""
         from .qb_status import patient_research_study_status
+        from ..tasks import LOW_PRIORITY, cache_single_patient_adherence_data
 
         # acquire a multiprocessing lock to prevent multiple requests
         # from duplicating rows during this slow process
@@ -935,7 +920,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                 trace(f"user determined ineligible for {research_study_id}")
                 return
 
-            # Create time line for user, from initial trigger date
+            # Create time-line for user, from initial trigger date
             qb_generator = ordered_qbs(user, research_study_id)
             user_qnrs = QNR_results(user, research_study_id)
 
@@ -981,7 +966,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                             # QBs - one needing to be removed (say the old
                             # month 36) in favor of the skipped new (say
                             # month 33), and the last legit old one (say
-                            # month 30) needing it's endpoint adjusted
+                            # month 30) needing its endpoint adjusted
                             # further below.
                             remove_qb_id = pending_qbts[i].qb_id
                             remove_iteration = pending_qbts[i].qb_iteration
@@ -1056,7 +1041,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                                 "Problematic qbd: %s", user_id, str(qbd))
                             continue
 
-                    # Must double check overlap; may no longer be true, if
+                    # Must double-check overlap; may no longer be true, if
                     # last_posted_index was one before...
                     if pending_qbts[last_posted_index].at > start:
                         # For questionnaires with common instrument names that
@@ -1172,25 +1157,27 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     pending_qbts.append(QBT(
                         at=expired_date, status='expired', **kwargs))
 
-            # If user withdrew from study - remove any rows post withdrawal
+            # If user withdrew from study, add a row marking the withdrawal
+            # to the user's timeline, at the proper sequence.
             num_stored = 0
             _, withdrawal_date = consent_withdrawal_dates(
                 user, research_study_id=research_study_id)
             if withdrawal_date:
                 trace("withdrawn as of {}".format(withdrawal_date))
-                store_rows = [
-                    qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
-                if store_rows:
-                    # To satisfy the `Withdrawn sanity check` in qb_status
-                    # the withdrawn row needs to match the last valid qb
-                    kwargs['qb_id'] = store_rows[-1].qb_id
-                    kwargs['qb_iteration'] = store_rows[-1].qb_iteration
-                    kwargs['qb_recur_id'] = store_rows[-1].qb_recur_id
-
-                store_rows.append(QBT(
-                    at=withdrawal_date,
-                    status='withdrawn',
-                    **kwargs))
+                j = 0
+                for qbt in pending_qbts:
+                    if qbt.at > withdrawal_date:
+                        break
+                    j += 1
+                if j > 0:
+                    # include visit in withdrawn for qb_status functionality
+                    kwargs['qb_id'] = pending_qbts[j-1].qb_id
+                    kwargs['qb_iteration'] = pending_qbts[j-1].qb_iteration
+                    kwargs['qb_recur_id'] = pending_qbts[j-1].qb_recur_id
+                store_rows = (
+                    pending_qbts[0:j] +
+                    [QBT(at=withdrawal_date, status='withdrawn', **kwargs)] +
+                    pending_qbts[j:])
                 check_for_overlaps(store_rows)
                 db.session.add_all(store_rows)
                 num_stored = len(store_rows)
@@ -1206,19 +1193,12 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
             db.session.commit()
 
             # With fresh calculation of a user's timeline, queue update of
-            # user's adherence data as celery job, avoiding recursive issues
-            # if this call happens to be part of an already running update
-            cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
-                patient_id=user_id,
-                research_study_id=research_study_id))
-            if not cache_moderation.run_recently():
-                kwargs = {
-                    'patient_id': user_id,
-                    'research_study_id': research_study_id}
-                celery = create_celery(current_app)
-                celery.send_task(
-                    'portal.tasks.cache_adherence_data_task',
-                    kwargs=kwargs)
+            # user's adherence data as celery job
+            kwargs = {
+                'patient_id': user_id,
+                'research_study_id': research_study_id}
+            cache_single_patient_adherence_data.apply_async(
+                kwargs=kwargs, queue=LOW_PRIORITY, retry=False)
 
     success = False
     for attempt in range(1, 6):
@@ -1264,8 +1244,7 @@ class QB_StatusCacheKey(object):
         # Lookup the configured expiration of the matching cache
         # container ("DOGPILE_CACHE_REGIONS" -> "assessment_cache_region")
         if self.redis is None:
-            self.redis = redis.StrictRedis.from_url(
-                current_app.config['REDIS_URL'])
+            self.redis = create_redis(current_app.config['REDIS_URL'])
         regions = current_app.config['DOGPILE_CACHE_REGIONS']
         for region_name, duration in regions:
             if region_name == self.region_name:
