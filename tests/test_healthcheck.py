@@ -29,21 +29,21 @@ class TestHealthcheck(TestCase):
         results = celery_available()
         assert results[0] is False
 
-    @patch('portal.views.healthcheck.redis')
+    @patch('portal.views.healthcheck.create_redis')
     def test_celery_beat_available_fails_when_redis_var_none(
         self,
-        redis_mock
+        create_redis_mock
     ):
-        redis_mock.from_url.return_value.get.return_value = None
+        create_redis_mock.return_value.get.return_value = None
         results = celery_beat_available()
         assert results[0] is False
 
-    @patch('portal.views.healthcheck.redis')
+    @patch('portal.views.healthcheck.create_redis')
     def test_celery_beat_available_succeeds_when_redis_var_set(
         self,
-        redis_mock
+        create_redis_mock
     ):
-        redis_mock.from_url.return_value.get.return_value = \
+        create_redis_mock.return_value.get.return_value = \
             str(datetime.now())
         results = celery_beat_available()
         assert results[0] is True
@@ -68,21 +68,21 @@ class TestHealthcheck(TestCase):
         results = postgresql_available()
         assert results[0] is False
 
-    @patch('portal.views.healthcheck.redis')
+    @patch('portal.views.healthcheck.create_redis')
     def test_redis_available_succeeds_when_ping_successful(
         self,
-        redis_mock
+        create_redis_mock
     ):
-        redis_mock.from_url.return_value.ping.return_value = True
+        create_redis_mock.return_value.ping.return_value = True
         results = redis_available()
         assert results[0] is True
 
-    @patch('portal.views.healthcheck.redis')
+    @patch('portal.views.healthcheck.create_redis')
     def test_redis_available_fails_when_ping_throws_exception(
         self,
-        redis_mock
+        create_redis_mock
     ):
-        redis_mock.from_url.return_value.ping.side_effect = \
+        create_redis_mock.return_value.ping.side_effect = \
             redis.ConnectionError()
         results = redis_available()
         assert results[0] is False
