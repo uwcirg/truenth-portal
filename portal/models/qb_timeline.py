@@ -764,6 +764,8 @@ def invalidate_users_QBT(user_id, research_study_id):
         if not current_app.config.get("TESTING", False):
             # clear the timeout lock as well, since we need a refresh
             # after deletion of the adherence data
+            # otherwise, we experience a deadlock situation where tables can't be dropped 
+            # between test runs, as postgres believes a deadlock condition exists
             cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
                 patient_id=user_id,
                 research_study_id=research_study_id))
