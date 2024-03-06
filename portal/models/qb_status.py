@@ -77,6 +77,11 @@ class QB_Status(object):
         # locate current qb - last found with start <= self.as_of_date
         cur_index, cur_qbd = None, None
         for i, qbd in zip(range(len(self.__ordered_qbs)), self.__ordered_qbs):
+            if self._withdrawal_date and (
+                    qbd.relative_start > self._withdrawal_date):
+                # as we now keep timeline data beyond withdrawal, break
+                # out if the requested date is beyond withdrawal
+                break
             if qbd.relative_start <= self.as_of_date:
                 cur_index = i
                 cur_qbd = qbd

@@ -555,6 +555,7 @@ def test_in_role(initialize_static, test_user):
     assert sm.quick_access_check(user)
 
 
+@pytest.mark.skip("no longer supporting moving initial trigger dates")
 def test_card_html_update(
         client, initialize_static, initialized_patient_logged_in):
     """Confirm assessment status state affects AE card on /home view"""

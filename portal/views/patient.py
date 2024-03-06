@@ -30,14 +30,13 @@ from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
-from ..models.reporting import single_patient_adherence_data
 from ..models.research_study import (
-    EMPRO_RS_ID,
     ResearchStudy,
     research_study_id_from_questionnaire
 )
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
+from ..models.user_consent import consent_withdrawal_dates
 from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 from .crossdomain import crossdomain
 from .demographics import demographics
@@ -331,6 +330,7 @@ def patient_timeline(patient_id):
     from ..models.questionnaire_bank import visit_name
     from ..models.questionnaire_response import aggregate_responses
     from ..models.research_protocol import ResearchProtocol
+    from ..tasks import cache_single_patient_adherence_data
     from ..trace import dump_trace, establish_trace
 
     user = get_user(patient_id, permission='view')
@@ -466,9 +466,11 @@ def patient_timeline(patient_id):
     if not adherence_data:
         # immediately following a cache purge, adherence data is gone and
         # needs to be recreated.
-        now = datetime.utcnow()
-        single_patient_adherence_data(
-            user, as_of_date=now, research_study_id=EMPRO_RS_ID)
+        kwargs = {
+            "patient_id": user.id,
+            "research_study_id": research_study_id,
+        }
+        cache_single_patient_adherence_data(**kwargs)
         adherence_data = sorted_adherence_data(patient_id, research_study_id)
 
     qnr_responses = aggregate_responses(
@@ -494,13 +496,20 @@ def patient_timeline(patient_id):
         i['auth_method'] = d['encounter']['auth_method']
         i['encounter_period'] = d['encounter']['period']
         i['document_authored'] = d['authored']
-        i['ae_session'] = d['identifier']['value']
+        try:
+            i['ae_session'] = d['identifier']['value']
+        except KeyError:
+            # happens with sub-study follow up, skip ae_session
+            pass
         i['status'] = d['status']
         i['org'] = d['subject']['careProvider'][0]['display']
         i['visit'] = d['timepoint']
         qnr_data.append(i)
 
+    consent_date, withdrawal_date = consent_withdrawal_dates(user, research_study_id)
+    consents = {"consent_date": consent_date, "withdrawal_date": withdrawal_date}
     kwargs = {
+        "consents": consents,
         "rps": rps,
         "status": status,
         "posted": posted,

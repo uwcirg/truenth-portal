@@ -165,7 +165,7 @@ def latest_consent(user, research_study_id):
         if no match is located
 
     """
-    # consents are ordered desc(acceptance_date)
+    # consents are ordered desc(id), i.e. most recent action first
     for consent in user.valid_consents:
         if consent.research_study_id != research_study_id:
             continue
@@ -197,7 +197,10 @@ def consent_withdrawal_dates(user, research_study_id):
         return consent.acceptance_date, withdrawal_date
 
     # Look for withdrawn case.  If found, also look up the previous
-    # consent date (prior to withdrawal)
+    # consent date (prior to withdrawal).  As withdrawal dates can
+    # be moved, continue to look back beyond all `suspended` until
+    # one of status deleted is found, as that would be the last one
+    # valid prior to withdrawal.
 
     prior_acceptance = None
     for consent in user.all_consents:
@@ -205,13 +208,15 @@ def consent_withdrawal_dates(user, research_study_id):
             continue
         if not withdrawal_date and (
                 consent.status == 'suspended' and not consent.deleted_id):
+            # the first or most recent withdrawal takes precedence.
             withdrawal_date = consent.acceptance_date
             if prior_acceptance:
                 raise ValueError(
                     "don't expect prior acceptance before withdrawal date")
         if consent.status == 'deleted' and withdrawal_date:
+            # the first deleted prior to any number of `suspended` is
+            # taken to be the most recent legit consent prior to withdrawal
             prior_acceptance = consent.acceptance_date
-            # situation where consent date was changed before withdrawal
-            # requires we continue to look and use last found (don't break!)
+            break
 
     return prior_acceptance, withdrawal_date
