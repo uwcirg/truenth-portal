@@ -157,6 +157,10 @@ class EmailMessage(db.Model):
         NB the cc isn't persisted with the rest of the record.
 
         """
+        if not self.recipients:
+            current_app.logger.error(
+                "can't email w/o recipients.  failed to send "
+                f"'{self.subject}' to user {self.recipient_id}")
         message = Message(
             subject=self.subject,
             extra_headers=extra_headers(),
