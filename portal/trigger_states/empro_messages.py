@@ -112,6 +112,9 @@ def staff_emails(patient, hard_triggers, initial_notification):
     }
     emails = []
     for staff in staff_list:
+        if not staff.email_ready():
+            current_app.logger.error(f"can't email staff {staff} without email")
+            continue
         mr = MailResource(
             app_text(app_text_name),
             locale_code=staff.locale_code,
