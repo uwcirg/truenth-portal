@@ -37,6 +37,7 @@ def patient_email(patient, soft_triggers, hard_triggers):
     mr = MailResource(
         app_text(name), locale_code=patient.locale_code, variables=args)
     em = EmailMessage(
+        recipient_id=patient.id,
         recipients=patient.email,
         sender=current_app.config['MAIL_DEFAULT_SENDER'],
         subject=mr.subject,
@@ -112,11 +113,15 @@ def staff_emails(patient, hard_triggers, initial_notification):
     }
     emails = []
     for staff in staff_list:
+        if not staff.email_ready():
+            current_app.logger.error(f"can't email staff {staff} without email")
+            continue
         mr = MailResource(
             app_text(app_text_name),
             locale_code=staff.locale_code,
             variables=args)
         emails.append(EmailMessage(
+            recipient_id=staff.id,
             recipients=staff.email,
             sender=current_app.config['MAIL_DEFAULT_SENDER'],
             subject=mr.subject,
