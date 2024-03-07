@@ -89,22 +89,24 @@ class QB_Status(object):
                 break
 
         # w/o a cur, probably hasn't started, set expired and leave
-        if not cur_qbd and (
-                self.__ordered_qbs[0].relative_start > self.as_of_date):
-            trace(
-                "no current QBD (too early); first qb doesn't start till"
-                " {} vs as_of {}".format(
-                    self.__ordered_qbs[0].relative_start, self.as_of_date))
+        if not cur_qbd:
+            if self.__ordered_qbs[0].relative_start > self.as_of_date:
+                trace(
+                    "no current QBD (too early); first qb doesn't start till"
+                    " {} vs as_of {}".format(
+                        self.__ordered_qbs[0].relative_start, self.as_of_date))
+            else:
+                current_app.logger.error(f"patient {self.user.id} w/o cur_qbd??")
             self._overall_status = OverallStatus.expired
             self.next_qbd = self.__ordered_qbs[0]
             return
 
-        if cur_index > 0:
+        if cur_index and cur_index > 0:
             self.prev_qbd = self.__ordered_qbs[cur_index-1]
         else:
             self.prev_qbd = None
 
-        if cur_index < len(self.__ordered_qbs) - 1:
+        if cur_index and cur_index < len(self.__ordered_qbs) - 1:
             self.next_qbd = self.__ordered_qbs[cur_index+1]
         else:
             self.next_qbd = None
