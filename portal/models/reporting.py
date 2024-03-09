@@ -22,7 +22,7 @@ from .organization import Organization, OrgTree
 from .overall_status import OverallStatus
 from .questionnaire_response import aggregate_responses
 from .qb_status import QB_Status
-from .qb_timeline import qb_status_visit_name
+from .qb_timeline import QBT, qb_status_visit_name
 from .questionnaire_bank import visit_name
 from .questionnaire_response import (
     QNR_results,
@@ -35,7 +35,7 @@ from .user import User, UserRoles, patients_query
 from .user_consent import consent_withdrawal_dates
 
 
-def single_patient_adherence_data(patient, as_of_date, research_study_id):
+def single_patient_adherence_data(patient_id, research_study_id):
     """Update any missing (from cache) adherence data for patient
 
     NB: all changes are side effects, persisted in adherence_data table.
@@ -48,8 +48,9 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
 
     :returns: number of added rows
     """
+    as_of_date = datetime.utcnow()
     cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
-        patient_id=patient.id,
+        patient_id=patient_id,
         research_study_id=research_study_id))
     if cache_moderation.run_recently():
         return 0
@@ -86,19 +87,22 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     def general_row_detail(row, patient, qbd):
         """Add general (either study) data for given (patient, qbd)"""
         # purge values that may have previous row data set and aren't certain
-        for key in "completion_date", "oow_completion_date", "entry_method":
+        for key in "oow_completion_date", "entry_method", "visit":
             row.pop(key, None)
 
         row['qb'] = qbd.questionnaire_bank.name
-        row['visit'] = visit_name(qbd)
-        if row['status'] == 'Completed':
-            row['completion_date'] = report_format(
-                qbd.completed_date(patient.id)) or ""
-            row['oow_completion_date'] = report_format(
-                qbd.oow_completed_date(patient.id)) or ""
+
+        # if withdrawn, include a row with that and little more
         if row['status'] == 'Withdrawn':
-            # visit unreliable when withdrawn - clear
-            row['visit'] = ''
+            # use date of withdrawal for "completion date"
+            _, withdrawal_date = consent_withdrawal_dates(
+                user=patient, research_study_id=research_study_id)
+            row['completion_date'] = report_format(withdrawal_date)
+            return
+        row['visit'] = visit_name(qbd)
+        row['completion_date'] = (
+            report_format(qbd.completed_date(patient.id))
+            if row['status'] == 'Completed' else '')
         entry_method = QNR_results(
             patient,
             research_study_id=research_study_id,
@@ -109,6 +113,9 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
 
     def empro_row_detail(row, ts_reporting):
         """Add EMPRO specifics"""
+        if not ts_reporting:
+            return
+
         # Rename column header for EMPRO
         if 'completion_date' in row:
             row['EMPRO_questionnaire_completion_date'] = (
@@ -135,6 +142,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
         row['content_domains_accessed'] = ', '.join(da) if da else ""
 
     added_rows = 0
+    patient = User.query.get(patient_id)
     qb_stats = QB_Status(
         user=patient,
         research_study_id=research_study_id,
@@ -152,20 +160,30 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
     # build up data until we find valid cache for patient's history
     status = str(qb_stats.overall_status)
     row = patient_data(patient)
+    row["status"] = status
     if status == "Expired" and research_study_id == EMPRO_RS_ID:
-        row["status"] = "Not Yet Available"
-    else:
-        row["status"] = status
+        # Expired status ambiguous for EMPRO study.
+        # - If the last available questionnaire in the study is present in
+        #   the user's timeline and the expired date has passed, it is
+        #   legitimately "Expired".
+        # - Otherwise, due to complex business rules around delayed
+        #   start/availability mark as "Not Yet Available"
+        exp_row = QBT.query.filter(QBT.research_study_id == EMPRO_RS_ID).filter(
+            QBT.user_id == patient.id).filter(
+            QBT.status == 'expired').filter(
+            QBT.qb_iteration == 10).first()  # baseline is 1, 11 iterations base 0
+        if not exp_row or exp_row.at > as_of_date:
+            row["status"] = "Not Yet Available"
 
+    ts_reporting = (
+        TriggerStatesReporting(patient_id=patient.id)
+        if research_study_id == EMPRO_RS_ID else None)
     if last_viable:
         general_row_detail(row, patient, last_viable)
-        if research_study_id == EMPRO_RS_ID:
-            # Initialize trigger states reporting for patient
-            ts_reporting = TriggerStatesReporting(patient_id=patient.id)
-            empro_row_detail(row, ts_reporting)
+        empro_row_detail(row, ts_reporting)
 
-        # latest is only valid for a week, unless the user withdrew
-        valid_for = 500 if row['status'] in ('Expired', 'Withdrawn') else 7
+        # latest is only valid for a day, unless the user withdrew
+        valid_for = 30 if row['status'] in ('Expired', 'Withdrawn') else 1
         AdherenceData.persist(
             patient_id=patient.id,
             rs_id_visit=rs_visit,
@@ -173,24 +191,60 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             data=row)
         added_rows += 1
 
+        # if the last row was withdrawn, add any completed visits beyond
+        # date of withdrawal
+        if row["status"] == 'Withdrawn':
+            withdrawal_date = (
+                row['completion_date'] if 'completion_date' in row
+                else row['EMPRO_questionnaire_completion_date'])
+            missing_qbts = []
+            completed_after_withdrawn = QBT.query.filter(
+                QBT.at > withdrawal_date).filter(
+                QBT.status == OverallStatus.completed).filter(
+                QBT.research_study_id == research_study_id).filter(
+                QBT.user_id == patient.id).order_by(QBT.at)
+            for qbt in completed_after_withdrawn:
+                missing_qbts.append((qbt.at, qbt.qbd()))
+
+            # one more special case!  the withdrawn visit was completed
+            # but BEFORE the user withdrew.  the qb_status accurately sees
+            # the visit as withdrawn, and wrote that to the last row, but
+            # failed to write out the completed status first.
+            pre_wd_visit_cd = last_viable.completed_date(patient.id)
+            if pre_wd_visit_cd and not [
+                    x for x, y in missing_qbts if x == pre_wd_visit_cd]:
+                missing_qbts.append((pre_wd_visit_cd, last_viable))
+
+            for at, qbd in missing_qbts:
+                row['status'] = 'Completed'  # overwrite withdrawn state
+                general_row_detail(row, patient, qbd)
+                empro_row_detail(row, ts_reporting)
+                rs_visit = AdherenceData.rs_visit_string(
+                    research_study_id, row['visit'], post_withdrawn=True)
+                AdherenceData.persist(
+                    patient_id=patient.id,
+                    rs_id_visit=rs_visit,
+                    valid_for_days=30,
+                    data=row)
+                added_rows += 1
+
     # as we require a full history, continue to add rows for each previous
     for qbd, status in qb_stats.older_qbds(last_viable):
         rs_visit = AdherenceData.rs_visit_string(
             research_study_id, visit_name(qbd))
-        # once we find cached_data, the rest of the user's history is good
+        # once we find cached_data, the rest of the user's history is likely
+        # good, but best to verify nothing is stale
         if AdherenceData.fetch(patient_id=patient.id, rs_id_visit=rs_visit):
-            break
+            continue
 
         historic = row.copy()
         historic['status'] = status
         general_row_detail(historic, patient, qbd)
-
-        if research_study_id == EMPRO_RS_ID:
-            empro_row_detail(historic, ts_reporting)
+        empro_row_detail(historic, ts_reporting)
         AdherenceData.persist(
             patient_id=patient.id,
             rs_id_visit=rs_visit,
-            valid_for_days=500,
+            valid_for_days=30,
             data=historic)
         added_rows += 1
 
@@ -223,7 +277,7 @@ def single_patient_adherence_data(patient, as_of_date, research_study_id):
             AdherenceData.persist(
                 patient_id=patient.id,
                 rs_id_visit=rs_visit,
-                valid_for_days=500,
+                valid_for_days=30,
                 data=indef)
             added_rows += 1
 
@@ -256,12 +310,13 @@ def cache_adherence_data(
       if limit was hit
 
     """
+    from ..tasks import cache_single_patient_adherence_data
     # For building cache, use system account; skip privilege checks
     acting_user = User.query.filter_by(email='__system__').one()
     as_of_date = datetime.utcnow()
 
     # Purge any rows that have or will soon expire
-    valid = (as_of_date + timedelta(days=1))
+    valid = (as_of_date + timedelta(hours=1))
     AdherenceData.query.filter(AdherenceData.valid_till < valid).delete()
     db.session.commit()
 
@@ -284,11 +339,16 @@ def cache_adherence_data(
 
     added_rows = 0
     for patient in patient_generator():
-        if added_rows > limit:
+        if limit and added_rows > limit:
             current_app.logger.info(
                 "pre-mature exit caching adherence data having hit limit")
             break
-        single_patient_adherence_data(patient, as_of_date, research_study_id)
+        # queue patient's adherence cache refresh as a separate job
+        kwargs = {
+            'patient_id': patient.id,
+            'research_study_id': research_study_id}
+        cache_single_patient_adherence_data.apply_async(
+            kwargs=kwargs, retry=False)
 
     return {'added': added_rows, 'limit_hit': limit and added_rows > limit}
 

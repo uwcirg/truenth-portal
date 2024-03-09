@@ -765,7 +765,9 @@ def withdraw_user_consent(user_id):
     Used to withdraw a consent agreements between a user and an organization.
     If a consent exists for the given user/org, the consent will be marked
     deleted, and a matching consent (with new status/option values) will be
-    created in its place.
+    created in its place.  If the user was already withdrawn, a new row will
+    be created also with status `suspended`, the prior will retain its
+    `suspended` status and marked deleted.
 
     NB Invalid to request a withdrawal date prior to current consent.
 
@@ -891,8 +893,18 @@ def withdraw_consent(
             if acceptance_date > datetime.utcnow() + timedelta(days=1):
                 raise ValueError(
                     "Can't suspend with acceptance date in the future")
+            prior_withdrawal_date = wc.acceptance_date
             wc.acceptance_date = acceptance_date
             db.session.commit()
+            # Audit the change
+            auditable_event(
+                f"Consent agreement {wc.id} updated from {prior_withdrawal_date} "
+                f"to {acceptance_date}",
+                user_id=current_user().id,
+                subject_id=user.id,
+                context="consent"
+            )
+
             # As withdrawal time just changed, force recalculation
             invalidate_users_QBT(
                 user_id=user.id, research_study_id=research_study_id)

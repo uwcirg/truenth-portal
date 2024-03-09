@@ -14,13 +14,13 @@ from traceback import format_exc
 
 from celery.utils.log import get_task_logger
 from flask import current_app
-import redis
 from requests import Request, Session
 from requests.exceptions import RequestException
 from sqlalchemy import and_
 
 from .database import db
 from .factories.app import create_app
+from .factories.redis import create_redis
 from .factories.celery import create_celery
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
@@ -32,6 +32,7 @@ from .models.reporting import (
     cache_adherence_data,
     generate_and_send_summaries,
     research_report,
+    single_patient_adherence_data,
 )
 from .models.research_study import ResearchStudy
 from .models.role import ROLE, Role
@@ -113,7 +114,14 @@ def info():
     queue=LOW_PRIORITY)
 @scheduled_task
 def cache_adherence_data_task(**kwargs):
+    """Queues up all patients needing a cache refresh"""
     return cache_adherence_data(**kwargs)
+
+
+@celery.task(queue=LOW_PRIORITY, ignore_results=True)
+def cache_single_patient_adherence_data(**kwargs):
+    """Populates adherence data for a single patient"""
+    return single_patient_adherence_data(**kwargs)
 
 
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
@@ -393,7 +401,7 @@ def token_watchdog(**kwargs):
 def celery_beat_health_check(**kwargs):
     """Refreshes self-expiring redis value for /healthcheck of celerybeat"""
 
-    rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
+    rs = create_redis(current_app.config['REDIS_URL'])
     return rs.setex(
         name='last_celery_beat_ping',
         time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
@@ -406,7 +414,7 @@ def celery_beat_health_check(**kwargs):
 def celery_beat_health_check_low_priority_queue(**kwargs):
     """Refreshes self-expiring redis value for /healthcheck of celerybeat"""
 
-    rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
+    rs = create_redis(current_app.config['REDIS_URL'])
     return rs.setex(
         name='last_celery_beat_ping_low_priority_queue',
         time=10*current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],

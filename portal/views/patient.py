@@ -30,9 +30,13 @@ from ..models.qb_timeline import QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
-from ..models.research_study import ResearchStudy
+from ..models.research_study import (
+    ResearchStudy,
+    research_study_id_from_questionnaire
+)
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
+from ..models.user_consent import consent_withdrawal_dates
 from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 from .crossdomain import crossdomain
 from .demographics import demographics
@@ -313,6 +317,7 @@ def patient_timeline(patient_id):
     :param research_study_id: set to alternative research study ID - default 0
     :param trace: set 'true' to view detailed logs generated, works best in
       concert with purge
+    :param only: set to filter all results but top level attribute given
 
     """
     from ..date_tools import FHIR_datetime, RelativeDelta
@@ -323,7 +328,9 @@ def patient_timeline(patient_id):
     from ..models.qbd import QBD
     from ..models.qb_status import QB_Status
     from ..models.questionnaire_bank import visit_name
+    from ..models.questionnaire_response import aggregate_responses
     from ..models.research_protocol import ResearchProtocol
+    from ..tasks import cache_single_patient_adherence_data
     from ..trace import dump_trace, establish_trace
 
     user = get_user(patient_id, permission='view')
@@ -341,6 +348,7 @@ def patient_timeline(patient_id):
         # questionnaire_response : qb relationships and remove cache lock
         # on adherence data.
         if purge == 'all':
+            # remove adherence cache key to allow fresh run
             cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
                 patient_id=patient_id,
                 research_study_id=research_study_id))
@@ -455,18 +463,69 @@ def patient_timeline(patient_id):
         status['indefinite status'] = indef_status
 
     adherence_data = sorted_adherence_data(patient_id, research_study_id)
+    if not adherence_data:
+        # immediately following a cache purge, adherence data is gone and
+        # needs to be recreated.
+        kwargs = {
+            "patient_id": user.id,
+            "research_study_id": research_study_id,
+        }
+        cache_single_patient_adherence_data(**kwargs)
+        adherence_data = sorted_adherence_data(patient_id, research_study_id)
 
+    qnr_responses = aggregate_responses(
+        instrument_ids=None,
+        current_user=current_user(),
+        research_study_id=research_study_id,
+        patch_dstu2=True,
+        ignore_qb_requirement=True,
+        patient_ids=[patient_id]
+    )
+    # filter qnr data to a manageable result data set
+    qnr_data = []
+    for row in qnr_responses['entry']:
+        i = {}
+        d = row['resource']
+        i['questionnaire'] = d['questionnaire']['reference'].split('/')[-1]
+
+        # qnr_responses return all.  filter to requested research_study
+        study_id = research_study_id_from_questionnaire(i['questionnaire'])
+        if study_id != research_study_id:
+            continue
+
+        i['auth_method'] = d['encounter']['auth_method']
+        i['encounter_period'] = d['encounter']['period']
+        i['document_authored'] = d['authored']
+        try:
+            i['ae_session'] = d['identifier']['value']
+        except KeyError:
+            # happens with sub-study follow up, skip ae_session
+            pass
+        i['status'] = d['status']
+        i['org'] = d['subject']['careProvider'][0]['display']
+        i['visit'] = d['timepoint']
+        qnr_data.append(i)
+
+    consent_date, withdrawal_date = consent_withdrawal_dates(user, research_study_id)
+    consents = {"consent_date": consent_date, "withdrawal_date": withdrawal_date}
+    kwargs = {
+        "consents": consents,
+        "rps": rps,
+        "status": status,
+        "posted": posted,
+        "timeline": results,
+        "adherence_data": adherence_data,
+        "qnr_data": qnr_data
+    }
     if trace:
-        return jsonify(
-            rps=rps,
-            status=status,
-            posted=posted,
-            timeline=results,
-            adherence_data=adherence_data,
-            trace=dump_trace("END time line lookup"))
-    return jsonify(
-        rps=rps, status=status, posted=posted, timeline=results,
-        adherence_data=adherence_data)
+        kwargs["trace"] = dump_trace("END time line lookup")
+
+    only = request.args.get('only', False)
+    if only:
+        if only not in kwargs:
+            raise ValueError(f"{only} not in {kwargs.keys()}")
+        return jsonify(only, kwargs[only])
+    return jsonify(**kwargs)
 
 
 @patient_api.route('/api/patient/<int:patient_id>/timewarp/<int:days>')

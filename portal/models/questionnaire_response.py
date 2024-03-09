@@ -842,7 +842,7 @@ class QNR_indef_results(QNR_results):
 
 def aggregate_responses(
         instrument_ids, current_user, research_study_id, patch_dstu2=False,
-        ignore_qb_requirement=False, celery_task=None):
+        ignore_qb_requirement=False, celery_task=None, patient_ids=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
@@ -852,13 +852,19 @@ def aggregate_responses(
     :param patch_dstu2: set to make bundle DSTU2 compliant
     :param ignore_qb_requirement: set to include all questionnaire responses
     :param celery_task: if defined, send occasional progress updates
+    :param patient_ids: if defined, limit result set to given patient list
 
+    NB: research_study_id not used to filter / restrict query set, but rather
+    for lookup of visit name.  Use instrument_ids to restrict query set.
     """
     from .qb_timeline import qb_status_visit_name  # avoid cycle
 
     # Gather up the patient IDs for whom current user has 'view' permission
     user_ids = patients_query(
-        current_user, include_test_role=False).with_entities(User.id)
+        current_user,
+        include_test_role=False,
+        filter_by_ids=patient_ids,
+    ).with_entities(User.id)
 
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.filter(
@@ -920,7 +926,7 @@ def aggregate_responses(
                 'resource': document,
                 # Todo: return URL to individual QuestionnaireResponse resource
                 'fullUrl': url_for(
-                    '.assessment',
+                    'assessment_engine_api.assessment',
                     patient_id=subject.id,
                     _external=True,
                 ),
@@ -1211,3 +1217,76 @@ def first_last_like_qnr(qnr):
             continue
         last = q
     return initial, last
+
+
+def capture_patient_state(patient_id):
+    """Call to capture QBT and QNR state for patient, used for before/after"""
+    from .qb_timeline import QBT
+    qnrs = QuestionnaireResponse.qnr_state(patient_id)
+    tl = QBT.timeline_state(patient_id)
+    return {'qnrs': qnrs, 'timeline': tl}
+
+
+def present_before_after_state(user_id, external_study_id, before_state):
+    from .qb_timeline import QBT
+    from ..dict_tools import dict_compare
+    after_qnrs = QuestionnaireResponse.qnr_state(user_id)
+    after_timeline = QBT.timeline_state(user_id)
+    qnrs_lost_reference = []
+    any_change_noted = False
+
+    def visit_from_timeline(qb_name, qb_iteration, timeline_results):
+        """timeline results have computed visit name - quick lookup"""
+        for visit, name, iteration in timeline_results.values():
+            if qb_name == name and qb_iteration == iteration:
+                return visit
+        raise ValueError(f"no visit found for {qb_name}, {qb_iteration}")
+
+    # Compare results
+    added_q, removed_q, modified_q, same = dict_compare(
+        after_qnrs, before_state['qnrs'])
+    assert not added_q
+    assert not removed_q
+
+    added_t, removed_t, modified_t, same = dict_compare(
+        after_timeline, before_state['timeline'])
+
+    if any((added_t, removed_t, modified_t, modified_q)):
+        any_change_noted = True
+        print(f"\nPatient {user_id} ({external_study_id}):")
+    if modified_q:
+        any_change_noted = True
+        print("\tModified QNRs (old, new)")
+        for mod in sorted(modified_q):
+            print(f"\t\t{mod} {modified_q[mod][1]} ==>"
+                  f" {modified_q[mod][0]}")
+            # If the QNR previously had a reference QB and since
+            # lost it, capture for reporting.
+            if (
+                    modified_q[mod][1][0] != "none of the above" and
+                    modified_q[mod][0][0] == "none of the above"):
+                visit_name = visit_from_timeline(
+                    modified_q[mod][1][0],
+                    modified_q[mod][1][1],
+                    before_state["timeline"])
+                qnrs_lost_reference.append((visit_name, modified_q[mod][1][2]))
+    if added_t:
+        any_change_noted = True
+        print("\tAdditional timeline rows:")
+        for item in sorted(added_t):
+            print(f"\t\t{item} {after_timeline[item]}")
+    if removed_t:
+        any_change_noted = True
+        print("\tRemoved timeline rows:")
+        for item in sorted(removed_t):
+            print(
+                f"\t\t{item} "
+                f"{before_state['timeline'][item]}")
+    if modified_t:
+        any_change_noted = True
+        print(f"\tModified timeline rows: (old, new)")
+        for item in sorted(modified_t):
+            print(f"\t\t{item}")
+            print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
+
+    return after_qnrs, after_timeline, qnrs_lost_reference, any_change_noted

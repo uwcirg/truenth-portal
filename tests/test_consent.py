@@ -109,11 +109,11 @@ class TestUserConsent(TestCase):
             '/api/user/{}/consent'.format(TEST_USER_ID))
         assert response.status_code == 200
         assert len(response.json['consent_agreements']) == 3
-        # should be ordered by acceptance date, descending: (uc3, uc1, uc2)
+        # regardless of age, most recent action takes precedence
         uc1, uc2, uc3 = map(db.session.merge, (uc1, uc2, uc3))
         assert response.json['consent_agreements'][0] == uc3.as_json()
-        assert response.json['consent_agreements'][1] == uc1.as_json()
-        assert response.json['consent_agreements'][2] == uc2.as_json()
+        assert response.json['consent_agreements'][1] == uc2.as_json()
+        assert response.json['consent_agreements'][2] == uc1.as_json()
 
     def test_post_user_consent(self):
         self.shallow_org_tree()

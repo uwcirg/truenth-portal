@@ -11,6 +11,7 @@ Usage:
     $cmdname [-h] [-b] [-n]
     -h     Show this help message
     -b     Backup current database before attempting update
+    -f     Ignore recent activity check before attempting restart
     -n     Do not pull docker images prior to starting
 
     Docker deployment script

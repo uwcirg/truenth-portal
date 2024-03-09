@@ -1,8 +1,8 @@
 import time
 
 from flask import current_app
-import redis
 
+from .factories.redis import create_redis
 
 class LockTimeout(BaseException):
     """Exception raised when wait for TimeoutLock exceeds timeout"""
@@ -31,8 +31,7 @@ class TimeoutLock(object):
         self.key = key
         self.timeout = timeout
         self.expires = expires
-        self.redis = redis.StrictRedis.from_url(
-            current_app.config['REDIS_URL'])
+        self.redis = create_redis(current_app.config['REDIS_URL'])
 
     def __enter__(self):
         timeout = self.timeout
@@ -102,11 +101,10 @@ ADHERENCE_DATA_KEY = "adherence_data_generated_for:{patient_id}:{research_study_
 class CacheModeration(object):
     """Redis key implementation to prevent same key from excessive updates"""
 
-    def __init__(self, key, timeout=3600):
+    def __init__(self, key, timeout=300):
         self.key = key
         self.timeout = timeout
-        self.redis = redis.StrictRedis.from_url(
-            current_app.config['REDIS_URL'])
+        self.redis = create_redis(current_app.config['REDIS_URL'])
 
     def run_recently(self):
         """if key has value in redis (i.e. didn't expire) return value"""
