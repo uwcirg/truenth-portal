@@ -268,6 +268,7 @@ def rebuild_trigger_states(patient):
     from ..models.qb_status import patient_research_study_status
     from ..models.qb_timeline import QBT, update_users_QBT
     from ..models.research_study import BASE_RS_ID, EMPRO_RS_ID
+    from ..models.user_consent import consent_withdrawal_dates
 
     # Use the timeline data for accurate start dates, etc.
     update_users_QBT(user_id=patient.id, research_study_id=EMPRO_RS_ID)
@@ -296,8 +297,19 @@ def rebuild_trigger_states(patient):
         # no trigger state data to move, no problem.
         return
 
+    consent_date, wd_date = consent_withdrawal_dates(patient, EMPRO_RS_ID)
+    month0_dues = [d for d in data if d.visit_month == 0 and d.state == 'due']
+    if len(month0_dues) != 1:
+        raise ValueError(f"{patient.id} failed to find trigger_states due row for month 0")
+    if (consent_date < month0_dues[0].timestamp) and (
+            month0_dues[0].timestamp < consent_date + timedelta(days=30)):
+        # if the user's month 0 due is within 30 days of consent, don't shift
+        return
+
     # purge rows and rebuild below
     # TODO TriggerState.delete and rebuild
+    current_app.logging.error(
+        f"{patient.id} trigger_states out of sync with qb_timeline; requires attention!")
     raise NotImplemented(f"can not adjust trigger_states for {patient.id}")
 
     if len([c for c in patient.clinicians]) == 0:
