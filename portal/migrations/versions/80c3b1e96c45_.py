@@ -1,7 +1,7 @@
 """Add sequential hard trigger count to EMPRO trigger_states.triggers domains.
 
 Revision ID: 80c3b1e96c45
-Revises: 2e9b9e696bb8
+Revises: 3c871e710277
 Create Date: 2023-07-24 17:08:35.128975
 
 """
@@ -9,6 +9,7 @@ from collections import defaultdict
 from copy import deepcopy
 from alembic import op
 from io import StringIO
+import logging
 from sqlalchemy.orm import sessionmaker
 from portal.database import db
 from portal.trigger_states.empro_domains import (
@@ -19,9 +20,12 @@ from portal.trigger_states.models import TriggerState
 
 # revision identifiers, used by Alembic.
 revision = '80c3b1e96c45'
-down_revision = '66368e673005'
+down_revision = '3c871e710277'
 
 Session = sessionmaker()
+
+log = logging.getLogger("alembic.runtime.migration")
+log.setLevel(logging.DEBUG)
 
 
 def upgrade():
@@ -61,9 +65,10 @@ def upgrade():
             for d in EMPRO_DOMAINS:
                 sequential_hard_for_this_domain = 0
                 if d not in improved_triggers["domain"]:
-                    # only seen on test, fill in the missing domain
-                    print(f"missing {d} in {pid}:{ts.visit_month}?")
-                    improved_triggers["domain"][d] = {}
+                    # shouldn't happen, SDC typically includes all domains
+                    # but a few records are lacking
+                    log.warning(f"{pid} missing domain {d} in {ts.visit_month} response")
+                    continue
 
                 if any(v == "hard" for v in improved_triggers["domain"][d].values()):
                     sequential_by_domain[d].append(ts.visit_month)
@@ -110,7 +115,8 @@ def downgrade():
             improved_triggers = deepcopy(ts.triggers)
             for d in EMPRO_DOMAINS:
                 if d not in improved_triggers["domain"]:
-                    raise RuntimeError(f"{d} missing from {ts.visit_month} for {pid}")
+                    log.warning(f"{d} missing from {ts.id}(month: {ts.visit_month}) for {pid}")
+                    continue
                 if sequential_hard_trigger_count_key in improved_triggers["domain"][d]:
                     del improved_triggers["domain"][d][sequential_hard_trigger_count_key]
                     output.write(f"  removed sequential from {ts.visit_month}:{d} {improved_triggers['domain'][d]}\n")
