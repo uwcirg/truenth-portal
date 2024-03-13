@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import make_transient
 
@@ -254,3 +255,79 @@ class TriggerStatesReporting:
         ts = self.latest_by_visit[visit_month]
         if ts:
             return ts.soft_trigger_list()
+
+
+def rebuild_trigger_states(patient):
+    """If a user's consent moves, need to re-build the trigger states for user
+
+    Especially messy process, as much of the data lives in the trigger_states
+    table alone, and a consent change may modify start eligibility, etc.
+    """
+    from .empro_states import initiate_trigger
+    from ..models.overall_status import OverallStatus
+    from ..models.qb_status import patient_research_study_status
+    from ..models.qb_timeline import QBT, update_users_QBT
+    from ..models.research_study import BASE_RS_ID, EMPRO_RS_ID
+
+    # Use the timeline data for accurate start dates, etc.
+    update_users_QBT(user_id=patient.id, research_study_id=EMPRO_RS_ID)
+    tl_query = QBT.query.filter(QBT.user_id == patient.id).filter(
+        QBT.research_study_id == EMPRO_RS_ID).order_by(QBT.id)
+    if not tl_query.count():
+        # User has no timeline data for EMPRO, likely not eligible
+        if TriggerState.query.filter(TriggerState.user_id == patient.id).count():
+            current_app.logging.error(f"no EMPRO timeline, yet trigger_states rows for {patient.id}")
+        return
+
+    # Capture state in memory for potential reuse when rebuilding
+    data = []
+    for row in TriggerState.query.filter(
+            TriggerState.user_id == patient.id).order_by(TriggerState.id):
+        data.append({
+            'id': row.id,
+            'state': row.state,
+            'timestamp': row.timestamp,
+            'questionnaire_response_id': row.questionnaire_response_id,
+            'triggers': row.triggers,
+            'visit_month': row.visit_month,
+            })
+
+    if not data:
+        # no trigger state data to move, no problem.
+        return
+
+    # purge rows and rebuild below
+    # TODO TriggerState.delete and rebuild
+    raise NotImplemented(f"can not adjust trigger_states for {patient.id}")
+
+    if len([c for c in patient.clinicians]) == 0:
+        # No valid trigger states without a clinician
+        return
+
+    visit_month = -1
+    for row in tl_query:
+        if row.status == OverallStatus.due:
+            # reset any state for next visit:
+            visit_month += 1
+            conclude_as_expired = False
+
+            # 'due' row starts when they became eligible
+            as_of_date = row.at
+            study_status = patient_research_study_status(
+                patient=patient, as_of_date=as_of_date, skip_initiate=True)
+
+            if study_status[BASE_RS_ID]['ready']:
+                # user had unfinished global work at said point in time.
+                # check if they complete before the current visit expires
+                basestudy_query = QBT.query.filter(QBT.user_id == patient.id).filter(
+                    QBT.research_study_id == BASE_RS_ID).filter(
+                    QBT.at.between(as_of_date, as_of_date+timedelta(days=30))).filter(
+                    QBT.status == OverallStatus.completed).first()
+                if basestudy_query:
+                    # user finished global work on time, start the visit then
+                    as_of_date = basestudy_query.as_of_date
+                else:
+                    # user was never able to submit visit for given empro month.
+                    # stick with initial start date and let it resolve as expired
+                    conclude_as_expired = True
+            initiate_trigger(patient.id, as_of_date=as_of_date, rebuilding=True)
