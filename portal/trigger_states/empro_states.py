@@ -95,6 +95,7 @@ def users_trigger_state(user_id, as_of_date=None):
     if as_of_date is None:
         as_of_date = datetime.utcnow()
 
+    ts = None
     rows = TriggerState.query.filter(
         TriggerState.user_id == user_id).order_by(
         TriggerState.timestamp.desc())
