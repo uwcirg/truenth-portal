@@ -12,13 +12,10 @@ from statemachine import StateMachine, State
 from statemachine.exceptions import TransitionNotAllowed
 
 from .empro_domains import DomainManifold
-from .empro_messages import patient_email, staff_emails
+from .empro_messages import invite_email, patient_email, staff_emails
 from .models import TriggerState
 from ..database import db
 from ..date_tools import FHIR_datetime
-from ..models.app_text import MailResource, app_text
-from ..models.communication import load_template_args
-from ..models.message import EmailMessage
 from ..models.qb_status import QB_Status
 from ..models.qbd import QBD
 from ..models.questionnaire_bank import QuestionnaireBank
@@ -81,7 +78,7 @@ class EMPRO_state(StateMachine):
     next_available = resolved.to(due)
 
 
-def users_trigger_state(user_id):
+def users_trigger_state(user_id, as_of_date=None):
     """Obtain the latest trigger state for given user
 
     Returns latest TriggerState row for user or creates transient if not
@@ -95,11 +92,22 @@ def users_trigger_state(user_id):
       - triggered: triggers available in TriggerState.triggers attribute
 
     """
-    ts = TriggerState.query.filter(
+    if as_of_date is None:
+        as_of_date = datetime.utcnow()
+
+    ts = None
+    rows = TriggerState.query.filter(
         TriggerState.user_id == user_id).order_by(
-        TriggerState.timestamp.desc()).first()
+        TriggerState.timestamp.desc())
+    for ts_row in rows:
+        # most recent with a timestamp prior to as_of_date, in case this is a rebuild
+        if as_of_date < ts_row.timestamp:
+            continue
+        ts = ts_row
+        break
+
     if not ts:
-        ts = TriggerState(user_id=user_id, state='unstarted')
+        ts = TriggerState(user_id=user_id, state='unstarted', timestamp=as_of_date)
 
     return ts
 
@@ -115,19 +123,22 @@ def lookup_visit_month(user_id, as_of_date):
     return one_index - 1
 
 
-def initiate_trigger(user_id):
+def initiate_trigger(user_id, as_of_date=None, rebuilding=False):
     """Call when EMPRO becomes available for user or next is due"""
+    if as_of_date is None:
+        as_of_date = datetime.utcnow()
+
     ts = users_trigger_state(user_id)
     if ts.state == 'due':
         # Possible the user took no action, as in skipped the last month
         # (or multiple months may have been skipped if time-warping).
         # If so, the visit_month and timestamp are updated on the last
         # `due` row that was found above.
-        visit_month = lookup_visit_month(user_id, datetime.utcnow())
+        visit_month = lookup_visit_month(user_id, as_of_date)
         if ts.visit_month != visit_month:
             current_app.logger.warn(f"{user_id} skipped EMPRO visit {ts.visit_month}")
             ts.visit_month = visit_month
-            ts.timestamp = datetime.utcnow()
+            ts.timestamp = as_of_date
             db.session.commit()
 
         # Allow idempotent call - skip out if in correct state
@@ -143,7 +154,7 @@ def initiate_trigger(user_id):
         next_visit = int(ts.visit_month) + 1
         current_app.logger.debug(f"transition from {ts} to next due")
         # generate a new ts, to leave resolved record behind
-        ts = TriggerState(user_id=user_id, state='unstarted')
+        ts = TriggerState(user_id=user_id, state='unstarted', as_of_date=as_of_date)
         ts.visit_month = next_visit
         current_app.logger.debug(
             "persist-trigger_states-new from initiate_trigger(), "
@@ -159,27 +170,9 @@ def initiate_trigger(user_id):
             "persist-trigger_states-new from initiate_trigger(),"
             f"record historical clause {ts}")
 
-    # TN-2863 auto send invite when first available
-    if ts.visit_month == 0:
-        user = User.query.get(user_id)
-        args = load_template_args(user=user)
-        item = MailResource(
-            app_text("patient invite email IRONMAN EMPRO Study"),
-            locale_code=user.locale_code,
-            variables=args)
-        msg = EmailMessage(
-            subject=item.subject,
-            body=item.body,
-            recipients=user.email,
-            sender=current_app.config['MAIL_DEFAULT_SENDER'],
-            user_id=user_id)
-        try:
-            msg.send_message()
-        except SMTPRecipientsRefused as exc:
-            current_app.logger.error(
-                "Error sending EMPRO Invite to %s: %s",
-                user.email, exc)
-        db.session.add(msg)
+    # TN-2863 auto send invite when first available, unless rebuilding
+    if ts.visit_month == 0 and not rebuilding:
+        invite_email(User.query.get(user_id))
 
     db.session.commit()
     return ts
@@ -210,9 +203,18 @@ def evaluate_triggers(qnr):
         ts = users_trigger_state(qnr.subject_id)
         sm = EMPRO_state(ts)
 
+        # include previous month resolved row, if available
+        previous = TriggerState.query.filter(
+            TriggerState.user_id == qnr.subject_id).filter(
+            TriggerState.state == 'resolved').order_by(
+            TriggerState.timestamp.desc()).first()
+
         # bring together and evaluate available data for triggers
         dm = DomainManifold(qnr)
-        ts.triggers = dm.eval_triggers()
+        previous_triggers = (
+            previous if previous and previous.visit_month + 1 == ts.visit_month
+            else None)
+        ts.triggers = dm.eval_triggers(previous_triggers)
         ts.questionnaire_response_id = qnr.id
 
         # transition and persist state
@@ -225,10 +227,6 @@ def evaluate_triggers(qnr):
         # a submission closes the window of availability for the
         # post-intervention clinician follow up.  mark state if
         # one is found
-        previous = TriggerState.query.filter(
-            TriggerState.user_id == qnr.subject_id).filter(
-            TriggerState.state == 'resolved').order_by(
-            TriggerState.timestamp.desc()).first()
         if previous and previous.triggers.get('action_state') not in (
                 'completed', 'missed', 'not applicable', 'withdrawn'):
             triggers = copy.deepcopy(previous.triggers)
