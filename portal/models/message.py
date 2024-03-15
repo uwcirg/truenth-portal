@@ -116,6 +116,11 @@ class EmailMessage(db.Model):
     def recipients(self, value):
         """Set recipients_id if a user is found w/ matching email"""
 
+        if value is None:
+            self._recipients = None
+            self.recipient_id = None
+            return
+
         # As the schema only tracks a single recipient_id, capture abuse;
         # don't allow comma in recipients till schema can capture
         if ',' in value:
@@ -152,6 +157,10 @@ class EmailMessage(db.Model):
         NB the cc isn't persisted with the rest of the record.
 
         """
+        if not self.recipients:
+            current_app.logger.error(
+                "can't email w/o recipients.  failed to send "
+                f"'{self.subject}' to user {self.recipient_id}")
         message = Message(
             subject=self.subject,
             extra_headers=extra_headers(),

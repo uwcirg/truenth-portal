@@ -76,6 +76,7 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user = db.session.merge(self.test_user)
         self.test_user.organizations.append(crv)
+        self.add_system_user()
         update_users_QBT(TEST_USER_ID, research_study_id=0)
         # expect (due, overdue, expired) for each QB (8)
         assert QBT.query.filter(QBT.status == OverallStatus.due).count() == 8
@@ -98,6 +99,7 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
         mock_qr('epic26_v2', qb=threeMo, iteration=0)
 
         self.test_user = db.session.merge(self.test_user)
+        self.add_system_user()
         update_users_QBT(TEST_USER_ID, research_study_id=0)
 
         # for the 8 QBs and verify counts
@@ -129,6 +131,7 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
         mock_qr('epic26_v2', qb=threeMo, iteration=0, timestamp=post_overdue)
 
         self.test_user = db.session.merge(self.test_user)
+        self.add_system_user()
         update_users_QBT(TEST_USER_ID, research_study_id=0)
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
@@ -162,6 +165,7 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
             mock_qr(q.name, qb=threeMo, iteration=0, timestamp=nowish)
 
         self.test_user = db.session.merge(self.test_user)
+        self.add_system_user()
         update_users_QBT(TEST_USER_ID, research_study_id=0)
         # for the 8 QBs and verify counts
         # given the partial results, we find one in progress and one
@@ -201,6 +205,7 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
             qb_count += 1
 
         self.test_user = db.session.merge(self.test_user)
+        self.add_system_user()
         update_users_QBT(TEST_USER_ID, research_study_id=0)
 
         # prior to consent change, expect QNRs to have baseline association
@@ -226,9 +231,6 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
         assert (0 == QuestionnaireResponse.query.filter(
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
             QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
-
-        # QB_Status requires system user for audits
-        self.add_user(username='__system__')
 
         # update QBT should not re-establish baseline connection given dates
         self.test_user = db.session.merge(self.test_user)
@@ -268,6 +270,7 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
             qb_count += 1
 
         self.test_user = db.session.merge(self.test_user)
+        self.add_system_user()
         update_users_QBT(TEST_USER_ID, research_study_id=0)
 
         # prior to consent change, expect QNRs to have baseline association
@@ -294,9 +297,6 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
             QuestionnaireResponse.subject_id == TEST_USER_ID).filter(
             QuestionnaireResponse.questionnaire_bank_id.isnot(None)).count())
 
-        # QB_Status requires system user for audits
-        self.add_user(username='__system__')
-
         # update QBT should re-establish baseline connection
         self.test_user = db.session.merge(self.test_user)
         qbstatus = QB_Status(
@@ -309,7 +309,7 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
         assert qbstatus.overall_status == OverallStatus.completed
 
     def test_withdrawn(self):
-        # qbs should halt beyond withdrawal
+        # check qb_status post withdrawal
         crv = self.setup_org_qbs()
         crv_id = crv.id
         # consent 17 months in past
@@ -334,8 +334,9 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
         for n in (3, 6, 9, 15):
             assert visit_name(next(gen)) == 'Month {}'.format(n)
 
-        with pytest.raises(StopIteration):
-            next(gen)
+        # current should be withdrawn, subsequent avail in case
+        # post withdrawn results come in
+        assert visit_name(next(gen)) == 'Month 18'
 
         # Confirm withdrawn user can still access "current"
         # as needed for reporting
@@ -343,9 +344,10 @@ class TestQbTimeline(TestQuestionnaireBankFixture):
         qb_stats = QB_Status(
             user=user,
             research_study_id=0,
-            as_of_date=now)
+            as_of_date=now+relativedelta(days=1))
         current = qb_stats.current_qbd(even_if_withdrawn=True)
         assert current
+        assert qb_stats.overall_status == OverallStatus.withdrawn
 
     def test_change_midstream_rp(self):
         back7, nowish = associative_backdate(

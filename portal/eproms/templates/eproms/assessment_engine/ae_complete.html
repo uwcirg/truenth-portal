@@ -1,4 +1,4 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_card_content, render_call_to_button, completed_card, thankyou_card, empro_thankyou_card, empro_due, completed_cards -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_card_content, render_call_to_button, completed_card, thankyou_card, empro_thankyou_card, empro_due, empro_expired, completed_cards -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- User completed both baseline and indefinite -->
 {% block head %}
@@ -38,17 +38,24 @@
                 <div class="text-content">{{_("No questionnaire is due.")}}</div>
             {%- endcall -%}
         {%- else -%}
-            <!-- substudy due card -->
-            {{empro_due(
-                substudy_assessment_is_due=substudy_assessment_is_due,
-                assessment_status=assessment_status,
-                OverallStatus=OverallStatus,
-                substudy_assessment_status=substudy_assessment_status,
-                substudy_due_date=substudy_due_date,
-                enrolled_in_substudy=enrolled_in_substudy,
-                substudy_assessment_is_ready=substudy_assessment_is_ready,
-                substudy_assessment_errors=substudy_assessment_errors
-            )}}
+            {%- if substudy_assessment_status.overall_status == OverallStatus.expired -%}
+                {{empro_expired(
+                    user=user,
+                    substudy_assessment_status=substudy_assessment_status
+                )}}
+            {%- else -%}
+                <!-- substudy due card -->
+                {{empro_due(
+                    substudy_assessment_is_due=substudy_assessment_is_due,
+                    assessment_status=assessment_status,
+                    OverallStatus=OverallStatus,
+                    substudy_assessment_status=substudy_assessment_status,
+                    substudy_due_date=substudy_due_date,
+                    enrolled_in_substudy=enrolled_in_substudy,
+                    substudy_assessment_is_ready=substudy_assessment_is_ready,
+                    substudy_assessment_errors=substudy_assessment_errors
+                )}}
+            {%- endif -%}
         {%- endif -%}
         <!-- both main and sub-study completed -->
         {{completed_cards(

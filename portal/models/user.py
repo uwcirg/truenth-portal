@@ -323,7 +323,7 @@ class User(db.Model, UserMixin):
                                      cascade='delete')
     _consents = db.relationship(
         'UserConsent', lazy='joined', cascade='delete',
-        order_by="desc(UserConsent.acceptance_date)")
+        order_by="desc(UserConsent.id)")
     indigenous = db.relationship(Coding, lazy='dynamic',
                                  secondary="user_indigenous")
     encounters = db.relationship('Encounter', cascade='delete')

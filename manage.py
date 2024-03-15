@@ -21,6 +21,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from portal.audit import auditable_event
 from portal.date_tools import FHIR_datetime
+from portal.config.config_persistence import import_config
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db, user_manager
 from portal.factories.app import create_app
@@ -43,7 +44,11 @@ from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     add_static_questionnaire_bank,
 )
-from portal.models.questionnaire_response import QuestionnaireResponse
+from portal.models.questionnaire_response import (
+    QuestionnaireResponse,
+    capture_patient_state,
+    present_before_after_state,
+)
 from portal.models.relationship import add_static_relationships
 from portal.models.research_study import (
     BASE_RS_ID,
@@ -176,6 +181,20 @@ def seed(keep_unmentioned=False):
     # import site export file if found
     SitePersistence(target_dir=None).import_(
         keep_unmentioned=keep_unmentioned)
+
+
+@app.cli.command()
+def generate_site_cfg():
+    """Generate only the site.cfg file via site_persistence
+
+    Typically done via `sync` or `seed`, this option exists for the
+    backend job queues to generate the `site.cfg` file to maintain
+    consistent configuration with the front end, withou the overhead
+    of the rest of `sync`
+    """
+    app.logger.info("generate-site-cfg begin")
+    import_config(target_dir=None)
+    app.logger.info("generate-site-cfg complete")
 
 
 @click.option('--directory', '-d', default=None, help="Export directory")
@@ -596,94 +615,6 @@ def update_qnr(qnr_id, link_id, actor, noop, replacement):
     click.echo(message)
 
 
-@click.option('--subject_id', type=int, multiple=True, help="Subject user ID", required=True)
-@click.option(
-    '--actor',
-    default="__system__",
-    required=False,
-    help='email address of user taking this action, for audit trail'
-)
-@app.cli.command()
-def remove_post_withdrawn_qnrs(subject_id, actor):
-    """Remove QNRs posted beyond subject's withdrawal date"""
-    from sqlalchemy.types import DateTime
-    from portal.cache import cache
-    from portal.models.questionnaire_bank import trigger_date
-
-    rs_id = 0  # only base study till need arises
-    acting_user = get_actor(actor, require_admin=True)
-
-    for subject_id in subject_id:
-        # Confirm user has withdrawn
-        subject = get_target(id=subject_id)
-        study_id = subject.external_study_id
-
-        # Make sure we're not working w/ stale timeline data
-        QuestionnaireResponse.purge_qb_relationship(
-            subject_id=subject_id,
-            research_study_id=rs_id,
-            acting_user_id=acting_user.id)
-        cache.delete_memoized(trigger_date)
-        update_users_QBT(
-            subject_id,
-            research_study_id=rs_id,
-            invalidate_existing=True)
-
-        deceased_date = None if not subject.deceased else subject.deceased.timestamp
-        withdrawn_visit = QBT.withdrawn_qbd(subject_id, rs_id)
-        if not withdrawn_visit:
-            raise ValueError("Only applicable to withdrawn users")
-
-        # Obtain all QNRs submitted beyond withdrawal date
-        query = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.document["authored"].astext.cast(DateTime) >
-            withdrawn_visit.relative_start
-        ).filter(
-            QuestionnaireResponse.subject_id == subject_id).with_entities(
-            QuestionnaireResponse.id,
-            QuestionnaireResponse.questionnaire_bank_id,
-            QuestionnaireResponse.qb_iteration,
-            QuestionnaireResponse.document["questionnaire"]["reference"].
-                label("instrument"),
-            QuestionnaireResponse.document["authored"].
-                label("authored")
-        ).order_by(QuestionnaireResponse.document["authored"])
-
-        for qnr in query:
-            # match format in bug report for easy diff
-            sub_padding = " "*(11 - len(str(subject_id)))
-            stdy_padding = " "*(12 - len(study_id))
-            out = (
-                f"{sub_padding}{subject_id} | "
-                f"{study_id}{stdy_padding}| "
-                f"{withdrawn_visit.relative_start.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}    | "
-                f"{qnr.authored} | ")
-
-            # do not include any belonging to the last active visit, unless
-            # they came in after deceased date
-            if (
-                    qnr.questionnaire_bank_id == withdrawn_visit.qb_id and
-                    qnr.qb_iteration == withdrawn_visit.iteration and
-                    (not deceased_date or FHIR_datetime.parse(
-                        qnr.authored) < deceased_date)):
-                print(f"{out}keep")
-                continue
-            if "irondemog" in qnr.instrument:
-                print(f"{out}keep (indefinite)")
-                continue
-            print(f"{out}delete")
-            db.session.delete(QuestionnaireResponse.query.get(qnr.id))
-            auditable_event(
-                message=(
-                    "deleted questionnaire response submitted beyond "
-                    "withdrawal visit as per request by PCCTC"),
-                context="assessment",
-                user_id=acting_user.id,
-                subject_id=subject_id)
-        db.session.commit()
-    return
-
-
 @click.option('--src_id', type=int, help="Source Patient ID (WILL BE DELETED!)")
 @click.option('--tgt_id', type=int, help="Target Patient ID")
 @click.option(
@@ -787,71 +718,6 @@ def merge_users(src_id, tgt_id, actor):
         user_id=acting_user.id,
         subject_id=tgt_id)
     print(message)
-
-
-def capture_patient_state(patient_id):
-    """Call to capture QBT and QNR state for patient, used for before/after"""
-    qnrs = QuestionnaireResponse.qnr_state(patient_id)
-    tl = QBT.timeline_state(patient_id)
-    return {'qnrs': qnrs, 'timeline': tl}
-
-
-def present_before_after_state(user_id, external_study_id, before_state):
-    from portal.dict_tools import dict_compare
-    after_qnrs = QuestionnaireResponse.qnr_state(user_id)
-    after_timeline = QBT.timeline_state(user_id)
-    qnrs_lost_reference = []
-
-    def visit_from_timeline(qb_name, qb_iteration, timeline_results):
-        """timeline results have computed visit name - quick lookup"""
-        for visit, name, iteration in timeline_results.values():
-            if qb_name == name and qb_iteration == iteration:
-                return visit
-        raise ValueError(f"no visit found for {qb_name}, {qb_iteration}")
-
-    # Compare results
-    added_q, removed_q, modified_q, same = dict_compare(
-        after_qnrs, before_state['qnrs'])
-    assert not added_q
-    assert not removed_q
-
-    added_t, removed_t, modified_t, same = dict_compare(
-        after_timeline, before_state['timeline'])
-
-    if any((added_t, removed_t, modified_t, modified_q)):
-        print(f"\nPatient {user_id} ({external_study_id}):")
-    if modified_q:
-        print("\tModified QNRs (old, new)")
-        for mod in sorted(modified_q):
-            print(f"\t\t{mod} {modified_q[mod][1]} ==>"
-                  f" {modified_q[mod][0]}")
-            # If the QNR previously had a reference QB and since
-            # lost it, capture for reporting.
-            if (
-                    modified_q[mod][1][0] != "none of the above" and
-                    modified_q[mod][0][0] == "none of the above"):
-                visit_name = visit_from_timeline(
-                    modified_q[mod][1][0],
-                    modified_q[mod][1][1],
-                    before_state["timeline"])
-                qnrs_lost_reference.append((visit_name, modified_q[mod][1][2]))
-    if added_t:
-        print("\tAdditional timeline rows:")
-        for item in sorted(added_t):
-            print(f"\t\t{item} {after_timeline[item]}")
-    if removed_t:
-        print("\tRemoved timeline rows:")
-        for item in sorted(removed_t):
-            print(
-                f"\t\t{item} "
-                f"{before_state['timeline'][item]}")
-    if modified_t:
-        print(f"\tModified timeline rows: (old, new)")
-        for item in sorted(modified_t):
-            print(f"\t\t{item}")
-            print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
-
-    return after_qnrs, after_timeline, qnrs_lost_reference
 
 
 @app.cli.command()
@@ -974,7 +840,7 @@ def preview_site_update(org_id, retired):
         )
         update_users_QBT(
             patient.id, research_study_id=0, invalidate_existing=True)
-        after_qnrs, after_timeline, qnrs_lost_reference = present_before_after_state(
+        after_qnrs, after_timeline, qnrs_lost_reference, _ = present_before_after_state(
             patient.id, patient.external_study_id, patient_state[patient.id])
         total_qnrs += len(patient_state[patient.id]['qnrs'])
         total_qbs_completed_b4 += len(

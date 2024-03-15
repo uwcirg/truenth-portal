@@ -12,7 +12,7 @@ RUN npm run build
 # -----------------------------------------------------------------------------
 
 
-FROM debian:buster as builder
+FROM debian:bullseye as builder
 
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
@@ -51,7 +51,7 @@ RUN \
 
 # -----------------------------------------------------------------------------
 
-FROM debian:buster as production
+FROM debian:bullseye as production
 
 LABEL org.opencontainers.image.source https://github.com/uwcirg/truenth-portal
 
@@ -75,8 +75,8 @@ RUN \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 # Copy substudy app files built in substudy_app stage
-COPY --from=substudy_app /tmp/substudy_app/dist/bundle/ /opt/venvs/portal/lib/python3.7/site-packages/portal/static/bundle/
-COPY --from=substudy_app /tmp/substudy_app/dist/templates/ /opt/venvs/portal/lib/python3.7/site-packages/portal/static/templates/
+COPY --from=substudy_app /tmp/substudy_app/dist/bundle/ /opt/venvs/portal/lib/python3.9/site-packages/portal/static/bundle/
+COPY --from=substudy_app /tmp/substudy_app/dist/templates/ /opt/venvs/portal/lib/python3.9/site-packages/portal/static/templates/
 
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \

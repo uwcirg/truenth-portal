@@ -1654,7 +1654,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+              {"name": "IRONMAN v3", "retired_as_of": "2020-07-24T05:00:00Z"},
+              {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3188,7 +3189,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2024-02-12T12:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3216,7 +3218,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2024-02-12T12:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3612,11 +3615,6 @@
               {
                 "code": "xh_ZA",
                 "display": "Xhosa",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "zu_ZA",
-                "display": "Zulu",
                 "system": "urn:ietf:bcp:47"
               }
             ]
@@ -4796,11 +4794,6 @@
                 "system": "urn:ietf:bcp:47"
               },
               {
-                "code": "zu_ZA",
-                "display": "Zulu",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
                 "code": "xh_ZA",
                 "display": "Xhosa",
                 "system": "urn:ietf:bcp:47"
@@ -4900,11 +4893,6 @@
               {
                 "code": "fr_CA",
                 "display": "Canadian French",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "zu_ZA",
-                "display": "Zulu",
                 "system": "urn:ietf:bcp:47"
               },
               {

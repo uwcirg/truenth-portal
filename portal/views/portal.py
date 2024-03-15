@@ -1064,6 +1064,15 @@ def celery_info():
     return jsonify(result=res.get(), task_id=res.task_id)
 
 
+@portal.route("/celery-settings")
+@roles_required([ROLE.ADMIN.value])
+@oauth.require_oauth()
+def celery_settings():
+    from ..tasks import settings
+    res = settings.apply_async()
+    return jsonify(result=res.get(), task_id=res.task_id)
+
+
 @portal.route("/task/<task_id>")
 @oauth.require_oauth()
 def task_result(task_id):
@@ -1243,7 +1252,7 @@ def communicate(email_or_id):
     if not u:
         message = 'no such user'
     elif u.deleted_id:
-        message = 'delted user - not allowed'
+        message = 'deleted user - not allowed'
     else:
         purge = request.args.get('purge', False)
         if purge in ('', '0', 'false', 'False'):
