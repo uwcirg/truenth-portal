@@ -9,6 +9,7 @@ from collections import defaultdict
 from copy import deepcopy
 from alembic import op
 from io import StringIO
+from flask import current_app
 import logging
 from sqlalchemy.orm import sessionmaker
 from portal.database import db
@@ -26,6 +27,32 @@ Session = sessionmaker()
 
 log = logging.getLogger("alembic.runtime.migration")
 log.setLevel(logging.DEBUG)
+
+
+def validate_users_trigger_states(session, patient_id):
+    """Confirm user has sequential visits in trigger states table.
+
+    Due to allowance of moving EMPRO consents and no previous checks,
+    some users on test have invalid overlapping trigger states rows.
+    """
+    ts_rows = session.query(TriggerState).filter(
+        TriggerState.user_id == patient_id).order_by(TriggerState.id)
+    month_counter = -1
+    for row in ts_rows:
+        if row.state == 'due':
+            # skipping months is okay, but every due should be sequentially greater than previous
+            if month_counter >= row.visit_month:
+                raise ValueError(f"{patient_id} expected month > {month_counter}, got {row.visit_month}")
+            month_counter = row.visit_month
+        else:
+            # states other than 'due' should be grouped together with same visit_month
+            if month_counter != row.visit_month:
+                raise ValueError(f"{patient_id} expected month {month_counter}, got {row.visit_month}")
+
+def purge_trigger_states(session, patient_id):
+    """Clean up test system problems from moving consent dates"""
+    log.info(f"Purging trigger states for {patient_id}")
+    session.query(TriggerState).filter(TriggerState.user_id == patient_id).delete()
 
 
 def upgrade():
@@ -53,6 +80,15 @@ def upgrade():
         # can't just send through current process, as it'll attempt to
         # insert undesired rows in the trigger_states table.  need to
         # add the sequential count to existing rows.
+        try:
+            validate_users_trigger_states(session, pid)
+        except ValueError as e:
+            if current_app.config.get('SYSTEM_TYPE') in ('development', 'test'):
+                purge_trigger_states(session, pid)
+                continue
+            else:
+                raise e
+
         output.write(f"\n\nPatient: {pid}  storing all zeros for sequential hard triggers except:\n")
         output.write("  (visit month : domain : # hard sequential)\n")
         sequential_by_domain = defaultdict(list)
