@@ -96,9 +96,29 @@ emproObj.prototype.initOptOutElementEvents = function () {
   if (!this.hasOptOutModal()) {
     return;
   }
+
+  let errorObserver = new MutationObserver(function (mutations) {
+    for (let mutation of mutations) {
+      console.log("mutation? ", mutation);
+      if (mutation.type === "childList") {
+        // do something here if error occurred
+        document
+          .querySelector("#emproOptOutModal .continue-container")
+          .classList.remove("hide");
+        console.log("mutation ", mutation);
+      }
+    }
+  });
+  errorObserver.observe(
+    document.querySelector("#emproOptOutModal .error-message"),
+    {
+      characterData: true,
+      attributes: true,
+      childList: true,
+    }
+  );
   $("#emproOptOutModal .btn-submit").on("click", function (e) {
     e.stopPropagation();
-    EmproObj.initOptOutModal(false);
     EmproObj.populateSelectedOptoutUI();
     if (EmproObj.selectedOptOutDomains.length) {
       var submitData = {
@@ -111,7 +131,10 @@ emproObj.prototype.initOptOutElementEvents = function () {
     }
     // TODO, call API to save selected opt out domains,
     // if call failed, display error, e.g. $("#emproOptOutModal .error-message").html(message), else go to the thank you modal
-    EmproObj.initThankyouModal(true);
+    //  EmproObj.initOptOutModal(false);
+    //EmproObj.initThankyouModal(true);
+    document.querySelector("#emproOptOutModal .error-message").innerText =
+      "Error! Not able to save your choices.";
   });
 
   $("#emproOptOutModal .btn-dismiss").on("click", function (e) {
@@ -131,6 +154,9 @@ emproObj.prototype.initOptOutElementEvents = function () {
         (val) => val !== $(this).val()
       );
     }
+  });
+  $("#emproOptOutModal .continue-button").on("click", function () {
+    EmproObj.initThankyouModal(true);
   });
 };
 emproObj.prototype.hasOptOutModal = function () {
