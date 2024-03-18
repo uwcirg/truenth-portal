@@ -16,10 +16,14 @@ var emproObj = function () {
   this.softTriggerDomains = [];
   this.optOutDomains = [];
   this.selectedOptOutDomains = [];
+  this.submittedOptOutDomains = [];
+  this.optOutSubmitData = null;
   this.hasHardTrigger = false;
   this.hasSoftTrigger = false;
   this.userId = 0;
   this.visitMonth = 0;
+  this.authorDate = null;
+  this.cachedAccessKey = null;
 };
 emproObj.prototype.getDomainDisplay = function (domain) {
   if (!domain) return "";
@@ -65,16 +69,15 @@ emproObj.prototype.initThankyouModal = function (autoShow) {
   $("#emproModal").modal(autoShow ? "show" : "hide");
 };
 emproObj.prototype.populateSelectedOptoutUI = function () {
-  if (EmproObj.selectedOptOutDomains.length === 0) {
-    $(".no-contact-list-wrapper").hide();
+  if (!this.submittedOptOutDomains || this.submittedOptOutDomains.length === 0) {
     return;
   }
-  console.log("selected opt out domains ", this.selectedOptOutDomains);
-  var contentHTML = this.selectedOptOutDomains
+  console.log("submitted opt out domains: ", this.submittedOptOutDomains);
+  var contentHTML = this.submittedOptOutDomains
     .map((domain) => this.getDomainDisplay(domain))
     .join(", ");
   $("#emproModal #noContactTriggerList").html("<b>" + contentHTML + "</b>");
-  $(".no-contact-list-wrapper").show();
+  $(".no-contact-list-wrapper").removeClass("hide");
 };
 emproObj.prototype.populateOptoutInputItems = function () {
   if (!this.hasThankyouModal()) {
@@ -86,26 +89,73 @@ emproObj.prototype.populateOptoutInputItems = function () {
   optOutDomainsListElement.html("");
   this.optOutDomains.forEach((domain) => {
     optOutDomainsListElement.append(`
-            <div class="item"><input type="checkbox" class="ck-input" value="${domain}"><span>${this.getDomainDisplay(
-      domain
-    )}</span></div>
+            <div class="item">
+              <input type="checkbox" class="ck-input ck-input-${domain}" value="${domain}">
+              <span class="ck-display" data-domain="${domain}">${this.getDomainDisplay(
+                domain
+              )}</span>
+            </div>
         `);
   });
 };
-emproObj.prototype.initOptOutElementEvents = function () {
-  if (!this.hasOptOutModal()) {
+emproObj.prototype.setOptoutSubmitData = function () {
+  if (!EmproObj.selectedOptOutDomains || !EmproObj.selectedOptOutDomains.length)
     return;
+  var triggerObject = {};
+  EmproObj.selectedOptOutDomains.forEach((item) => {
+    triggerObject[item] = {
+      _opt_out_next_visit: "true",
+    };
+  });
+  var submitData = {
+    user_id: EmproObj.userId,
+    visit_month: EmproObj.visitMonth,
+    triggers: {
+      domains: triggerObject,
+    },
+  };
+  console.log("Optout data to be submitted: ", submitData);
+  EmproObj.optOutSubmitData = submitData;
+};
+emproObj.prototype.onBeforeSubmitOptoutData = function () {
+  // reset error
+  $("#emproOptOutModal .error-message").addClass("hide");
+  // set data in the correct format for submission to API
+  EmproObj.setOptoutSubmitData();
+  // disable buttons
+  $("#emproOptOutModal .btn-submit").attr("disabled", true);
+  $("#emproOptOutModal .btn-dismiss").attr("disabled", true);
+  // display saving in progress indicator icon
+  $("#emproOptOutModal .saving-indicator-container").removeClass("hide");
+};
+emproObj.prototype.onAfterSubmitOptoutData = function (data) {
+  // enable buttons
+  $("#emproOptOutModal .btn-submit").attr("disabled", false);
+  $("#emproOptOutModal .btn-dismiss").attr("disabled", false);
+  // hide saving in progress indicator icon
+  $("#emproOptOutModal .saving-indicator-container").addClass("hide");
+  // show error if any
+  if (data && data.error) {
+    document.querySelector("#emproOptOutModal .error-message").innerText =
+      "System error: Unable to save your choices.";
+    $("#emproOptOutModal .error-message").removeClass("hide");
+    return false;
   }
-
+  EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
+  EmproObj.populateSelectedOptoutUI();
+  EmproObj.initOptOutModal(false);
+  EmproObj.initThankyouModal(true);
+  return true;
+};
+emproObj.prototype.initObservers = function () {
   let errorObserver = new MutationObserver(function (mutations) {
     for (let mutation of mutations) {
-      console.log("mutation? ", mutation);
+      // console.log("mutation? ", mutation);
       if (mutation.type === "childList") {
         // do something here if error occurred
         document
           .querySelector("#emproOptOutModal .continue-container")
           .classList.remove("hide");
-        console.log("mutation ", mutation);
       }
     }
   });
@@ -117,24 +167,31 @@ emproObj.prototype.initOptOutElementEvents = function () {
       childList: true,
     }
   );
+  $(window).on("unload", function () {
+    errorObserver.disconnect();
+  });
+  //other observers if needed
+};
+emproObj.prototype.initOptOutElementEvents = function () {
+  if (!this.hasOptOutModal()) {
+    return;
+  }
+  EmproObj.initObservers();
+
   $("#emproOptOutModal .btn-submit").on("click", function (e) {
+    e.preventDefault();
     e.stopPropagation();
-    EmproObj.populateSelectedOptoutUI();
-    if (EmproObj.selectedOptOutDomains.length) {
-      var submitData = {
-        user_id: EmproObj.userId,
-        visit_month: EmproObj.visitMonth,
-        opt_out_domains: EmproObj.selectedOptOutDomains,
-      };
-      // TODO: call API to save
-      console.log("data to be submitted ", submitData);
-    }
-    // TODO, call API to save selected opt out domains,
-    // if call failed, display error, e.g. $("#emproOptOutModal .error-message").html(message), else go to the thank you modal
-    //  EmproObj.initOptOutModal(false);
-    //EmproObj.initThankyouModal(true);
-    document.querySelector("#emproOptOutModal .error-message").innerText =
-      "Error! Not able to save your choices.";
+    EmproObj.onBeforeSubmitOptoutData();
+    tnthAjax.setOptoutTriggers(
+      EmproObj.userId,
+      {
+        data: JSON.stringify(EmproObj.optOutSubmitData),
+        max_attempts: 1
+      },
+      (data) => {
+        return EmproObj.onAfterSubmitOptoutData(data);
+      }
+    );
   });
 
   $("#emproOptOutModal .btn-dismiss").on("click", function (e) {
@@ -142,6 +199,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
     EmproObj.initOptOutModal(false);
     EmproObj.initThankyouModal(true);
   });
+
   $("#emproOptOutModal .ck-input").on("click", function () {
     if ($(this).is(":checked")) {
       if (
@@ -154,6 +212,15 @@ emproObj.prototype.initOptOutElementEvents = function () {
         (val) => val !== $(this).val()
       );
     }
+  });
+
+  $("#emproOptOutModal .ck-display").on("click", function () {
+    var domain = $(this).attr("data-domain");
+    var associatedCkInput = $("#emproOptOutModal .ck-input-"+domain);
+    if (associatedCkInput.is(":checked"))
+      associatedCkInput.prop("checked", false);
+    else
+      associatedCkInput.prop("checked", true);
   });
   $("#emproOptOutModal .continue-button").on("click", function () {
     EmproObj.initThankyouModal(true);
@@ -252,16 +319,26 @@ emproObj.prototype.init = function () {
             let assessmentCompleted =
               String(status).toLowerCase() === "completed";
             console.log(
+              "today ",
+              today,
               "author date ",
               authoredDate,
               " assessment completed ",
               assessmentCompleted
             );
 
+            this.authorDate = authoredDate;
+
             /*
              * associating each thank you modal popup accessed by assessment date
              */
             let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${authoredDate}`;
+            this.cachedAccessKey = cachedAccessKey;
+
+            const clearCacheData = getUrlParameter("clearCache");
+            if (clearCacheData) {
+              localStorage.removeItem(this.cachedAccessKey);
+            }
             /*
              * automatically pops up thank you modal IF sub-study assessment is completed,
              * and sub-study assessment is completed today and the thank you modal has not already popped up today
@@ -280,7 +357,7 @@ emproObj.prototype.init = function () {
              */
             localStorage.setItem(cachedAccessKey, `true`);
 
-            console.log("Opt out domain? ", this.optOutDomains);
+            // console.log("Opt out domain? ", this.optOutDomains);
             if (this.optOutDomains.length > 0) {
               this.populateOptoutInputItems();
               this.initOptOutElementEvents();
@@ -312,6 +389,10 @@ emproObj.prototype.processTriggerData = function (data) {
   }
   var self = this;
   console.log("trigger data ", data);
+
+  // set visit month related to trigger data
+  this.visitMonth = data.visit_month;
+
   for (let key in data.triggers.domain) {
     if (!Object.keys(data.triggers.domain[key]).length) {
       continue;
@@ -387,8 +468,6 @@ emproObj.prototype.initTriggerDomains = function (callbackFunc) {
      * show/hide sections based on triggers
      */
     this.initTriggerItemsVis();
-
-    this.visitMonth = data.visit_month;
 
     callback(data);
 

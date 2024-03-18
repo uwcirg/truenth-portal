@@ -228,10 +228,9 @@
     </div>
 {%- endmacro -%}
 {%- macro empro_no_contact_notice() -%}
-    <div class="no-contact-list-wrapper">
-        <b>Note:</b> You have chosen not to be contacted about <span id="noContactTriggerList"><b>fatigue</b>, <b>general pain</b>, <b>insomnia</b></span>. Your care team will not discuss these issues this month.
+    <div class="no-contact-list-wrapper hide">
+        <b>Note:</b> You have chosen not to be contacted about <span id="noContactTriggerList"></span>. Your care team will not discuss these issues this month.
     </div>
-    <br/>
 {%- endmacro -%}
 {%- macro empro_modal_hardTrigger_supportTeam_block(organization="") -%}
     <div class="item">
@@ -386,8 +385,11 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-empro-primary btn-submit">Submit</button>
-                    <button class="btn btn-default btn-dismiss">Dismiss</button>
+                    <div>
+                        <button class="btn btn-empro-primary btn-submit">Submit</button>
+                        <button class="btn btn-default btn-dismiss">Dismiss</button>
+                    </div>
+                    <div class="saving-indicator-container hide"><i class="fa fa-spinner fa-spin"></i> {{_("Saving data...")}}</div>
                 </div>
             </div>
         </div>

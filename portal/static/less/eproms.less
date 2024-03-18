@@ -4075,6 +4075,13 @@ section.header {
     .continue-container {
       margin-top: 8px;
     }
+    .saving-indicator-container {
+      margin-top: 16px;
+    }
+    .no-contact-list-wrapper {
+      margin-top: 20px;
+      color: @warningColor;
+    }
   }
   .modal-footer {
     background: @bodyBgColor;
@@ -4161,10 +4168,13 @@ section.header {
       }
       ul {
         padding-left: 20px;
-        margin-bottom: 20px;
+        //margin-bottom: 20px;
       }
       li:not(:last-of-type) {
         margin-bottom: 8px;
+      }
+      li:last-of-type {
+        margin-bottom: 16px;
       }
     }
     .buttons-container {
@@ -4258,6 +4268,10 @@ section.header {
       gap: 8px;
       &:not(:last-of-type) {
         margin-bottom:8px;
+      }
+      .ck-display:hover {
+        cursor: pointer;
+        color: @emproBtnPrimaryColor;
       }
     }
   }
