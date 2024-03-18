@@ -83,7 +83,7 @@ def upgrade():
         try:
             validate_users_trigger_states(session, pid)
         except ValueError as e:
-            if current_app.config.get('SYSTEM_TYPE') in ('development', 'test'):
+            if current_app.config.get('SYSTEM_TYPE') in ('development', 'testing'):
                 purge_trigger_states(session, pid)
                 continue
             else:
