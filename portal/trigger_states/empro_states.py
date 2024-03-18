@@ -154,7 +154,7 @@ def initiate_trigger(user_id, as_of_date=None, rebuilding=False):
         next_visit = int(ts.visit_month) + 1
         current_app.logger.debug(f"transition from {ts} to next due")
         # generate a new ts, to leave resolved record behind
-        ts = TriggerState(user_id=user_id, state='unstarted', as_of_date=as_of_date)
+        ts = TriggerState(user_id=user_id, state='unstarted', timestamp=as_of_date)
         ts.visit_month = next_visit
         current_app.logger.debug(
             "persist-trigger_states-new from initiate_trigger(), "
