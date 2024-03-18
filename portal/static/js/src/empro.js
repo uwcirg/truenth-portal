@@ -69,7 +69,10 @@ emproObj.prototype.initThankyouModal = function (autoShow) {
   $("#emproModal").modal(autoShow ? "show" : "hide");
 };
 emproObj.prototype.populateSelectedOptoutUI = function () {
-  if (!this.submittedOptOutDomains || this.submittedOptOutDomains.length === 0) {
+  if (
+    !this.submittedOptOutDomains ||
+    this.submittedOptOutDomains.length === 0
+  ) {
     return;
   }
   console.log("submitted opt out domains: ", this.submittedOptOutDomains);
@@ -92,8 +95,8 @@ emproObj.prototype.populateOptoutInputItems = function () {
             <div class="item">
               <input type="checkbox" class="ck-input ck-input-${domain}" value="${domain}">
               <span class="ck-display" data-domain="${domain}">${this.getDomainDisplay(
-                domain
-              )}</span>
+      domain
+    )}</span>
             </div>
         `);
   });
@@ -117,9 +120,12 @@ emproObj.prototype.setOptoutSubmitData = function () {
   console.log("Optout data to be submitted: ", submitData);
   EmproObj.optOutSubmitData = submitData;
 };
+emproObj.prototype.setOptoutError = function(text) {
+  document.querySelector("#emproOptOutModal .error-message").innerText = text;
+}
 emproObj.prototype.onBeforeSubmitOptoutData = function () {
   // reset error
-  $("#emproOptOutModal .error-message").addClass("hide");
+  EmproObj.setOptoutError("");
   // set data in the correct format for submission to API
   EmproObj.setOptoutSubmitData();
   // disable buttons
@@ -136,9 +142,7 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
   $("#emproOptOutModal .saving-indicator-container").addClass("hide");
   // show error if any
   if (data && data.error) {
-    document.querySelector("#emproOptOutModal .error-message").innerText =
-      "System error: Unable to save your choices.";
-    $("#emproOptOutModal .error-message").removeClass("hide");
+    EmproObj.setOptoutError("System error: Unable to save your choices.");
     return false;
   }
   EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
@@ -150,12 +154,23 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
 emproObj.prototype.initObservers = function () {
   let errorObserver = new MutationObserver(function (mutations) {
     for (let mutation of mutations) {
-      console.log("mutation? ", mutation);
+      console.log("error mutation? ", mutation);
       if (mutation.type === "childList") {
         // do something here if error occurred
-        document
-          .querySelector("#emproOptOutModal .continue-container")
-          .classList.remove("hide");
+        const errorNode =
+          mutation.addedNodes && mutation.addedNodes.length
+            ? mutation.addedNodes[0]
+            : null;
+        let continueContainerElement = document.querySelector(
+          "#emproOptOutModal .continue-container"
+        );
+        if (continueContainerElement) {
+          if (errorNode.data) {
+            continueContainerElement.classList.remove("hide");
+          } else {
+            continueContainerElement.classList.add("hide");
+          }
+        }
       }
     }
   });
@@ -176,7 +191,6 @@ emproObj.prototype.initOptOutElementEvents = function () {
   }
   EmproObj.initObservers();
 
-
   // submit buttons
   $("#emproOptOutModal .btn-submit").on("click", function (e) {
     e.preventDefault();
@@ -186,7 +200,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
       EmproObj.userId,
       {
         data: JSON.stringify(EmproObj.optOutSubmitData),
-        max_attempts: 1
+        max_attempts: 1,
       },
       (data) => {
         return EmproObj.onAfterSubmitOptoutData(data);
@@ -219,11 +233,10 @@ emproObj.prototype.initOptOutElementEvents = function () {
   // checkbox display text, clicking on which should check or uncheck the associated checkbox
   $("#emproOptOutModal .ck-display").on("click", function () {
     var domain = $(this).attr("data-domain");
-    var associatedCkInput = $("#emproOptOutModal .ck-input-"+domain);
+    var associatedCkInput = $("#emproOptOutModal .ck-input-" + domain);
     if (associatedCkInput.is(":checked"))
       associatedCkInput.prop("checked", false);
-    else
-      associatedCkInput.prop("checked", true);
+    else associatedCkInput.prop("checked", true);
   });
 
   // continue button that displays when error
@@ -421,7 +434,7 @@ emproObj.prototype.processTriggerData = function (data) {
         q === "_sequential_hard_trigger_count" &&
         parseInt(data.triggers.domain[key][q]) > 1
       ) {
-       // console.log("domain? ", key, " sequence ", parseInt(data.triggers.domain[key][q]));
+        // console.log("domain? ", key, " sequence ", parseInt(data.triggers.domain[key][q]));
         if (self.optOutDomains.indexOf(key) === -1) {
           self.optOutDomains.push(key);
         }

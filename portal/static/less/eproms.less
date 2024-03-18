@@ -4079,7 +4079,12 @@ section.header {
       margin-top: 16px;
     }
     .no-contact-list-wrapper {
-      margin-top: 20px;
+      margin-top: 16px;
+      margin-bottom: 16px;
+      &:empty {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
       color: @warningColor;
     }
   }
