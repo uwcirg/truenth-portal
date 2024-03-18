@@ -73,20 +73,20 @@
         "ironman_ss.1": "hard",
         "ironman_ss.2": "hard",
         "ironman_ss.3": "hard",
-        "_sequential_hard_trigger_count": 3
+        "_sequential_hard_trigger_count": 1
       },
       "insomnia": { "ironman_ss.7": "hard", "ironman_ss.8": "hard" },
       "joint_pain": {
         "ironman_ss.4": "hard",
         "ironman_ss.5": "hard",
         "ironman_ss.6": "hard",
-        "_sequential_hard_trigger_count": 3
+        "_sequential_hard_trigger_count": 2
       },
       "sad": {
         "ironman_ss.17": "hard",
         "ironman_ss.18": "hard",
         "ironman_ss.19": "hard",
-        "_sequential_hard_trigger_count": 3
+        "_sequential_hard_trigger_count": 2
       },
       "social_isolation": { "ironman_ss.20": "hard" }
     },

@@ -150,7 +150,7 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
 emproObj.prototype.initObservers = function () {
   let errorObserver = new MutationObserver(function (mutations) {
     for (let mutation of mutations) {
-      // console.log("mutation? ", mutation);
+      console.log("mutation? ", mutation);
       if (mutation.type === "childList") {
         // do something here if error occurred
         document
@@ -162,8 +162,6 @@ emproObj.prototype.initObservers = function () {
   errorObserver.observe(
     document.querySelector("#emproOptOutModal .error-message"),
     {
-      characterData: true,
-      attributes: true,
       childList: true,
     }
   );
@@ -178,6 +176,8 @@ emproObj.prototype.initOptOutElementEvents = function () {
   }
   EmproObj.initObservers();
 
+
+  // submit buttons
   $("#emproOptOutModal .btn-submit").on("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -194,12 +194,14 @@ emproObj.prototype.initOptOutElementEvents = function () {
     );
   });
 
+  // close and dismiss buttons
   $("#emproOptOutModal .btn-dismiss").on("click", function (e) {
     e.stopPropagation();
     EmproObj.initOptOutModal(false);
     EmproObj.initThankyouModal(true);
   });
 
+  // checkboxes
   $("#emproOptOutModal .ck-input").on("click", function () {
     if ($(this).is(":checked")) {
       if (
@@ -214,6 +216,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
     }
   });
 
+  // checkbox display text, clicking on which should check or uncheck the associated checkbox
   $("#emproOptOutModal .ck-display").on("click", function () {
     var domain = $(this).attr("data-domain");
     var associatedCkInput = $("#emproOptOutModal .ck-input-"+domain);
@@ -222,6 +225,8 @@ emproObj.prototype.initOptOutElementEvents = function () {
     else
       associatedCkInput.prop("checked", true);
   });
+
+  // continue button that displays when error
   $("#emproOptOutModal .continue-button").on("click", function () {
     EmproObj.initThankyouModal(true);
   });
@@ -411,14 +416,15 @@ emproObj.prototype.processTriggerData = function (data) {
       self.mappedDomains.push(mappedDomain);
     }
     for (let q in data.triggers.domain[key]) {
+      // if sequence count > 1, that means it has been asked before
       if (
         q === "_sequential_hard_trigger_count" &&
-        parseInt(data.triggers.domain[key][q]) === 3
+        parseInt(data.triggers.domain[key][q]) > 1
       ) {
+       // console.log("domain? ", key, " sequence ", parseInt(data.triggers.domain[key][q]));
         if (self.optOutDomains.indexOf(key) === -1) {
           self.optOutDomains.push(key);
         }
-        // TODO add key to opt out domain(s)
       }
       if (data.triggers.domain[key][q] === "hard") {
         self.hasHardTrigger = true;
