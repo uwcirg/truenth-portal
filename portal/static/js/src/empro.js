@@ -158,6 +158,9 @@ emproObj.prototype.toggleOptoutSavingIndicator = function (boolShow) {
     boolShow
   );
 };
+emproObj.prototype.hasErrorText = function () {
+  return !!$("#emproOptOutModal .error-message").text().trim();
+};
 emproObj.prototype.onBeforeSubmitOptoutData = function () {
   // reset error
   EmproObj.setOptoutError("");
@@ -189,12 +192,15 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
   return true;
 };
 emproObj.prototype.handleSubmitOptoutData = function () {
-  if (!EmproObj.hasSelectedOptOutDomains()) {
+  if (!EmproObj.hasErrorText() && !EmproObj.hasSelectedOptOutDomains()) {
     EmproObj.setOptoutError(
       i18next.t(
         "You didn't select anything. Are you sure?\r\nIf so, click 'Dismiss' to continue."
       )
     );
+    return;
+  }
+  if (!EmproObj.hasSelectedOptOutDomains()) {
     return;
   }
   EmproObj.onBeforeSubmitOptoutData();
@@ -259,7 +265,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
   // close and dismiss buttons
   $("#emproOptOutModal .btn-dismiss").on("click", function (e) {
     e.stopPropagation();
-    if (!$("#emproOptOutModal .error-message").text().trim()) {
+    if (!EmproObj.hasErrorText()) {
       if (!EmproObj.hasSelectedOptOutDomains()) {
         EmproObj.setOptoutError(
           i18next.t(
@@ -368,77 +374,84 @@ emproObj.prototype.init = function () {
         this.setLoadingVis();
         return false;
       }
-      this.initTriggerDomains((result) => {
-        if (result && result.error) {
-          console.log("Error retrieving trigger data");
-          if (result.reason) {
-            console.log("Error retrieving trigger data: ", result.reason);
+      tnthAjax.assessmentReport(
+        this.userId,
+        EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+        (data) => {
+          if (isDebugging) {
+            data = TestResponsesJson;
+            data.entry[0].authored = new Date().toISOString();
           }
-        }
-        tnthAjax.assessmentReport(
-          this.userId,
-          EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
-          (data) => {
+          console.log("Questionnaire response data: ", data);
+          if (!data || !data.entry || !data.entry.length) {
             this.setLoadingVis(); // hide loading indicator when done
-            if (isDebugging) {
-              data = TestResponsesJson;
-              data.entry[0].authored = new Date().toISOString();
+            return;
+          }
+          /*
+           * make sure data item with the latest authored date is first
+           */
+          let assessmentData = data.entry.sort(function (a, b) {
+            return new Date(b.authored) - new Date(a.authored);
+          });
+          let assessmentDate = assessmentData[0]["authored"];
+          let [today, authoredDate, status] = [
+            tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
+            tnthDate.getDateWithTimeZone(
+              new Date(assessmentDate),
+              "yyyy-mm-dd"
+            ),
+            assessmentData[0].status,
+          ];
+          let assessmentCompleted =
+            String(status).toLowerCase() === "completed";
+          console.log(
+            "today ",
+            today,
+            "author date ",
+            authoredDate,
+            " assessment completed ",
+            assessmentCompleted
+          );
+
+          if (!assessmentCompleted) {
+            this.setLoadingVis(); // hide loading indicator when done
+            return;
+          }
+
+          this.authorDate = authoredDate;
+
+          /*
+           * associating each thank you modal popup accessed by assessment date
+           */
+          let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${authoredDate}`;
+          this.cachedAccessKey = cachedAccessKey;
+
+          const clearCacheData = getUrlParameter("clearCache");
+          if (clearCacheData) {
+            localStorage.removeItem(this.cachedAccessKey);
+          }
+          /*
+           * automatically pops up thank you modal IF sub-study assessment is completed,
+           * and sub-study assessment is completed today and the thank you modal has not already popped up today
+           */
+          let autoShowModal =
+            !localStorage.getItem(cachedAccessKey) &&
+            assessmentCompleted &&
+            today === authoredDate;
+
+          if (!autoShowModal) {
+            this.setLoadingVis(); // hide loading indicator when done
+            return;
+          }
+
+          this.initTriggerDomains((result) => {
+            this.setLoadingVis(); // hide loading indicator when done
+            if (result && result.error) {
+              console.log("Error retrieving trigger data");
+              if (result.reason) {
+                console.log("Error retrieving trigger data: ", result.reason);
+              }
             }
-            console.log("Questionnaire response data: ", data);
-            if (!data || !data.entry || !data.entry.length) {
-              return;
-            }
-            /*
-             * make sure data item with the latest authored date is first
-             */
-            let assessmentData = data.entry.sort(function (a, b) {
-              return new Date(b.authored) - new Date(a.authored);
-            });
-            let assessmentDate = assessmentData[0]["authored"];
-            let [today, authoredDate, status] = [
-              tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
-              tnthDate.getDateWithTimeZone(
-                new Date(assessmentDate),
-                "yyyy-mm-dd"
-              ),
-              assessmentData[0].status,
-            ];
-            let assessmentCompleted =
-              String(status).toLowerCase() === "completed";
-            console.log(
-              "today ",
-              today,
-              "author date ",
-              authoredDate,
-              " assessment completed ",
-              assessmentCompleted
-            );
-
-            this.authorDate = authoredDate;
-
-            /*
-             * associating each thank you modal popup accessed by assessment date
-             */
-            let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${authoredDate}`;
-            this.cachedAccessKey = cachedAccessKey;
-
-            const clearCacheData = getUrlParameter("clearCache");
-            if (clearCacheData) {
-              localStorage.removeItem(this.cachedAccessKey);
-            }
-            /*
-             * automatically pops up thank you modal IF sub-study assessment is completed,
-             * and sub-study assessment is completed today and the thank you modal has not already popped up today
-             */
-            let autoShowModal =
-              !localStorage.getItem(cachedAccessKey) &&
-              assessmentCompleted &&
-              today === authoredDate;
-
-            if (!autoShowModal) {
-              return;
-            }
-
             /*
              * set thank you modal accessed flag here
              */
@@ -454,9 +467,9 @@ emproObj.prototype.init = function () {
             }
 
             this.initThankyouModal(true);
-          }
-        );
-      });
+          });
+        }
+      );
     });
   });
 };
