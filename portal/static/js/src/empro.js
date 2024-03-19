@@ -359,9 +359,10 @@ emproObj.prototype.init = function () {
     tnthAjax.getUserResearchStudies(this.userId, "patient", false, (data) => {
       if (
         !isDebugging &&
-        data[EPROMS_SUBSTUDY_ID] &&
-        data[EPROMS_SUBSTUDY_ID].errors &&
-        data[EPROMS_SUBSTUDY_ID].errors.length
+        (!data[EPROMS_SUBSTUDY_ID] ||
+          (data[EPROMS_SUBSTUDY_ID] &&
+            data[EPROMS_SUBSTUDY_ID].errors &&
+            data[EPROMS_SUBSTUDY_ID].errors.length))
       ) {
         //don't present popup if errors e.g. base study questionnaire due
         this.setLoadingVis();
