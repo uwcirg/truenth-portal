@@ -154,7 +154,9 @@ class DomainManifold(object):
 
         for domain in EMPRO_DOMAINS:
             if domain in self.cur_obs:
-                prev_triggers_for_domain = previous_triggers["domain"][domain] if previous_triggers else None
+                prev_triggers_for_domain = (
+                    previous_triggers["domain"].get(domain)
+                    if previous_triggers else None)
                 dt = DomainTriggers(
                     domain=domain,
                     current_answers=self.cur_obs[domain],

@@ -212,7 +212,7 @@ def evaluate_triggers(qnr):
         # bring together and evaluate available data for triggers
         dm = DomainManifold(qnr)
         previous_triggers = (
-            previous if previous and previous.visit_month + 1 == ts.visit_month
+            previous.triggers if previous and previous.visit_month + 1 == ts.visit_month
             else None)
         ts.triggers = dm.eval_triggers(previous_triggers)
         ts.questionnaire_response_id = qnr.id
