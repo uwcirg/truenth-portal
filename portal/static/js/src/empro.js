@@ -75,35 +75,41 @@ emproObj.prototype.populateSelectedOptoutUI = function () {
   ) {
     return;
   }
-  console.log("submitted opt out domains: ", this.submittedOptOutDomains);
+  console.log("Submitted opt out domains: ", this.submittedOptOutDomains);
   var contentHTML = this.submittedOptOutDomains
     .map((domain) => this.getDomainDisplay(domain))
     .join(", ");
   $("#emproModal #noContactTriggerList").html("<b>" + contentHTML + "</b>");
-  $(".no-contact-list-wrapper").removeClass("hide");
+  $("#emproModal .no-contact-list-wrapper").removeClass("hide");
 };
 emproObj.prototype.populateOptoutInputItems = function () {
-  if (!this.hasThankyouModal()) {
-    return;
-  }
   var optOutDomainsListElement = $(
     "#emproOptOutModal .optout-domains-checkbox-list"
   );
-  optOutDomainsListElement.html("");
+  if (!optOutDomainsListElement.length) return;
+  if (!this.optOutDomains || !this.optOutDomains.length) return;
+  if (optOutDomainsListElement.find(".ck-input").length) return;
+  // render checkbox input element for each domain
   this.optOutDomains.forEach((domain) => {
     optOutDomainsListElement.append(`
             <div class="item">
               <input type="checkbox" class="ck-input ck-input-${domain}" value="${domain}">
-              <span class="ck-display" data-domain="${domain}">${this.getDomainDisplay(
-      domain
-    )}</span>
+              <span class="ck-display" data-domain="${domain}">
+                ${this.getDomainDisplay(domain)}
+              </span>
             </div>
         `);
   });
 };
+emproObj.prototype.hasSelectedOptOutDomains = function () {
+  return (
+    EmproObj.selectedOptOutDomains && EmproObj.selectedOptOutDomains.length
+  );
+};
 emproObj.prototype.setOptoutSubmitData = function () {
-  if (!EmproObj.selectedOptOutDomains || !EmproObj.selectedOptOutDomains.length)
+  if (!EmproObj.hasSelectedOptOutDomains()) {
     return;
+  }
   var triggerObject = {};
   EmproObj.selectedOptOutDomains.forEach((item) => {
     triggerObject[item] = {
@@ -117,29 +123,56 @@ emproObj.prototype.setOptoutSubmitData = function () {
       domains: triggerObject,
     },
   };
-  console.log("Optout data to be submitted: ", submitData);
+  console.log("Data to be submitted for optout: ", submitData);
   EmproObj.optOutSubmitData = submitData;
 };
-emproObj.prototype.setOptoutError = function(text) {
-  document.querySelector("#emproOptOutModal .error-message").innerText = text;
-}
+emproObj.prototype.setError = function (strSeletor, text) {
+  if (!document.querySelector(strSeletor)) return;
+  document.querySelector(strSeletor).innerText = text;
+};
+emproObj.prototype.setButtonsDisableState = function (
+  strSelector,
+  boolDisable
+) {
+  $(strSelector).attr("disabled", boolDisable);
+};
+emproObj.prototype.toggleSavingIndicator = function (strSelector, boolShow) {
+  if (boolShow) {
+    $(strSelector).removeClass("hide");
+    return;
+  }
+  $(strSelector).addClass("hide");
+};
+emproObj.prototype.setOptoutError = function (text) {
+  EmproObj.setError("#emproOptOutModal .error-message", text);
+};
+emproObj.prototype.setOptoutButtonsState = function (boolDisable) {
+  EmproObj.setButtonsDisableState(
+    "#emproOptOutModal .btn-submit, #emproOptOutModal .btn-dismiss",
+    boolDisable
+  );
+};
+emproObj.prototype.toggleOptoutSavingIndicator = function (boolShow) {
+  EmproObj.toggleSavingIndicator(
+    "#emproOptOutModal .saving-indicator-container",
+    boolShow
+  );
+};
 emproObj.prototype.onBeforeSubmitOptoutData = function () {
   // reset error
   EmproObj.setOptoutError("");
   // set data in the correct format for submission to API
   EmproObj.setOptoutSubmitData();
   // disable buttons
-  $("#emproOptOutModal .btn-submit").attr("disabled", true);
-  $("#emproOptOutModal .btn-dismiss").attr("disabled", true);
+  EmproObj.setOptoutButtonsState(true);
   // display saving in progress indicator icon
-  $("#emproOptOutModal .saving-indicator-container").removeClass("hide");
+  EmproObj.toggleOptoutSavingIndicator(true);
 };
 emproObj.prototype.onAfterSubmitOptoutData = function (data) {
   // enable buttons
-  $("#emproOptOutModal .btn-submit").attr("disabled", false);
-  $("#emproOptOutModal .btn-dismiss").attr("disabled", false);
+  EmproObj.setOptoutButtonsState(false);
   // hide saving in progress indicator icon
-  $("#emproOptOutModal .saving-indicator-container").addClass("hide");
+  EmproObj.toggleOptoutSavingIndicator(false);
   // show error if any
   if (data && data.error) {
     EmproObj.setOptoutError("System error: Unable to save your choices.");
@@ -151,10 +184,29 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
   EmproObj.initThankyouModal(true);
   return true;
 };
+emproObj.prototype.handleSubmitOptoutData = function () {
+  if (!EmproObj.hasSelectedOptOutDomains()) {
+    EmproObj.setOptoutError(
+      "Please check at least one checkbox. Otherwise click 'Continue'."
+    );
+    return;
+  }
+  EmproObj.onBeforeSubmitOptoutData();
+  tnthAjax.setOptoutTriggers(
+    EmproObj.userId,
+    {
+      data: JSON.stringify(EmproObj.optOutSubmitData),
+      max_attempts: 2,
+    },
+    (data) => {
+      return EmproObj.onAfterSubmitOptoutData(data);
+    }
+  );
+};
 emproObj.prototype.initObservers = function () {
   let errorObserver = new MutationObserver(function (mutations) {
     for (let mutation of mutations) {
-      console.log("error mutation? ", mutation);
+      // console.log("error mutation? ", mutation);
       if (mutation.type === "childList") {
         // do something here if error occurred
         const errorNode =
@@ -165,7 +217,7 @@ emproObj.prototype.initObservers = function () {
           "#emproOptOutModal .continue-container"
         );
         if (continueContainerElement) {
-          if (errorNode.data) {
+          if (errorNode && errorNode.data) {
             continueContainerElement.classList.remove("hide");
           } else {
             continueContainerElement.classList.add("hide");
@@ -195,17 +247,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
   $("#emproOptOutModal .btn-submit").on("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
-    EmproObj.onBeforeSubmitOptoutData();
-    tnthAjax.setOptoutTriggers(
-      EmproObj.userId,
-      {
-        data: JSON.stringify(EmproObj.optOutSubmitData),
-        max_attempts: 1,
-      },
-      (data) => {
-        return EmproObj.onAfterSubmitOptoutData(data);
-      }
-    );
+    EmproObj.handleSubmitOptoutData();
   });
 
   // close and dismiss buttons
@@ -217,6 +259,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
 
   // checkboxes
   $("#emproOptOutModal .ck-input").on("click", function () {
+    EmproObj.setOptoutError("");
     if ($(this).is(":checked")) {
       if (
         !EmproObj.selectedOptOutDomains.find((val) => val === $(this).val())
@@ -232,6 +275,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
 
   // checkbox display text, clicking on which should check or uncheck the associated checkbox
   $("#emproOptOutModal .ck-display").on("click", function () {
+    EmproObj.setOptoutError("");
     var domain = $(this).attr("data-domain");
     var associatedCkInput = $("#emproOptOutModal .ck-input-" + domain);
     if (associatedCkInput.is(":checked"))
@@ -241,6 +285,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
 
   // continue button that displays when error
   $("#emproOptOutModal .continue-button").on("click", function () {
+    EmproObj.initOptOutModal(false);
     EmproObj.initThankyouModal(true);
   });
 };
