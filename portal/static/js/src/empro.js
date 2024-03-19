@@ -175,7 +175,7 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
   EmproObj.toggleOptoutSavingIndicator(false);
   // show error if any
   if (data && data.error) {
-    EmproObj.setOptoutError("System error: Unable to save your choices.");
+    EmproObj.setOptoutError("System error: Unable to save your choices. Please try again.  Otherwise click 'Continue' or 'Dismiss' to continue.");
     return false;
   }
   EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
@@ -187,7 +187,7 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
 emproObj.prototype.handleSubmitOptoutData = function () {
   if (!EmproObj.hasSelectedOptOutDomains()) {
     EmproObj.setOptoutError(
-      "Please check at least one checkbox. Otherwise click 'Continue'."
+      "Please check at least one checkbox. Otherwise click 'Continue' or 'Dismiss' to continue."
     );
     return;
   }
@@ -348,7 +348,7 @@ emproObj.prototype.init = function () {
         if (result && result.error) {
           console.log("Error retrieving trigger data");
           if (result.reason) {
-            console.log(reason);
+            console.log("Error retrieving trigger data: ", result.reason);
           }
         }
         tnthAjax.assessmentReport(
