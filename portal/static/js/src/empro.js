@@ -175,7 +175,11 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
   EmproObj.toggleOptoutSavingIndicator(false);
   // show error if any
   if (data && data.error) {
-    EmproObj.setOptoutError("System error: Unable to save your choices. Please try again.  Otherwise click 'Continue' or 'Dismiss' to continue.");
+    EmproObj.setOptoutError(
+      i18next.t(
+        "System error: Unable to save your choices.\r\nPlease click 'Submit' to try again. \r\nOtherwise click 'Dismiss' to continue."
+      )
+    );
     return false;
   }
   EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
@@ -187,7 +191,9 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
 emproObj.prototype.handleSubmitOptoutData = function () {
   if (!EmproObj.hasSelectedOptOutDomains()) {
     EmproObj.setOptoutError(
-      "Please check at least one checkbox. Otherwise click 'Continue' or 'Dismiss' to continue."
+      i18next.t(
+        "You didn't select anything. Are you sure?\r\nIf so, click 'Dismiss' to continue."
+      )
     );
     return;
   }
@@ -241,7 +247,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
   if (!this.hasOptOutModal()) {
     return;
   }
-  EmproObj.initObservers();
+  // EmproObj.initObservers();
 
   // submit buttons
   $("#emproOptOutModal .btn-submit").on("click", function (e) {
@@ -253,6 +259,23 @@ emproObj.prototype.initOptOutElementEvents = function () {
   // close and dismiss buttons
   $("#emproOptOutModal .btn-dismiss").on("click", function (e) {
     e.stopPropagation();
+    if (!$("#emproOptOutModal .error-message").text().trim()) {
+      if (!EmproObj.hasSelectedOptOutDomains()) {
+        EmproObj.setOptoutError(
+          i18next.t(
+            "You didn't select anything. Are you sure?\r\nIf so, click 'Dismiss' again to continue."
+          )
+        );
+        return;
+      } else {
+        EmproObj.setOptoutError(
+          i18next.t(
+            "You have made selection(s). Click 'Submit' to save your selection(s).\r\nOtherwise, click 'Dismiss' again to continue."
+          )
+        );
+        return;
+      }
+    }
     EmproObj.initOptOutModal(false);
     EmproObj.initThankyouModal(true);
   });
