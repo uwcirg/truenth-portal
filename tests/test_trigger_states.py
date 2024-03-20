@@ -181,6 +181,16 @@ def test_worsening_baseline():
     assert dt.triggers[sequential_hard_trigger_count_key] == 1
 
 
+def test_apply_opt_out(initialized_patient, processed_ts, opt_out_submission):
+    from portal.trigger_states.models import opt_out_key
+    # apply opt out request
+    user = db.session.merge(initialized_patient)
+    ts = users_trigger_state(user.id)
+    result = ts.apply_opt_out(opt_out_submission)
+    found = [k for k,v in result.triggers['domain'].items() if opt_out_key in v]
+    assert len(found) == 2
+
+
 def test_ts_trigger_lists(mock_triggers):
     ts = TriggerState(state='processed', triggers=mock_triggers, user_id=1)
     assert set(['general_pain', 'joint_pain', 'fatigue']) == set(
