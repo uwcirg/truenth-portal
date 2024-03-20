@@ -81,8 +81,9 @@ class EMPRO_state(StateMachine):
 def users_trigger_state(user_id, as_of_date=None):
     """Obtain the latest trigger state for given user
 
-    Returns latest TriggerState row for user or creates transient if not
-     found.
+    Returns latest TriggerState row for user or creates transient if current
+     visit_month not found.  NB: beyond end of study or withdrawal, the last
+     valid is returned.
 
     :returns TriggerState: with ``state`` attribute meaning:
       - unstarted: no info avail for user
@@ -95,6 +96,7 @@ def users_trigger_state(user_id, as_of_date=None):
     if as_of_date is None:
         as_of_date = datetime.utcnow()
 
+    vm = lookup_visit_month(user_id, as_of_date)
     ts = None
     rows = TriggerState.query.filter(
         TriggerState.user_id == user_id).order_by(
@@ -104,10 +106,16 @@ def users_trigger_state(user_id, as_of_date=None):
         if as_of_date < ts_row.timestamp:
             continue
         ts = ts_row
+        if ts.visit_month < vm:
+            current_app.logger.debug(
+                f"{user_id} trigger state out of sync for visit {vm} (found {ts.visit_month})")
+            # unset ts given wrong month, to pick up below
+            ts = None
         break
 
     if not ts:
-        ts = TriggerState(user_id=user_id, state='unstarted', timestamp=as_of_date)
+        ts = TriggerState(
+            user_id=user_id, state='unstarted', timestamp=as_of_date, visit_month=vm)
 
     return ts
 
@@ -154,7 +162,7 @@ def initiate_trigger(user_id, as_of_date=None, rebuilding=False):
         next_visit = int(ts.visit_month) + 1
         current_app.logger.debug(f"transition from {ts} to next due")
         # generate a new ts, to leave resolved record behind
-        ts = TriggerState(user_id=user_id, state='unstarted', as_of_date=as_of_date)
+        ts = TriggerState(user_id=user_id, state='unstarted', timestamp=as_of_date)
         ts.visit_month = next_visit
         current_app.logger.debug(
             "persist-trigger_states-new from initiate_trigger(), "
@@ -212,7 +220,7 @@ def evaluate_triggers(qnr):
         # bring together and evaluate available data for triggers
         dm = DomainManifold(qnr)
         previous_triggers = (
-            previous if previous and previous.visit_month + 1 == ts.visit_month
+            previous.triggers if previous and previous.visit_month + 1 == ts.visit_month
             else None)
         ts.triggers = dm.eval_triggers(previous_triggers)
         ts.questionnaire_response_id = qnr.id

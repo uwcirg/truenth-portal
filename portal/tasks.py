@@ -249,6 +249,9 @@ def update_patients(patient_list, update_cache, queue_messages):
                 update_users_QBT(user_id, research_study_id)
             if queue_messages:
                 qbstatus = QB_Status(user, research_study_id, now)
+                if qbstatus.withdrawn_by(now):
+                    # NEVER notify withdrawn patients
+                    continue
                 qbd = qbstatus.current_qbd()
                 if qbd:
                     queue_outstanding_messages(
