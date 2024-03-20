@@ -57,6 +57,26 @@ def user_triggers(user_id):
     return jsonify(users_trigger_state(user_id).as_json())
 
 
+@trigger_states.route('/api/patient/<int:user_id>/triggers/opt_out', methods=['POST', 'PUT'])
+@crossdomain()
+@oauth.require_oauth()
+def opt_out(user_id):
+    """Takes a JSON object defining the domains for which to opt-out
+
+    The ad-hoc JSON expected resembles that returned from `user_triggers()`
+    simplified to only interpret the domains for which the user chooses to
+    opt-out.
+
+    :returns TriggerState in JSON for the requested visit month
+    """
+    # confirm view access
+    get_user(user_id, 'edit', allow_on_url_authenticated_encounters=True)
+
+    # TODO validate visit_month is current, correct user, then persist opt_out data
+
+    return jsonify(users_trigger_state(user_id).as_json())
+
+
 @trigger_states.route('/api/patient/<int:user_id>/trigger_history')
 @crossdomain()
 @oauth.require_oauth()
