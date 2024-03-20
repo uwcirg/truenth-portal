@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, abort, jsonify, make_response, request
 from flask_user import roles_required
 
 from .empro_states import extract_observations, users_trigger_state
@@ -67,14 +67,16 @@ def opt_out(user_id):
     simplified to only interpret the domains for which the user chooses to
     opt-out.
 
-    :returns TriggerState in JSON for the requested visit month
+    :returns: TriggerState in JSON for the requested visit month
     """
-    # confirm view access
     get_user(user_id, 'edit', allow_on_url_authenticated_encounters=True)
+    ts = users_trigger_state(user_id)
+    try:
+        ts = ts.apply_opt_out(request.json)
+    except ValueError as e:
+        abort(400, str(e))
 
-    # TODO validate visit_month is current, correct user, then persist opt_out data
-
-    return jsonify(users_trigger_state(user_id).as_json())
+    return jsonify(ts.as_json())
 
 
 @trigger_states.route('/api/patient/<int:user_id>/trigger_history')
