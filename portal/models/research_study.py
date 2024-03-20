@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..cache import TWO_HOURS, cache
@@ -122,3 +123,17 @@ def add_static_research_studies():
     rs = ResearchStudy.from_fhir(base)
     if ResearchStudy.query.get(rs.id) is None:
         db.session.add(rs)
+
+
+def withdrawn_from_research_study(patient_id, research_study_id):
+    """Check for withdrawn row in patients timeline
+
+    :returns: If withdrawn row found, returns withdrawal date, else None
+    """
+    from .qb_timeline import QBT
+    from .overall_status import OverallStatus
+
+    withdrawn = QBT.query.filter(QBT.user_id == patient_id).filter(
+        QBT.research_study_id == research_study_id).filter(
+        QBT.status == OverallStatus.withdrawn).first()
+    return withdrawn.at if withdrawn else None
