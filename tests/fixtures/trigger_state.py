@@ -52,3 +52,21 @@ def triggered_ts(initialized_patient, mock_triggers):
         db.session.add(ts)
         db.session.commit()
     return db.session.merge(ts)
+
+
+@fixture
+def opt_out_submission():
+    return {
+        "user_id": 1,
+        "visit_month": 0,
+        "triggers": {
+            "domains": {
+                "general_pain": {
+                    "_opt_out_next_visit": True
+                },
+                "fatigue": {
+                    "_opt_out_next_visit": True
+                }
+            }
+        }
+    }
