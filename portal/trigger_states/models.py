@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime, timedelta
 from flask import current_app
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
@@ -6,6 +7,8 @@ from sqlalchemy.orm import make_transient
 from ..database import db
 from ..date_tools import FHIR_datetime, weekday_delta
 from ..models.audit import Audit
+
+opt_out_key = '_opt_out_next_visit'
 
 trigger_state_enum = ENUM(
     'unstarted',
@@ -72,6 +75,46 @@ class TriggerState(db.Model):
         # and the session.commit() clears all associated object state
         # see https://github.com/sqlalchemy/sqlalchemy/issues/3640
         self = db.session.merge(self)
+
+    def apply_opt_out(self, opt_out_dict):
+        """Given JSON dict with opt_out domains, apply to self.triggers
+
+        The format of the expected JSON can be found in:
+          tests/fixtures/trigger_state.py::opt_out_submission
+
+        :raise ValueError: if problems found with validating incoming JSON
+          or self.triggers isn't defined
+        :returns: modified self
+        """
+        if not self.triggers:
+            raise ValueError(
+                f"{self.user_id} has no triggers for {self.visit_month}; "
+                "can't apply opt_out as requested")
+        if opt_out_dict.get('user_id') != self.user_id:
+            raise ValueError(f"user_id({self.user_id} not in opt_out: {opt_out_dict}")
+        if opt_out_dict.get('visit_month') != self.visit_month:
+            raise ValueError(
+                f"user_id({self.user_id} visit_month({self.visit_month}) "
+                f"not in opt_out: {opt_out_dict}")
+
+        opt_out_of_domains = set()
+        for d, vals in opt_out_dict['triggers']['domains'].items():
+            if vals.get(opt_out_key) is True:
+                opt_out_of_domains.add(d)
+
+        tc = deepcopy(self.triggers)
+        for domain, link_triggers in tc['domain'].items():
+            if domain in opt_out_of_domains:
+                link_triggers[opt_out_key] = True
+                opt_out_of_domains.remove(domain)
+
+        if opt_out_of_domains:
+            raise ValueError(
+                f"user_id({self.user_id}):visit_month({self.visit_month}) missing domains "
+                f"requested in opt_out: {opt_out_of_domains}")
+
+        self.triggers = tc
+        return self
 
     def hard_trigger_list(self):
         """Convenience function to return list of hard trigger domains
