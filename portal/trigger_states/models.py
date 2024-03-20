@@ -107,6 +107,8 @@ class TriggerState(db.Model):
             if domain in opt_out_of_domains:
                 link_triggers[opt_out_key] = True
                 opt_out_of_domains.remove(domain)
+            elif opt_out_key in link_triggers:
+                link_triggers.pop(opt_out_key)
 
         if opt_out_of_domains:
             raise ValueError(
