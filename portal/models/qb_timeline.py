@@ -268,7 +268,7 @@ def calc_and_adjust_start(user, research_study_id, qbd, initial_trigger):
 
     delta = users_trigger - initial_trigger
     # this case should no longer be possible; raise the alarm
-    raise RuntimeError("found initial trigger to differ by: %s", str(delta))
+    raise RuntimeError("found user(%d) initial trigger to differ by: %s", user.id, str(delta))
     current_app.logger.debug("calc_and_adjust_start delta: %s", str(delta))
     return qbd.relative_start + delta
 
