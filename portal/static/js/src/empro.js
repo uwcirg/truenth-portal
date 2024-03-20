@@ -413,11 +413,6 @@ emproObj.prototype.init = function () {
             assessmentCompleted
           );
 
-          if (!assessmentCompleted) {
-            this.setLoadingVis(); // hide loading indicator when done
-            return;
-          }
-
           this.authorDate = authoredDate;
 
           /*
