@@ -172,12 +172,12 @@ emproObj.prototype.onBeforeSubmitOptoutData = function () {
   EmproObj.toggleOptoutSavingIndicator(true);
 };
 emproObj.prototype.onAfterSubmitOptoutData = function (data) {
-  // enable buttons
-  EmproObj.setOptoutButtonsState(false);
   // hide saving in progress indicator icon
   EmproObj.toggleOptoutSavingIndicator(false);
   // show error if any
   if (data && data.error) {
+    // enable buttons
+    EmproObj.setOptoutButtonsState(false);
     EmproObj.setOptoutError(
       i18next.t(
         "System error: Unable to save your choices.\r\nPlease click 'Submit' to try again. \r\nOtherwise click 'Dismiss' to continue."
@@ -189,6 +189,8 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
   $("#emproOptOutModal .save-success-indicator-container").removeClass("hide");
 
   setTimeout(() => {
+    // enable buttons
+    EmproObj.setOptoutButtonsState(false);
     EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
     EmproObj.populateSelectedOptoutUI();
     EmproObj.initOptOutModal(false);
@@ -516,7 +518,7 @@ emproObj.prototype.initTriggerDomains = function (callbackFunc) {
   }
   //var self = this;
   const isDebugging = getUrlParameter("debug");
-  tnthAjax.getSubStudyTriggers(this.userId, { maxTryAttempts: 3 }, (data) => {
+  tnthAjax.getSubStudyTriggers(this.userId, { maxTryAttempts: isDebugging ? 1 : 3 }, (data) => {
     if (isDebugging) {
       data = TestTriggersJson;
     }
