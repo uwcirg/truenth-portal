@@ -210,9 +210,6 @@
                 {% endif %}
             </div>
         {%- endcall -%}
-        {% if substudy_assessment_status.overall_status == OverallStatus.completed %}
-            {{empro_thankyou_modal(user)}}
-        {% endif %}
     {%- endif -%}
 {%- endmacro -%}
 {%- macro empro_thankyou_card(full_name="") -%}
@@ -389,7 +386,8 @@
                         <button class="btn btn-empro-primary btn-submit">Submit</button>
                         <button class="btn btn-default btn-dismiss">Dismiss</button>
                     </div>
-                    <div class="saving-indicator-container hide"><i class="fa fa-spinner fa-spin"></i> {{_("Saving data...")}}</div>
+                    <div class="saving-indicator-container hide"><i class="fa fa-spinner fa-spin"></i> {{_("Saving your choices...")}}</div>
+                    <div class="save-success-indicator-container text-success hide"><i class="fa fa-check"></i> {{_("Your choices are saved successfully.")}}</div>
                 </div>
             </div>
         </div>

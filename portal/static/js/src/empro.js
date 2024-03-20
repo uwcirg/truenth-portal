@@ -185,10 +185,15 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
     );
     return false;
   }
-  EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
-  EmproObj.populateSelectedOptoutUI();
-  EmproObj.initOptOutModal(false);
-  EmproObj.initThankyouModal(true);
+  // show successful save feedback
+  $("#emproOptOutModal .save-success-indicator-container").removeClass("hide");
+
+  setTimeout(() => {
+    EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
+    EmproObj.populateSelectedOptoutUI();
+    EmproObj.initOptOutModal(false);
+    EmproObj.initThankyouModal(true);
+  }, 1000);
   return true;
 };
 emproObj.prototype.handleSubmitOptoutData = function () {
@@ -215,46 +220,10 @@ emproObj.prototype.handleSubmitOptoutData = function () {
     }
   );
 };
-emproObj.prototype.initObservers = function () {
-  let errorObserver = new MutationObserver(function (mutations) {
-    for (let mutation of mutations) {
-      // console.log("error mutation? ", mutation);
-      if (mutation.type === "childList") {
-        // do something here if error occurred
-        const errorNode =
-          mutation.addedNodes && mutation.addedNodes.length
-            ? mutation.addedNodes[0]
-            : null;
-        let continueContainerElement = document.querySelector(
-          "#emproOptOutModal .continue-container"
-        );
-        if (continueContainerElement) {
-          if (errorNode && errorNode.data) {
-            continueContainerElement.classList.remove("hide");
-          } else {
-            continueContainerElement.classList.add("hide");
-          }
-        }
-      }
-    }
-  });
-  errorObserver.observe(
-    document.querySelector("#emproOptOutModal .error-message"),
-    {
-      childList: true,
-    }
-  );
-  $(window).on("unload", function () {
-    errorObserver.disconnect();
-  });
-  //other observers if needed
-};
 emproObj.prototype.initOptOutElementEvents = function () {
   if (!this.hasOptOutModal()) {
     return;
   }
-  // EmproObj.initObservers();
-
   // submit buttons
   $("#emproOptOutModal .btn-submit").on("click", function (e) {
     e.preventDefault();
@@ -353,10 +322,6 @@ emproObj.prototype.init = function () {
   tnthAjax.getCurrentUser((data) => {
     if (!data || !data.id) return;
     this.userId = data.id;
-    /*
-     * construct user report URL
-     */
-    this.initReportLink();
 
     const isDebugging = getUrlParameter("debug");
 
@@ -374,6 +339,11 @@ emproObj.prototype.init = function () {
         this.setLoadingVis();
         return false;
       }
+      /*
+       * construct user report URL
+       */
+      this.initReportLink();
+
       tnthAjax.assessmentReport(
         this.userId,
         EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
@@ -383,8 +353,9 @@ emproObj.prototype.init = function () {
             data.entry[0].authored = new Date().toISOString();
           }
           console.log("Questionnaire response data: ", data);
+          // no questionnaire data, just return here
           if (!data || !data.entry || !data.entry.length) {
-            this.setLoadingVis(); // hide loading indicator when done
+            this.setLoadingVis(); // hide loading indicator
             return;
           }
           /*
