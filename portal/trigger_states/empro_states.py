@@ -21,7 +21,7 @@ from ..models.qbd import QBD
 from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.observation import Observation
-from ..models.research_study import EMPRO_RS_ID
+from ..models.research_study import EMPRO_RS_ID, withdrawn_from_research_study
 from ..models.user import User
 from ..timeout_lock import TimeoutLock
 
@@ -98,6 +98,7 @@ def users_trigger_state(user_id, as_of_date=None):
 
     vm = lookup_visit_month(user_id, as_of_date)
     ts = None
+    withdrawal_date = withdrawn_from_research_study(user_id, EMPRO_RS_ID)
     rows = TriggerState.query.filter(
         TriggerState.user_id == user_id).order_by(
         TriggerState.timestamp.desc())
@@ -106,7 +107,7 @@ def users_trigger_state(user_id, as_of_date=None):
         if as_of_date < ts_row.timestamp:
             continue
         ts = ts_row
-        if ts.visit_month < vm:
+        if ts.visit_month < vm and not withdrawal_date:
             current_app.logger.debug(
                 f"{user_id} trigger state out of sync for visit {vm} (found {ts.visit_month})")
             # unset ts given wrong month, to pick up below
