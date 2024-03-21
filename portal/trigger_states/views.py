@@ -3,6 +3,7 @@ from flask_user import roles_required
 
 from .empro_states import extract_observations, users_trigger_state
 from .models import TriggerState
+from ..database import db
 from ..extensions import oauth
 from ..models.role import ROLE
 from ..models.user import get_user
@@ -76,6 +77,8 @@ def opt_out(user_id):
     except ValueError as e:
         abort(400, str(e))
 
+    # persist the change
+    db.session.commit()
     return jsonify(ts.as_json())
 
 
