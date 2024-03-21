@@ -1,6 +1,7 @@
 from copy import deepcopy
 from datetime import datetime, timedelta
 from flask import current_app
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import make_transient
 
@@ -37,6 +38,12 @@ class TriggerState(db.Model):
         db.ForeignKey('questionnaire_responses.id'), index=True)
     visit_month = db.Column(db.Integer, nullable=False, index=True, default=0)
     triggers = db.Column(JSONB)
+
+    __table_args__ = (
+        UniqueConstraint(
+            user_id, state, visit_month,
+            name='_trigger_states_user_state_visit_month'),
+    )
 
     def as_json(self):
         results = {
@@ -90,6 +97,8 @@ class TriggerState(db.Model):
             raise ValueError(
                 f"{self.user_id} has no triggers for {self.visit_month}; "
                 "can't apply opt_out as requested")
+        if not opt_out_dict:
+            raise ValueError("missing required JSON doc")
         if opt_out_dict.get('user_id') != self.user_id:
             raise ValueError(f"user_id({self.user_id} not in opt_out: {opt_out_dict}")
         if opt_out_dict.get('visit_month') != self.visit_month:
