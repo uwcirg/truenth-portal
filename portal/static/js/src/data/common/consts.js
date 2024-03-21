@@ -12,6 +12,7 @@ export var EMPRO_TRIGGER_UNPROCCESSED_STATES = [
   "inprocess",
   "unstarted",
 ];
+export var EMPRO_TRIGGER_PRESTATE = "unstarted"; // see /trigger_states/empro_states.py for explanation of different trigger states
 export var EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER = "ironman_ss";
 export var EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER = "ironman_ss_post_tx";
 //pre-existing translated text
