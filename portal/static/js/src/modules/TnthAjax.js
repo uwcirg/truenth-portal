@@ -4,7 +4,7 @@ import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
-import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_PRESTATE, EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
+import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_IN_PROCESS_STATE} from "../data/common/consts.js";
 const MAX_ATTEMPTS = 3
 export default { /*global $ */
     "beforeSend": function() {
@@ -350,10 +350,9 @@ export default { /*global $ */
             const dataState = String(data.state).toLowerCase();
             params = params || {};
 
+            //if the trigger data has not been processed, try again until maximum number of attempts has been reached
             if (params.retryAttempt < params.maxTryAttempts &&
-                dataState !== EMPRO_TRIGGER_PRESTATE &&
-                //if the trigger data has not been processed, try again until maximum number of attempts has been reached
-                EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(dataState) === -1) {
+                dataState === EMPRO_TRIGGER_IN_PROCESS_STATE) {
                 params.retryAttempt++;
                 setTimeout(function() {
                     this.getSubStudyTriggers(userId, params, callback);
