@@ -348,6 +348,7 @@ export default { /*global $ */
             }
 
             const dataState = String(data.state).toLowerCase();
+            params = params || {};
 
             if (params.retryAttempt < params.maxTryAttempts &&
                 dataState !== EMPRO_TRIGGER_PRESTATE &&
