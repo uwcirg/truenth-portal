@@ -414,32 +414,37 @@ emproObj.prototype.init = function () {
 
           console.log("Should show EMPRO thank you modal ", autoShowModal);
 
-          this.initTriggerDomains((result) => {
-            this.setLoadingVis(); // hide loading indicator when done
-            if (result && result.error) {
-              console.log("Error retrieving trigger data");
-              if (result.reason) {
-                console.log("Error retrieving trigger data: ", result.reason);
+          this.initTriggerDomains(
+            {
+              clearCache: autoShowModal,
+            },
+            (result) => {
+              this.setLoadingVis(); // hide loading indicator when done
+              if (result && result.error) {
+                console.log("Error retrieving trigger data");
+                if (result.reason) {
+                  console.log("Error retrieving trigger data: ", result.reason);
+                }
               }
-            }
 
-            /*
-             * set thank you modal accessed flag here
-             */
-            if (autoShowModal) {
-              localStorage.setItem(this.cachedAccessKey, `true`);
-              // console.log("Opt out domain? ", this.optOutDomains);
-              if (this.optOutDomains.length > 0) {
-                this.populateOptoutInputItems();
-                this.initOptOutElementEvents();
-                this.initOptOutModal(true);
-                this.initThankyouModal(false);
-                return;
+              /*
+               * set thank you modal accessed flag here
+               */
+              if (autoShowModal) {
+                localStorage.setItem(this.cachedAccessKey, `true`);
+                // console.log("Opt out domain? ", this.optOutDomains);
+                if (this.optOutDomains.length > 0) {
+                  this.populateOptoutInputItems();
+                  this.initOptOutElementEvents();
+                  this.initOptOutModal(true);
+                  this.initThankyouModal(false);
+                  return;
+                }
               }
-            }
 
-            this.initThankyouModal(autoShowModal);
-          });
+              this.initThankyouModal(autoShowModal);
+            }
+          );
         }
       );
     });
@@ -513,7 +518,7 @@ emproObj.prototype.processTriggerData = function (data) {
     }
   }
 };
-emproObj.prototype.initTriggerDomains = function (callbackFunc) {
+emproObj.prototype.initTriggerDomains = function (params, callbackFunc) {
   var callback = callbackFunc || function () {};
   if (!this.hasThankyouModal()) {
     callback({ error: true });
@@ -523,7 +528,7 @@ emproObj.prototype.initTriggerDomains = function (callbackFunc) {
   const isDebugging = getUrlParameter("debug");
   tnthAjax.getSubStudyTriggers(
     this.userId,
-    { maxTryAttempts: isDebugging ? 1 : 5 },
+    { maxTryAttempts: isDebugging ? 1 : 5, ...(params ? params : {}) },
     (data) => {
       if (isDebugging) {
         data = TestTriggersJson;
