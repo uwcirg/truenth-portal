@@ -113,7 +113,7 @@ emproObj.prototype.setOptoutSubmitData = function () {
   var triggerObject = {};
   EmproObj.selectedOptOutDomains.forEach((item) => {
     triggerObject[item] = {
-      _opt_out_next_visit: "true",
+      _opt_out_next_visit: true,
     };
   });
   var submitData = {
