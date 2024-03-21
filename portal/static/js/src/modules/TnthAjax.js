@@ -385,7 +385,7 @@ export default { /*global $ */
             callback({error: true});
             return false;
         }
-        this.sendRequest(`/api/patient/${userId}/triggers/opt_out`, "POST", userId, params, (data) => {
+        this.sendRequest(`/api/patient/${userId}/triggers/opt_out`, "PUT", userId, params, (data) => {
             if (!data || data.error) {
                 callback({"error": true});
                 return false;
