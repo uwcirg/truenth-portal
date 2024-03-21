@@ -518,10 +518,11 @@ emproObj.prototype.initTriggerDomains = function (callbackFunc) {
   }
   //var self = this;
   const isDebugging = getUrlParameter("debug");
-  tnthAjax.getSubStudyTriggers(this.userId, { maxTryAttempts: isDebugging ? 1 : 3 }, (data) => {
+  tnthAjax.getSubStudyTriggers(this.userId, { maxTryAttempts: isDebugging ? 1 : 5 }, (data) => {
     if (isDebugging) {
       data = TestTriggersJson;
     }
+    console.log("Trigger data: ", data);
     if (!data || data.error || !data.triggers || !data.triggers.domain) {
       callback({ error: true, reason: "no trigger data" });
       return false;
