@@ -386,7 +386,7 @@ emproObj.prototype.init = function () {
             "author date ",
             authoredDate,
             " assessment completed ",
-            assessmentCompleted, 
+            assessmentCompleted,
             " identifier ",
             identifier
           );
@@ -412,10 +412,7 @@ emproObj.prototype.init = function () {
             assessmentCompleted &&
             today === authoredDate;
 
-          if (!autoShowModal) {
-            this.setLoadingVis(); // hide loading indicator when done
-            return;
-          }
+          console.log("Should show EMPRO thank you modal ", autoShowModal);
 
           this.initTriggerDomains((result) => {
             this.setLoadingVis(); // hide loading indicator when done
@@ -425,21 +422,23 @@ emproObj.prototype.init = function () {
                 console.log("Error retrieving trigger data: ", result.reason);
               }
             }
+
             /*
              * set thank you modal accessed flag here
              */
-            localStorage.setItem(cachedAccessKey, `true`);
-
-            // console.log("Opt out domain? ", this.optOutDomains);
-            if (this.optOutDomains.length > 0) {
-              this.populateOptoutInputItems();
-              this.initOptOutElementEvents();
-              this.initOptOutModal(true);
-              this.initThankyouModal(false);
-              return;
+            if (autoShowModal) {
+              localStorage.setItem(this.cachedAccessKey, `true`);
+              // console.log("Opt out domain? ", this.optOutDomains);
+              if (this.optOutDomains.length > 0) {
+                this.populateOptoutInputItems();
+                this.initOptOutElementEvents();
+                this.initOptOutModal(true);
+                this.initThankyouModal(false);
+                return;
+              }
             }
 
-            this.initThankyouModal(true);
+            this.initThankyouModal(autoShowModal);
           });
         }
       );
@@ -461,7 +460,6 @@ emproObj.prototype.processTriggerData = function (data) {
     return false;
   }
   var self = this;
-  console.log("trigger data ", data);
 
   // set visit month related to trigger data
   this.visitMonth = data.visit_month;
