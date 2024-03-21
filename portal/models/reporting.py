@@ -48,6 +48,11 @@ def single_patient_adherence_data(patient_id, research_study_id):
 
     :returns: number of added rows
     """
+    # ignore non-patient requests
+    patient = User.query.get(patient_id)
+    if not patient.has_role(ROLE.PATIENT.value):
+        return
+
     as_of_date = datetime.utcnow()
     cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
         patient_id=patient_id,
@@ -142,7 +147,6 @@ def single_patient_adherence_data(patient_id, research_study_id):
         row['content_domains_accessed'] = ', '.join(da) if da else ""
 
     added_rows = 0
-    patient = User.query.get(patient_id)
     qb_stats = QB_Status(
         user=patient,
         research_study_id=research_study_id,
