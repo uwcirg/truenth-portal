@@ -367,13 +367,16 @@ emproObj.prototype.init = function () {
             return new Date(b.authored) - new Date(a.authored);
           });
           let assessmentDate = assessmentData[0]["authored"];
-          let [today, authoredDate, status] = [
+          let [today, authoredDate, status, identifier] = [
             tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
             tnthDate.getDateWithTimeZone(
               new Date(assessmentDate),
               "yyyy-mm-dd"
             ),
             assessmentData[0].status,
+            assessmentData[0].identifier && assessmentData[0].identifier.value
+              ? assessmentData[0].identifier.value
+              : assessmentDate,
           ];
           let assessmentCompleted =
             String(status).toLowerCase() === "completed";
@@ -383,7 +386,9 @@ emproObj.prototype.init = function () {
             "author date ",
             authoredDate,
             " assessment completed ",
-            assessmentCompleted
+            assessmentCompleted, 
+            " identifier ",
+            identifier
           );
 
           this.authorDate = authoredDate;
@@ -391,7 +396,7 @@ emproObj.prototype.init = function () {
           /*
            * associating each thank you modal popup accessed by assessment date
            */
-          let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${authoredDate}`;
+          let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${authoredDate}_${identifier}`;
           this.cachedAccessKey = cachedAccessKey;
 
           const clearCacheData = getUrlParameter("clearCache");
@@ -518,33 +523,37 @@ emproObj.prototype.initTriggerDomains = function (callbackFunc) {
   }
   //var self = this;
   const isDebugging = getUrlParameter("debug");
-  tnthAjax.getSubStudyTriggers(this.userId, { maxTryAttempts: isDebugging ? 1 : 5 }, (data) => {
-    if (isDebugging) {
-      data = TestTriggersJson;
+  tnthAjax.getSubStudyTriggers(
+    this.userId,
+    { maxTryAttempts: isDebugging ? 1 : 5 },
+    (data) => {
+      if (isDebugging) {
+        data = TestTriggersJson;
+      }
+      console.log("Trigger data: ", data);
+      if (!data || data.error || !data.triggers || !data.triggers.domain) {
+        callback({ error: true, reason: "no trigger data" });
+        return false;
+      }
+
+      this.processTriggerData(data);
+
+      /*
+       * display user domain topic(s)
+       */
+      this.populateDomainDisplay();
+      /*
+       * show/hide sections based on triggers
+       */
+      this.initTriggerItemsVis();
+
+      callback(data);
+
+      //console.log("self.domains? ", self.domains);
+      //console.log("has hard triggers ", self.hasHardTrigger);
+      //console.log("has soft triggers ", self.hasSoftTrigger);
     }
-    console.log("Trigger data: ", data);
-    if (!data || data.error || !data.triggers || !data.triggers.domain) {
-      callback({ error: true, reason: "no trigger data" });
-      return false;
-    }
-
-    this.processTriggerData(data);
-
-    /*
-     * display user domain topic(s)
-     */
-    this.populateDomainDisplay();
-    /*
-     * show/hide sections based on triggers
-     */
-    this.initTriggerItemsVis();
-
-    callback(data);
-
-    //console.log("self.domains? ", self.domains);
-    //console.log("has hard triggers ", self.hasHardTrigger);
-    //console.log("has soft triggers ", self.hasSoftTrigger);
-  });
+  );
 };
 let EmproObj = new emproObj();
 $(document).ready(function () {
