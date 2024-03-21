@@ -1,0 +1,111 @@
+{
+  "state": "resolved",
+  "timestamp": "2023-07-31T23:17:03+00:00",
+  "triggers": {
+    "action_state": "completed",
+    "actions": {
+      "email": [
+        {
+          "context": "patient thank you",
+          "email_message_id": 147757,
+          "timestamp": "2023-07-10T23:17:04.336385Z"
+        },
+        {
+          "context": "initial staff alert",
+          "email_message_id": 147758,
+          "timestamp": "2023-07-10T23:17:04.767591Z"
+        },
+        {
+          "context": "initial staff alert",
+          "email_message_id": 147759,
+          "timestamp": "2023-07-10T23:17:04.981972Z"
+        },
+        {
+          "context": "initial staff alert",
+          "email_message_id": 147760,
+          "timestamp": "2023-07-10T23:17:05.197306Z"
+        },
+        {
+          "context": "initial staff alert",
+          "email_message_id": 147761,
+          "timestamp": "2023-07-10T23:17:05.413215Z"
+        },
+        {
+          "context": "initial staff alert",
+          "email_message_id": 147762,
+          "timestamp": "2023-07-10T23:17:05.657467Z"
+        },
+        {
+          "context": "initial staff alert",
+          "email_message_id": 147763,
+          "timestamp": "2023-07-10T23:17:05.879160Z"
+        },
+        {
+          "context": "initial staff alert",
+          "email_message_id": 147764,
+          "timestamp": "2023-07-10T23:17:06.088223Z"
+        },
+        {
+          "context": "initial staff alert",
+          "email_message_id": 147765,
+          "timestamp": "2023-07-10T23:17:06.284333Z"
+        }
+      ]
+    },
+    "domain": {
+      "anxious": {
+        "ironman_ss.11": "hard",
+        "ironman_ss.12": "hard",
+        "ironman_ss.13": "hard",
+        "_sequential_hard_trigger_count": 2
+      },
+      "discouraged": {
+        "ironman_ss.14": "hard",
+        "ironman_ss.15": "hard",
+        "ironman_ss.16": "hard",
+        "_sequential_hard_trigger_count": 2
+      },
+      "fatigue": {
+        "ironman_ss.10": "hard",
+        "ironman_ss.9": "hard",
+        "_sequential_hard_trigger_count": 0
+      },
+      "general_pain": {
+        "ironman_ss.1": "hard",
+        "ironman_ss.2": "hard",
+        "ironman_ss.3": "hard",
+        "_sequential_hard_trigger_count": 2
+      },
+      "insomnia": { "ironman_ss.7": "hard", "ironman_ss.8": "hard" },
+      "joint_pain": {
+        "ironman_ss.4": "hard",
+        "ironman_ss.5": "hard",
+        "ironman_ss.6": "hard",
+        "_sequential_hard_trigger_count": 0
+      },
+      "sad": {
+        "ironman_ss.17": "hard",
+        "ironman_ss.18": "hard",
+        "ironman_ss.19": "hard",
+        "_sequential_hard_trigger_count": 2
+      },
+      "social_isolation": {
+        "ironman_ss.20": "hard",
+        "_sequential_hard_trigger_count": 2
+      }
+    },
+    "resolution": {
+      "authored": "2023-07-25T16:21:24Z",
+      "qb_iteration": null,
+      "qnr_id": 4162
+    },
+    "source": {
+      "authored": "2023-07-25T23:16:54Z",
+      "qb_id": 114,
+      "qb_iteration": null,
+      "qnr_id": 4161
+    }
+  },
+  "user_id": 4118,
+  "visit_month": 1
+}
