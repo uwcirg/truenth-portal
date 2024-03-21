@@ -416,6 +416,7 @@ emproObj.prototype.init = function () {
 
           this.initTriggerDomains(
             {
+              maxTryAttempts: isDebugging && !autoShowModal ? 1 : 5,
               clearCache: autoShowModal,
             },
             (result) => {
@@ -526,37 +527,33 @@ emproObj.prototype.initTriggerDomains = function (params, callbackFunc) {
   }
   //var self = this;
   const isDebugging = getUrlParameter("debug");
-  tnthAjax.getSubStudyTriggers(
-    this.userId,
-    { maxTryAttempts: isDebugging ? 1 : 5, ...(params ? params : {}) },
-    (data) => {
-      if (isDebugging) {
-        data = TestTriggersJson;
-      }
-      console.log("Trigger data: ", data);
-      if (!data || data.error || !data.triggers || !data.triggers.domain) {
-        callback({ error: true, reason: "no trigger data" });
-        return false;
-      }
-
-      this.processTriggerData(data);
-
-      /*
-       * display user domain topic(s)
-       */
-      this.populateDomainDisplay();
-      /*
-       * show/hide sections based on triggers
-       */
-      this.initTriggerItemsVis();
-
-      callback(data);
-
-      //console.log("self.domains? ", self.domains);
-      //console.log("has hard triggers ", self.hasHardTrigger);
-      //console.log("has soft triggers ", self.hasSoftTrigger);
+  tnthAjax.getSubStudyTriggers(this.userId, params, (data) => {
+    if (isDebugging) {
+      data = TestTriggersJson;
     }
-  );
+    console.log("Trigger data: ", data);
+    if (!data || data.error || !data.triggers || !data.triggers.domain) {
+      callback({ error: true, reason: "no trigger data" });
+      return false;
+    }
+
+    this.processTriggerData(data);
+
+    /*
+     * display user domain topic(s)
+     */
+    this.populateDomainDisplay();
+    /*
+     * show/hide sections based on triggers
+     */
+    this.initTriggerItemsVis();
+
+    callback(data);
+
+    //console.log("self.domains? ", self.domains);
+    //console.log("has hard triggers ", self.hasHardTrigger);
+    //console.log("has soft triggers ", self.hasSoftTrigger);
+  });
 };
 let EmproObj = new emproObj();
 $(document).ready(function () {
