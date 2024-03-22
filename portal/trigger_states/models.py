@@ -9,7 +9,9 @@ from ..database import db
 from ..date_tools import FHIR_datetime, weekday_delta
 from ..models.audit import Audit
 
-opt_out_key = '_opt_out_next_visit'
+opt_out_next_visit_key = '_opt_out_next_visit'
+opted_out_previous_key = '_opted_out_previous_visit'
+
 
 trigger_state_enum = ENUM(
     'unstarted',
@@ -108,16 +110,16 @@ class TriggerState(db.Model):
 
         opt_out_of_domains = set()
         for d, vals in opt_out_dict['triggers']['domains'].items():
-            if vals.get(opt_out_key) is True:
+            if vals.get(opt_out_next_visit_key) is True:
                 opt_out_of_domains.add(d)
 
         tc = deepcopy(self.triggers)
         for domain, link_triggers in tc['domain'].items():
             if domain in opt_out_of_domains:
-                link_triggers[opt_out_key] = True
+                link_triggers[opt_out_next_visit_key] = True
                 opt_out_of_domains.remove(domain)
-            elif opt_out_key in link_triggers:
-                link_triggers.pop(opt_out_key)
+            elif opt_out_next_visit_key in link_triggers:
+                link_triggers.pop(opt_out_next_visit_key)
 
         if opt_out_of_domains:
             raise ValueError(
@@ -142,6 +144,27 @@ class TriggerState(db.Model):
             if 'hard' in link_triggers.values():
                 results.append(domain)
         return sorted(results)
+
+    def opted_out_domains(self):
+        """Convenience function to return list of opted out previous visit domains
+
+        :returns: list of domains user opted out of on previous visit, or empty list.
+        """
+        results = []
+        if not self.triggers:
+            return results
+
+        # need previous month triggers for this one
+        prev = self.query.filter(TriggerState.user_id == self.user_id).filter(
+            TriggerState.visit_month == self.visit_month - 1).filter(
+            TriggerState.state == 'resolved').first()
+        if not (prev and prev.triggers):
+            return results
+
+        for domain, link_triggers in prev.triggers['domain'].items():
+            if opt_out_next_visit_key in link_triggers:
+                results.append(domain)
+        return results
 
     def reminder_due(self, as_of_date=None):
         """Determine if reminder is due from internal state"""
