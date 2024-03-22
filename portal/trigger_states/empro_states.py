@@ -13,7 +13,7 @@ from statemachine.exceptions import TransitionNotAllowed
 
 from .empro_domains import DomainManifold
 from .empro_messages import invite_email, patient_email, staff_emails
-from .models import TriggerState
+from .models import TriggerState, opted_out_previous_key
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..models.qb_status import QB_Status
@@ -295,6 +295,13 @@ def fire_trigger_events():
         # on hard triggers.  Patient gets 'thank you' email regardless.
         hard_triggers = ts.hard_trigger_list()
         soft_triggers = ts.soft_trigger_list()
+        opted_out = ts.opted_out_domains()
+        actionable_triggers = list(set(hard_triggers) - set(opted_out))
+        # persist all opted out for front-end use as well
+        for domain, link_triggers in triggers['domain'].items():
+            if domain in opted_out:
+                link_triggers[opted_out_previous_key] = True
+
         pending_emails = []
         patient = User.query.get(ts.user_id)
 
@@ -307,11 +314,10 @@ def fire_trigger_events():
             current_app.logger.error(
                 f"EMPRO Patient({patient.id}) w/o email!  Can't send message")
 
-        if hard_triggers:
+        if actionable_triggers:
             triggers['action_state'] = 'required'
-
             # In the event of hard_triggers, clinicians/staff get mail
-            for msg in staff_emails(patient, hard_triggers, True):
+            for msg in staff_emails(patient, actionable_triggers, True):
                 pending_emails.append((msg, "initial staff alert"))
 
         for em, context in pending_emails:
@@ -322,8 +328,8 @@ def fire_trigger_events():
         sm = EMPRO_state(ts)
         sm.fired_events()
 
-        # Without hard triggers, no further action is necessary
-        if not hard_triggers:
+        # Without actionable triggers, no further action is necessary
+        if not actionable_triggers:
             sm.resolve()
 
         current_app.logger.debug(
