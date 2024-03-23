@@ -201,6 +201,7 @@ export default (function() {
              */
             subStudyTriggers: {
                 domains: [],
+                optout_domains: [],
                 date: "",
                 state: "",
                 data: {}
@@ -263,6 +264,9 @@ export default (function() {
             },
             computedSubStudyTriggers: function() {
                 return this.subStudyTriggers.domains;
+            },
+            computedSubStudyOptOutDomains: function() {
+                return this.subStudyTriggers.optout_domains;
             },
             computedSubStudyAssessmentData: function() {
                 return this.subStudyAssessment.data;
@@ -1410,6 +1414,7 @@ export default (function() {
                                 return;
                             }
                             let domains = new Array();
+                            let arrOptOut = new Array();
                             let lastTriggerItem = null;
                             for (var index = data.length-1; index >= 0; index--) {
                                if (EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(String(data[index].state).toLowerCase()) === -1) {
@@ -1423,6 +1428,10 @@ export default (function() {
                             }
                             for (let topic in lastTriggerItem.triggers.domain) {
                                 if (!Object.keys(lastTriggerItem.triggers.domain[topic]).length) {
+                                    continue;
+                                }
+                                if (lastTriggerItem.triggers.domain[topic]._opt_out_next_visit) {
+                                    arrOptOut.push(topic);
                                     continue;
                                 }
                                 for (let q in lastTriggerItem.triggers.domain[topic]) {
@@ -1439,12 +1448,14 @@ export default (function() {
                             completedDate = new Date(completedDate); //convert to local date/time
                             [
                                 this.subStudyTriggers.domains,
+                                this.subStudyTriggers.optout_domains,
                                 this.subStudyTriggers.date,
                                 this.subStudyTriggers.displaydate,
                                 this.subStudyTriggers.state,
                                 this.subStudyTriggers.data
                             ] = [
                                 domains,
+                                arrOptOut,
                                 completedDate,
                                 i18next.t(
                                     this.modules.tnthDates.formatDateString(completedDate, "d M y hh:mm")+" <span class='small muted'>({timezone})</span>"
@@ -1456,10 +1467,18 @@ export default (function() {
                 });
             },
             hasSubStudyTriggers: function() {
-                return this.computedSubStudyTriggers.length;
+                return false;
+               // return this.computedSubStudyTriggers.length;
+            },
+            hasSubStudyOptOutDomains: function() {
+                return this.computedSubStudyOptOutDomains.length > 0;
             },
             hasPrevSubStudyPostTx: function() {
                 return this.computedSubStudyPostTxResponses.length;
+            },
+            getSubStudyOptoutDomainsDisplay: function() {
+                if (!this.hasSubStudyOptOutDomains()) return "";
+                return this.subStudyTriggers.optout_domains.map((item) => item.replace(/_/g, ' ')).join(", ");
             },
             setPrevPostTxResponses: function(qnrId) {
                 if (!qnrId) {
@@ -1528,6 +1547,7 @@ export default (function() {
             shouldDisableSubstudyPostTx: function() {
                 return (
                   !this.isPostTxQuestionnaireEligible() ||
+                  this.isPostTxActionNotApplicable() ||
                   this.isSubStudyTriggersResolved()
                 );
             },
@@ -1555,6 +1575,12 @@ export default (function() {
                 return this.subStudyTriggers.data &&
                 (["due", "overdue", "required"].indexOf(this.getPostTxActionStatus()) !== -1
                 );
+            },
+            isPostTxActionNotApplicable: function() {
+                if (!this.subStudyTriggers.data) {
+                    return true;
+                }
+                return this.getPostTxActionStatus() === "not applicable";
             },
             isSubStudyTriggersResolved: function() {
                 if (!this.subStudyTriggers.data) {

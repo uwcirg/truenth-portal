@@ -488,10 +488,10 @@ emproObj.prototype.processTriggerData = function (data) {
       self.mappedDomains.push(mappedDomain);
     }
     for (let q in data.triggers.domain[key]) {
-      // if sequence count > 1, that means it has been asked before
+      // if sequence count >= 3, that means it has been triggered previously
       if (
         q === "_sequential_hard_trigger_count" &&
-        parseInt(data.triggers.domain[key][q]) > 1
+        parseInt(data.triggers.domain[key][q]) >= 3
       ) {
         // console.log("domain? ", key, " sequence ", parseInt(data.triggers.domain[key][q]));
         if (self.optOutDomains.indexOf(key) === -1) {
