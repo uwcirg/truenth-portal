@@ -874,9 +874,9 @@
 {% macro postInterventionOptoutDomains() %}
     <div class="item text-warning" v-if="hasSubStudyOptOutDomains()">
         <p>
-            {{_("<b>NOTE</b>: The participant has chosen not to be contacted about some issues.")}}
+            {{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted about some issues.")}}
             <br/>
-            {{_("High distressed areas (<u>Do not contact</u>): ")}}
+            {{_("High distressed areas ( <em>Do not contact</em> ): ")}}
             <span v-text="getSubStudyOptoutDomainsDisplay()"></span>
         </p>
     </div>
@@ -911,7 +911,7 @@
                             <span class="text" v-text="getLastSubStudyAssessmentDate()"></span>
                         </div>
                         <!-- IF no triggers are indicated, ONLY display as such for assessment that has been COMPLETED, as triggers aren't calculated yet for assessment still in progress -->
-                        <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No high distress areas indicated")}}</div>
+                        <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No action required")}}</div>
                         {{postInterventionOptoutDomains()}}
                     </div>
                 </div>

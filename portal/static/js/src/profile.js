@@ -6,7 +6,7 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
-import {sortArrayByField} from "./modules/Utility.js";
+import {sortArrayByField, getUrlParameter} from "./modules/Utility.js";
 import {
   EPROMS_SUBSTUDY_ID,
   EPROMS_SUBSTUDY_TITLE,
@@ -1478,7 +1478,11 @@ export default (function() {
             },
             getSubStudyOptoutDomainsDisplay: function() {
                 if (!this.hasSubStudyOptOutDomains()) return "";
-                return this.subStudyTriggers.optout_domains.map((item) => item.replace(/_/g, ' ')).join(", ");
+                const arrOptoutDomains = this.subStudyTriggers.optout_domains;
+                if (!arrOptoutDomains || !arrOptoutDomains.length) return "";
+                return arrOptoutDomains.map(
+                    (item) => item.replace(/_/g, " ")
+                ).join(", ");
             },
             setPrevPostTxResponses: function(qnrId) {
                 if (!qnrId) {
@@ -1566,6 +1570,9 @@ export default (function() {
                 if (!this.subStudyTriggers.data || !this.subStudyTriggers.data.action_state) {
                     return "";
                 }
+                const paramActionState = getUrlParameter("trigger_action_state");
+                // for debugging
+                if (paramActionState) return paramActionState.toLowerCase();
                 return String(this.subStudyTriggers.data.action_state).toLowerCase();
             },
             hasMissedPostTxAction: function() {
@@ -1658,6 +1665,7 @@ export default (function() {
                              *  if the triggers are considered proccessed. check to see if they have been resolved
                              */
                             if (
+                                self.subStudyTriggers.data &&
                                 self.subStudyTriggers.data.resolution &&
                                 self.subStudyTriggers.data.resolution.qnr_id
                             ){
