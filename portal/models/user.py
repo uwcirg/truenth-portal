@@ -1328,8 +1328,8 @@ class User(db.Model, UserMixin):
         alternatively, if the user has been reactivated and the withdrawn mask
         is present, remove it.
         """
-        from research_study import EMPRO_RS_ID, BASE_RS_ID
-        from user_consent import consent_withdrawal_dates
+        from .research_study import EMPRO_RS_ID, BASE_RS_ID
+        from .user_consent import consent_withdrawal_dates
 
         mask_user = None
         # check former consent/withdrawal status for both studies
@@ -1374,8 +1374,8 @@ class User(db.Model, UserMixin):
                 comment=comment,
                 context='demographics',
                 timestamp=datetime.utcnow())
-        db.session.add(audit)
-        db.session.commit()
+            db.session.add(audit)
+            db.session.commit()
 
     def deactivate_tous(self, acting_user, types=None):
         """ Mark user's current active ToU agreements as inactive
