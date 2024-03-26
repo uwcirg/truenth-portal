@@ -13,6 +13,7 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.research_study import ResearchStudy
+from portal.models.user import User, WITHDRAWN_PREFIX
 from portal.models.user_consent import UserConsent
 from tests import TEST_USER_ID, TestCase
 
@@ -377,6 +378,10 @@ class TestUserConsent(TestCase):
             user_id=TEST_USER_ID, organization_id=org1_id).first()
         assert dc.status == 'deleted'
 
+        # confirm withdrawn user email mask not in place
+        self.test_user = db.session.query(User).get(TEST_USER_ID)
+        assert not self.test_user._email.startswith(WITHDRAWN_PREFIX)
+
     def test_withdraw_user_consent(self):
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
@@ -420,6 +425,10 @@ class TestUserConsent(TestCase):
             (not current_app.config.get('GIL')))
         assert not new_consent.send_reminders
         assert new_consent.acceptance_date == suspend_date
+
+        # confirm withdrawn user email mask in place
+        self.test_user = db.session.query(User).get(TEST_USER_ID)
+        assert self.test_user._email.startswith(WITHDRAWN_PREFIX)
 
     def test_withdraw_user_consent_other_study(self):
         self.shallow_org_tree()
@@ -490,6 +499,10 @@ class TestUserConsent(TestCase):
 
         assert valid_consents[1].research_study_id == 1
         assert valid_consents[1].acceptance_date == study_1_acceptance_date
+
+        # confirm user email isn't masked
+        self.test_user = db.session.query(User).get(TEST_USER_ID)
+        assert not self.test_user._email.startswith(WITHDRAWN_PREFIX)
 
     def test_withdraw_too_early(self):
         """Avoid problems with withdrawals predating the existing consent"""
@@ -587,3 +600,7 @@ class TestUserConsent(TestCase):
             status='suspended')
         assert query.count() == 1
         assert query.first().acceptance_date == just_right
+
+        # confirm withdrawn user email mask in place
+        self.test_user = db.session.query(User).get(TEST_USER_ID)
+        assert self.test_user._email.startswith(WITHDRAWN_PREFIX)
