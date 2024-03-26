@@ -1372,7 +1372,7 @@ class User(db.Model, UserMixin):
                 user_id=self.id,
                 subject_id=self.id,
                 comment=comment,
-                context='demographics',
+                context='user',
                 timestamp=datetime.utcnow())
             db.session.add(audit)
             db.session.commit()

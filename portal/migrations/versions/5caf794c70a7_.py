@@ -107,7 +107,7 @@ def mask_withdrawn_user_email(session, patient, admin):
             "INSERT INTO AUDIT"
             " (user_id, subject_id, context, timestamp, version, comment)"
             " VALUES"
-            f"({admin.id}, {subject_id}, 'demographics',"
+            f"({admin.id}, {subject_id}, 'user',"
             f" '{now}', '{version}', '{msg}')")
         session.execute(insert)
 
