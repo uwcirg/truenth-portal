@@ -60,6 +60,7 @@ from .value_quantity import ValueQuantity
 
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
+WITHDRAWN_PREFIX = "__withdrawn__"
 DELETED_PREFIX = "__deleted_{time}__"
 DELETED_REGEX = r"__deleted_\d+__(.*)"
 
@@ -640,6 +641,9 @@ class User(db.Model, UserMixin):
 
         if self._email.startswith(NO_EMAIL_PREFIX) or not valid_email:
             return False, _("invalid email address")
+
+        if self._email.startswith(WITHDRAWN_PREFIX):
+            return False, _("withdrawn user; invalid address")
 
         if not ignore_preference and UserPreference.query.filter(
                 UserPreference.user_id == self.id).filter(
