@@ -1,4 +1,4 @@
-"""empty message
+"""mask email for withdrawn; obtain details of messages sent to withdrawn users
 
 Revision ID: 5caf794c70a7
 Revises: 3c871e710277
@@ -12,6 +12,7 @@ from flask import current_app
 from sqlalchemy.orm import sessionmaker
 
 from portal.models.audit import Audit
+from portal.models.message import EmailMessage
 from portal.models.organization import Organization, OrgTree
 from portal.models.qb_timeline import QBT
 from portal.models.user import User, WITHDRAWN_PREFIX, patients_query
@@ -56,14 +57,40 @@ def audit_since_for_patient(patient):
     for audit in audit_query:
         if audit.context == 'consent' and audit.comment.startswith('remove bogus'):
             continue
-        # TODO counts from audit depending on interaction
         print(audit)
+
+def emails_since_for_patient(patient):
+    """report details on any emails since upgrade sent for patient"""
+    min_id = 140419  # last id on prod before update
+    addr = patient.email
+    email_by_addr = EmailMessage.query.filter(EmailMessage.recipients == addr).filter(
+        EmailMessage.id > min_id)
+    email_by_id = EmailMessage.query.filter(EmailMessage.recipient_id == patient.id).filter(
+        EmailMessage.id > min_id)
+    if not (email_by_addr.count() + email_by_id.count()):
+        return
+    ids_seen = set()
+
+    deceased = "deceased" if patient.deceased_id is not None else ""
+    print(f"Patient {patient.id} {patient.external_study_id} {deceased}")
+    for email in email_by_addr:
+        ids_seen.add(email.id)
+        print(f"User {patient.id} {email}")
+    for email in email_by_id:
+        if email.id not in ids_seen:
+            print(f"User {patient.id} {email}")
+
 
 def confirm_withdrawn_row(patient, rs_id):
     """confirm a withdrawal row is in users qb_timeline for given research study"""
     count = QBT.query.filter(QBT.user_id == patient.id).filter(
         QBT.research_study_id == rs_id).filter(QBT.status == 'withdrawn').count()
     if count != 1:
+        # look out for the one valid case, where user has zero timeline rows
+        if QBT.query.filter(QBT.user_id == patient.id).filter(
+                    QBT.research_study_id == rs_id).count() == 0:
+            return
+
         raise ValueError(f"no (or too many) withdrawn row for {patient.id} {rs_id}")
 
 
@@ -109,12 +136,12 @@ def upgrade():
 
         # check for users consented for both but only withdrawn from one
         if (consent_g and consent_e) and not (withdrawal_g and withdrawal_e):
-            print(f"user {patient_id} consented for both, but only withdrawn from one")
+            # print(f"user {patient_id} consented for both, but only withdrawn from one")
             continue
 
-        mask_withdrawn_user_email(session, patient, admin)
         audit_since_for_patient(patient)
-        #print(f"Patient {patient.id}")
+        emails_since_for_patient(patient)
+        mask_withdrawn_user_email(session, patient, admin)
         session.commit()
 
 
