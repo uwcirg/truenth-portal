@@ -1283,6 +1283,7 @@ class User(db.Model, UserMixin):
             db.session.add(replaced)
         db.session.commit()
         self.check_consents()
+        self.mask_withdrawn()
 
     def check_consents(self):
         """Hook method for application of consent related rules"""
@@ -1313,6 +1314,68 @@ class User(db.Model, UserMixin):
                 current_app.logger.error(
                     "Multiple Primary Investigators for organization"
                     f" {consent.organization_id}")
+
+
+    def mask_withdrawn(self):
+        """withdrawn users get email mask to prevent any communication
+
+        after a few rounds of trouble with automated messages sneaking through,
+        now masking the email address to prevent any unintentional communications.
+
+        this method confirms the user was withdrawn from all studies, and if
+        so, adds an email maks.
+
+        alternatively, if the user has been reactivated and the withdrawn mask
+        is present, remove it.
+        """
+        from research_study import EMPRO_RS_ID, BASE_RS_ID
+        from user_consent import consent_withdrawal_dates
+
+        mask_user = None
+        # check former consent/withdrawal status for both studies
+        consent_g, withdrawal_g = consent_withdrawal_dates(self, BASE_RS_ID)
+        consent_e, withdrawal_e = consent_withdrawal_dates(self, EMPRO_RS_ID)
+
+        if not consent_g:
+            # never consented, done.
+            mask_user = False
+        if mask_user is None and not consent_e:
+            # only in global study
+            if withdrawal_g:
+                mask_user = True
+            else:
+                mask_user = False
+        elif mask_user is None:
+            # in both studies
+            if not withdrawal_g or not withdrawal_e:
+                # haven't withdrawn from both
+                mask_user = False
+            elif withdrawal_g and withdrawal_e:
+                # withdrawn from both
+                mask_user = True
+
+        # apply or remove mask if needed
+        comment = None
+        if mask_user is True:
+            if not self.email_ready()[0]:
+                # already masked or no email - no op
+                return
+            self._email = WITHDRAWN_PREFIX + self._email
+            comment = "mask withdrawn user email"
+        if mask_user is False:
+            if self._email and self._email.startswith(WITHDRAWN_PREFIX):
+                self._email = self._email[len(WITHDRAWN_PREFIX):]
+                comment = "remove withdrawn user email mask"
+
+        if comment:
+            audit = Audit(
+                user_id=self.id,
+                subject_id=self.id,
+                comment=comment,
+                context='demographics',
+                timestamp=datetime.utcnow())
+        db.session.add(audit)
+        db.session.commit()
 
     def deactivate_tous(self, acting_user, types=None):
         """ Mark user's current active ToU agreements as inactive
