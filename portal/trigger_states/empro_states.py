@@ -292,7 +292,7 @@ def fire_trigger_events():
         patient = User.query.get(ts.user_id)
 
         # Patient always gets mail
-        if patient.email_ready():
+        if patient.email_ready()[0]:
             pending_emails.append((
                 patient_email(patient, soft_triggers, hard_triggers),
                 "patient thank you"))
