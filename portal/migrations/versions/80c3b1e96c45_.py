@@ -1,7 +1,7 @@
 """Add sequential hard trigger count to EMPRO trigger_states.triggers domains.
 
 Revision ID: 80c3b1e96c45
-Revises: 3c871e710277
+Revises: 5caf794c70a7
 Create Date: 2023-07-24 17:08:35.128975
 
 """
