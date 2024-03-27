@@ -333,10 +333,14 @@ def send_user_messages(user, force_update=False):
     if force_update:
         for rs_id in users_rs_ids:
             invalidate_users_QBT(user_id=user.id, research_study_id=rs_id)
-            qbd = QB_Status(
+            qbstatus = QB_Status(
                 user=user,
                 research_study_id=rs_id,
-                as_of_date=datetime.utcnow()).current_qbd()
+                as_of_date=datetime.utcnow())
+            if qbstatus.withdrawn_by(datetime.utcnow()):
+                # NEVER notify withdrawn patients
+                continue
+            qbd = qbstatus.current_qbd()
             if qbd:
                 queue_outstanding_messages(
                     user=user,

@@ -271,14 +271,14 @@ class TestDemographics(TestCase):
         user = User.query.get(TEST_USER_ID)
         assert user._email == NO_EMAIL_PREFIX
 
-    def test_demographics_bad_dob(self):
+    def test_demographics_alternative_format_dob(self):
         data = {"resourceType": "Patient", "birthDate": '10/20/1980'}
 
         self.login()
         response = self.client.put(
             '/api/demographics/%s' % TEST_USER_ID,
             content_type='application/json', data=json.dumps(data))
-        assert response.status_code == 400
+        assert response.status_code == 200
 
     def test_demographics_list_names(self):
         # confirm we can handle when given lists for names as spec'd
