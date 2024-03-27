@@ -125,7 +125,7 @@ def upgrade():
             output.write(f"{k}: {v}; ")
 
         db.session.commit()
-        print(output.getvalue())
+        # print(output.getvalue())  # useful for debugging, too noisy
 
 
 def downgrade():
@@ -161,4 +161,4 @@ def downgrade():
             ts.triggers = improved_triggers
 
         db.session.commit()
-        print(output.getvalue())
+        # print(output.getvalue())  # useful for debugging, too noisy
