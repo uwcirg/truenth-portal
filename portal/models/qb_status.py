@@ -96,7 +96,7 @@ class QB_Status(object):
                     " {} vs as_of {}".format(
                         self.__ordered_qbs[0].relative_start, self.as_of_date))
             else:
-                current_app.logger.error(f"patient {self.user.id} w/o cur_qbd??")
+                current_app.logger.warning(f"patient {self.user.id} w/o cur_qbd??")
             self._overall_status = OverallStatus.expired
             self.next_qbd = self.__ordered_qbs[0]
             return
