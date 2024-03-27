@@ -410,7 +410,8 @@ def staff_user(test_user, promote_user):
 
 @pytest.fixture
 def staff_rp_org_user(add_user, promote_user, org_w_test_rp):
-    staff = add_user(username="test_staff_user")
+    staff = add_user(username="test_staff_user", email="test_staff_user@example.com")
+    staff.birthdate = datetime(year=2020, month=1, day=1)
     promote_user(user=staff, role_name=ROLE.STAFF.value)
     promote_user(user=staff, role_name=ROLE.CLINICIAN.value)
     staff = db.session.merge(staff)

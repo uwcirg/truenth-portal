@@ -3,6 +3,7 @@
 import base64
 from html import escape
 from datetime import datetime, timedelta
+from dateutil.parser import parse as dateparser
 from io import StringIO
 import os
 import re
@@ -60,6 +61,7 @@ from .value_quantity import ValueQuantity
 
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
+WITHDRAWN_PREFIX = "__withdrawn__"
 DELETED_PREFIX = "__deleted_{time}__"
 DELETED_REGEX = r"__deleted_\d+__(.*)"
 
@@ -640,6 +642,9 @@ class User(db.Model, UserMixin):
 
         if self._email.startswith(NO_EMAIL_PREFIX) or not valid_email:
             return False, _("invalid email address")
+
+        if self._email.startswith(WITHDRAWN_PREFIX):
+            return False, _("withdrawn user; invalid address")
 
         if not ignore_preference and UserPreference.query.filter(
                 UserPreference.user_id == self.id).filter(
@@ -1279,6 +1284,7 @@ class User(db.Model, UserMixin):
             db.session.add(replaced)
         db.session.commit()
         self.check_consents()
+        self.mask_withdrawn()
 
     def check_consents(self):
         """Hook method for application of consent related rules"""
@@ -1309,6 +1315,68 @@ class User(db.Model, UserMixin):
                 current_app.logger.error(
                     "Multiple Primary Investigators for organization"
                     f" {consent.organization_id}")
+
+
+    def mask_withdrawn(self):
+        """withdrawn users get email mask to prevent any communication
+
+        after a few rounds of trouble with automated messages sneaking through,
+        now masking the email address to prevent any unintentional communications.
+
+        this method confirms the user was withdrawn from all studies, and if
+        so, adds an email maks.
+
+        alternatively, if the user has been reactivated and the withdrawn mask
+        is present, remove it.
+        """
+        from .research_study import EMPRO_RS_ID, BASE_RS_ID
+        from .user_consent import consent_withdrawal_dates
+
+        mask_user = None
+        # check former consent/withdrawal status for both studies
+        consent_g, withdrawal_g = consent_withdrawal_dates(self, BASE_RS_ID)
+        consent_e, withdrawal_e = consent_withdrawal_dates(self, EMPRO_RS_ID)
+
+        if not consent_g:
+            # never consented, done.
+            mask_user = False
+        if mask_user is None and not consent_e:
+            # only in global study
+            if withdrawal_g:
+                mask_user = True
+            else:
+                mask_user = False
+        elif mask_user is None:
+            # in both studies
+            if not withdrawal_g or not withdrawal_e:
+                # haven't withdrawn from both
+                mask_user = False
+            elif withdrawal_g and withdrawal_e:
+                # withdrawn from both
+                mask_user = True
+
+        # apply or remove mask if needed
+        comment = None
+        if mask_user is True:
+            if not self.email_ready()[0]:
+                # already masked or no email - no op
+                return
+            self._email = WITHDRAWN_PREFIX + self._email
+            comment = "mask withdrawn user email"
+        if mask_user is False:
+            if self._email and self._email.startswith(WITHDRAWN_PREFIX):
+                self._email = self._email[len(WITHDRAWN_PREFIX):]
+                comment = "remove withdrawn user email mask"
+
+        if comment:
+            audit = Audit(
+                user_id=self.id,
+                subject_id=self.id,
+                comment=comment,
+                context='user',
+                timestamp=datetime.utcnow())
+            db.session.add(audit)
+            db.session.commit()
 
     def deactivate_tous(self, acting_user, types=None):
         """ Mark user's current active ToU agreements as inactive
@@ -1502,8 +1570,7 @@ class User(db.Model, UserMixin):
     def update_birthdate(self, fhir):
         try:
             bd = fhir['birthDate']
-            self.birthdate = datetime.strptime(
-                bd.strip(), '%Y-%m-%d') if bd else None
+            self.birthdate = dateparser(bd.strip()) if bd else None
         except (AttributeError, ValueError):
             abort(400, "birthDate '{}' doesn't match expected format "
                        "'%Y-%m-%d'".format(fhir['birthDate']))
