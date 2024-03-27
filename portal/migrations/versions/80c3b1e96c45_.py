@@ -21,7 +21,7 @@ from portal.trigger_states.models import TriggerState
 
 # revision identifiers, used by Alembic.
 revision = '80c3b1e96c45'
-down_revision = '3c871e710277'
+down_revision = '5caf794c70a7'
 
 Session = sessionmaker()
 
