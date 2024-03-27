@@ -3,6 +3,7 @@
 import base64
 from html import escape
 from datetime import datetime, timedelta
+from dateutil.parser import parse as dateparser
 from io import StringIO
 import os
 import re
@@ -1569,8 +1570,7 @@ class User(db.Model, UserMixin):
     def update_birthdate(self, fhir):
         try:
             bd = fhir['birthDate']
-            self.birthdate = datetime.strptime(
-                bd.strip(), '%Y-%m-%d') if bd else None
+            self.birthdate = dateparser(bd.strip()) if bd else None
         except (AttributeError, ValueError):
             abort(400, "birthDate '{}' doesn't match expected format "
                        "'%Y-%m-%d'".format(fhir['birthDate']))
