@@ -598,7 +598,7 @@ def patient_research_study_status(
                 # Clear ready status when base has pending work
                 rs_status['ready'] = False
                 rs_status['errors'].append('Pending work in base study')
-            elif not patient.email_ready():
+            elif not patient.email_ready()[0]:
                 # Avoid errors from automated emails, that is, email required
                 rs_status['ready'] = False
                 rs_status['errors'].append('User lacks valid email address')

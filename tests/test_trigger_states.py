@@ -182,12 +182,12 @@ def test_worsening_baseline():
 
 
 def test_apply_opt_out(initialized_patient, processed_ts, opt_out_submission):
-    from portal.trigger_states.models import opt_out_key
+    from portal.trigger_states.models import opt_out_next_visit_key
     # apply opt out request
     user = db.session.merge(initialized_patient)
     ts = users_trigger_state(user.id)
     result = ts.apply_opt_out(opt_out_submission)
-    found = [k for k,v in result.triggers['domain'].items() if opt_out_key in v]
+    found = [k for k,v in result.triggers['domain'].items() if opt_out_next_visit_key in v]
     assert len(found) == 2
 
 

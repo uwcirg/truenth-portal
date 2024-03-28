@@ -1351,6 +1351,15 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
         QBT.at <= as_of_date).order_by(
         QBT.at.desc(), QBT.id.desc()).first()
     if qbt:
+        # now that timelines are built beyond withdrawal, check for a
+        # withdrawal row before the one found above
+        withdrawn_qbt = (QBT.query.filter(QBT.user_id == user_id).filter(
+            QBT.research_study_id == research_study_id).filter(
+            QBT.at <= qbt.at).filter(
+            QBT.status == OverallStatus.withdrawn)).first()
+        if withdrawn_qbt:
+            qbt = withdrawn_qbt
+
         results['status'] = qbt.status
         results['visit_name'] = visit_name(qbt.qbd())
 
