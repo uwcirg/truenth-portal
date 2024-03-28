@@ -164,6 +164,7 @@ class DomainManifold(object):
                     initial_answers=self.initial_obs.get(domain),
                     previous_triggers=prev_triggers_for_domain,
                 )
+                # calculate and record user's triggered state by domain
                 triggers['domain'][domain] = dt.triggers
 
         triggers['source'] = {
