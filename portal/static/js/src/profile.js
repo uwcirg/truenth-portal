@@ -13,6 +13,7 @@ import {
   EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
   EPROMS_SUBSTUDY_SHORT_TITLE,
   EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
+  EMPRO_TRIGGER_STATE_OPTOUT_KEY,
   EMPRO_TRIGGER_UNPROCCESSED_STATES,
   REQUIRED_PI_ROLES,
   REQUIRED_PI_ROLES_WARNING_MESSAGE,
@@ -1430,7 +1431,7 @@ export default (function() {
                                 if (!Object.keys(lastTriggerItem.triggers.domain[topic]).length) {
                                     continue;
                                 }
-                                if (lastTriggerItem.triggers.domain[topic]._opt_out_next_visit) {
+                                if (lastTriggerItem.triggers.domain[topic][EMPRO_TRIGGER_STATE_OPTOUT_KEY]) {
                                     arrOptOut.push(topic);
                                     continue;
                                 }
@@ -1446,6 +1447,7 @@ export default (function() {
                             }
                             let completedDate = lastTriggerItem.triggers.source && lastTriggerItem.triggers.source.authored ? lastTriggerItem.triggers.source.authored : lastTriggerItem.timestamp;
                             completedDate = new Date(completedDate); //convert to local date/time
+                            console.log("Last trigger item ", lastTriggerItem);
                             [
                                 this.subStudyTriggers.domains,
                                 this.subStudyTriggers.optout_domains,
@@ -1467,8 +1469,7 @@ export default (function() {
                 });
             },
             hasSubStudyTriggers: function() {
-                return false;
-               // return this.computedSubStudyTriggers.length;
+                return this.computedSubStudyTriggers.length;
             },
             hasSubStudyOptOutDomains: function() {
                 return this.computedSubStudyOptOutDomains.length > 0;
