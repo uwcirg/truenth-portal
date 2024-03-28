@@ -338,10 +338,11 @@ def fire_trigger_events():
             current_app.logger.error(
                 f"EMPRO Patient({patient.id}) w/o email!  Can't send message")
 
-        if actionable_triggers:
-            triggers['action_state'] = 'required'
+        if hard_triggers:
+            if actionable_triggers:
+                triggers['action_state'] = 'required'
             # In the event of hard_triggers, clinicians/staff get mail
-            for msg in staff_emails(patient, actionable_triggers, True):
+            for msg in staff_emails(patient, hard_triggers, opted_out, True):
                 pending_emails.append((msg, "initial staff alert"))
 
         for em, context in pending_emails:
@@ -394,7 +395,7 @@ def fire_trigger_events():
 
         if ts.reminder_due():
             pending_emails = staff_emails(
-                patient, ts.hard_trigger_list(), False)
+                patient, ts.hard_trigger_list(), ts.opted_out_domains, False)
 
             # necessary to make deep copy in order to update DB JSON
             triggers = copy.deepcopy(ts.triggers)
