@@ -161,8 +161,4 @@ def downgrade():
             ts.triggers = improved_triggers
 
         db.session.commit()
-<<<<<<< HEAD
-        print(output.getvalue())
-=======
         # print(output.getvalue())  # useful for debugging, too noisy
->>>>>>> ba59e6c9d67f8b3f86ca60d82d3180b09d5d8fbe
