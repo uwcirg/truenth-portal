@@ -4,7 +4,7 @@ import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
-import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
+import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_IN_PROCESS_STATE} from "../data/common/consts.js";
 const MAX_ATTEMPTS = 3
 export default { /*global $ */
     "beforeSend": function() {
@@ -347,9 +347,12 @@ export default { /*global $ */
                 return false;
             }
 
+            const dataState = String(data.state).toLowerCase();
+            params = params || {};
+
+            //if the trigger data has not been processed, try again until maximum number of attempts has been reached
             if (params.retryAttempt < params.maxTryAttempts &&
-                //if the trigger data has not been processed, try again until maximum number of attempts has been reached
-                EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(String(data.state).toLowerCase()) === -1) {
+                dataState === EMPRO_TRIGGER_IN_PROCESS_STATE) {
                 params.retryAttempt++;
                 setTimeout(function() {
                     this.getSubStudyTriggers(userId, params, callback);
@@ -370,6 +373,22 @@ export default { /*global $ */
             return false;
         }
         this.sendRequest(`/api/patient/${userId}/trigger_history`, "GET", userId, params, (data) => {
+            if (!data || data.error) {
+                callback({"error": true});
+                return false;
+            }
+            callback(data);
+            return true;
+        });
+    },
+    "setOptoutTriggers": function(userId, params, callback) {
+        callback = callback || function() {};
+        params = params || {};
+        if (!userId) {
+            callback({error: true});
+            return false;
+        }
+        this.sendRequest(`/api/patient/${userId}/triggers/opt_out`, "PUT", userId, params, (data) => {
             if (!data || data.error) {
                 callback({"error": true});
                 return false;

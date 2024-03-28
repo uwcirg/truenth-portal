@@ -520,7 +520,8 @@ class QB_Status(object):
                 f" {requested_indef} already!")
 
 
-def patient_research_study_status(patient, ignore_QB_status=False):
+def patient_research_study_status(
+        patient, ignore_QB_status=False, as_of_date=None, skip_initiate=False):
     """Returns details regarding patient readiness for available studies
 
     Wraps complexity of checking multiple QB_Status and ResearchStudy
@@ -532,6 +533,8 @@ def patient_research_study_status(patient, ignore_QB_status=False):
     :param patient: subject to check
     :param ignore_QB_status: set to prevent recursive call, if used during
       process of evaluating QB_status.  Will restrict results to eligible
+    :param as_of_date: set to check status at alternative time
+    :param skip_initiate: set only when rebuilding to avoid state change
     :returns: dictionary of applicable studies keyed by research_study_id.
       Each contains a dictionary with keys:
      - eligible: set True if assigned to research study and pre-requisites
@@ -546,7 +549,8 @@ def patient_research_study_status(patient, ignore_QB_status=False):
     """
     from datetime import datetime
     from .research_study import EMPRO_RS_ID, ResearchStudy
-    as_of_date = datetime.utcnow()
+    if as_of_date is None:
+        as_of_date = datetime.utcnow()
 
     results = {}
     # check studies in required order - first found with pending work
@@ -601,7 +605,8 @@ def patient_research_study_status(patient, ignore_QB_status=False):
             elif rs_status['ready']:
                 # As user may have just entered ready status on EMPRO
                 # move trigger_states.state to due
-                from ..trigger_states.empro_states import initiate_trigger
-                initiate_trigger(patient.id)
+                if not skip_initiate:
+                    from ..trigger_states.empro_states import initiate_trigger
+                    initiate_trigger(patient.id)
 
     return results

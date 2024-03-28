@@ -4,6 +4,7 @@ NB - this is not to be confused with 'patients', which defines views
 for staff
 
 """
+from collections import defaultdict
 from datetime import datetime
 import json
 
@@ -367,6 +368,10 @@ def patient_timeline(patient_id):
     except ValueError as ve:
         abort(500, str(ve))
 
+    consents = [
+        {"research_study_id": c.research_study_id,
+         "acceptance_date": c.acceptance_date,
+         "status": c.status} for c in user.valid_consents]
     results = []
     # We order by at (to get the latest status for a given QB) and
     # secondly by id, as on rare occasions, the time (`at`) of
@@ -543,7 +548,41 @@ def patient_timewarp(patient_id, days):
     from copy import deepcopy
     from portal.models.questionnaire_response import QuestionnaireResponse
     from portal.models.user_consent import UserConsent
+    from ..trigger_states.models import TriggerState
 
+    def sanity_check():
+        """confirm user state before / after timewarp"""
+        # User should have one valid consent
+        patient = get_user(patient_id, 'view')
+        consents = patient.valid_consents
+        rps = [c for c in consents if c.research_study_id == 0]
+        assert len(rps) == 1
+
+        rp1s = [c for c in consents if c.research_study_id == 1]
+        if not len(rp1s):
+            return
+        assert len(rp1s) == 1
+
+        # Confirm valid trigger_states.  No data prior to consent.
+        ts = TriggerState.query.filter(
+            TriggerState.user_id == patient_id,
+            TriggerState.timestamp < rp1s[0].acceptance_date).count()
+        assert ts == 0
+
+        # should never be more than a single row for any given state
+        ts = TriggerState.query.filter(
+            TriggerState.user_id == patient_id
+        )
+        data = defaultdict(int)
+        for row in ts:
+            key = f"{row.visit_month}:{row.state}"
+            data[key] += 1
+        for k, v in data.items():
+            if v > 1:
+                raise RuntimeError(
+                    f"Unique visit_month:state {k} broken in trigger_states for {patient}")
+
+    sanity_check()
     if current_app.config['SYSTEM_TYPE'] == "production":
         abort(404)
 
@@ -569,7 +608,6 @@ def patient_timewarp(patient_id, days):
 
     # trigger_state
     if current_app.config['GIL'] is None:
-        from ..trigger_states.models import TriggerState
         for ts in TriggerState.query.filter(
                 TriggerState.user_id == user.id):
             changed.append(f"trigger_state {ts.id}")
@@ -603,6 +641,7 @@ def patient_timewarp(patient_id, days):
         ar.timestamp = ar.timestamp - delta
 
     db.session.commit()
+    sanity_check()
 
     # Recalculate users timeline & qnr associations
     cache.delete_memoized(trigger_date)

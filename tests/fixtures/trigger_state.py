@@ -13,7 +13,9 @@ def mock_triggers():
                 'ironman_ss.1': 'soft', 'ironman_ss.2': 'hard'},
             'joint_pain': {
                 'ironman_ss.4': 'hard', 'ironman_ss.6': 'soft'},
-            'insomnia': {},
+            'insomnia': {
+                '_sequential_hard_trigger_count': 2,
+                '_opt_out_this_visit': True},
             'fatigue': {'ironman_ss.9': 'hard'},
             'anxious': {'ironman_ss.12': 'soft'},
         }
@@ -52,3 +54,21 @@ def triggered_ts(initialized_patient, mock_triggers):
         db.session.add(ts)
         db.session.commit()
     return db.session.merge(ts)
+
+
+@fixture
+def opt_out_submission():
+    return {
+        "user_id": 1,
+        "visit_month": 0,
+        "triggers": {
+            "domains": {
+                "general_pain": {
+                    "_opt_out_this_visit": True
+                },
+                "fatigue": {
+                    "_opt_out_this_visit": True
+                }
+            }
+        }
+    }

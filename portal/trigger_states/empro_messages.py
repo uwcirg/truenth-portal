@@ -2,13 +2,39 @@
 from datetime import datetime
 from flask import current_app, url_for
 from flask_babel import gettext as _
+from smtplib import SMTPRecipientsRefused
 
+from portal.database import db
 from portal.models.app_text import MailResource, app_text
 from portal.models.communication import EmailMessage, load_template_args
 from portal.models.organization import UserOrganization
 from portal.models.role import ROLE, Role
 from portal.models.user import User, UserRoles
 from portal.models.qb_status import QB_Status
+
+
+def invite_email(user):
+    if not user.email_ready():
+        current_app.logger.error(f"{user.id} can't receive EMPRO invite email")
+        return
+    args = load_template_args(user=user)
+    item = MailResource(
+        app_text("patient invite email IRONMAN EMPRO Study"),
+        locale_code=user.locale_code,
+        variables=args)
+    msg = EmailMessage(
+        subject=item.subject,
+        body=item.body,
+        recipients=user.email,
+        sender=current_app.config['MAIL_DEFAULT_SENDER'],
+        user_id=user.id)
+    try:
+        msg.send_message()
+    except SMTPRecipientsRefused as exc:
+        current_app.logger.error(
+            "Error sending EMPRO Invite to %s: %s",
+            user.email, exc)
+    db.session.add(msg)
 
 
 def patient_email(patient, soft_triggers, hard_triggers):

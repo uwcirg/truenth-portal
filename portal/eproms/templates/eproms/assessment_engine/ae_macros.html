@@ -210,9 +210,6 @@
                 {% endif %}
             </div>
         {%- endcall -%}
-        {% if substudy_assessment_status.overall_status == OverallStatus.completed %}
-            {{empro_thankyou_modal(user)}}
-        {% endif %}
     {%- endif -%}
 {%- endmacro -%}
 {%- macro empro_thankyou_card(full_name="") -%}
@@ -227,6 +224,11 @@
 
     </div>
 {%- endmacro -%}
+{%- macro empro_no_contact_notice() -%}
+    <div class="no-contact-list-wrapper hide">
+        <b>Note:</b> You have chosen not to be contacted about <span id="noContactTriggerList"></span>. Your care team will not discuss these issues this month.
+    </div>
+{%- endmacro -%}
 {%- macro empro_modal_hardTrigger_supportTeam_block(organization="") -%}
     <div class="item">
         <h4>{{_("Your Support Team")}}</h4>
@@ -234,6 +236,7 @@
         <ul class="hardTriggersDisplayList">
            <!-- dynamically populated based on user trigger domain(s) -->
         </ul>
+        {{empro_no_contact_notice()}}
         <p><b>{{_("To help address any issues, we've informed your care team and they'll be in contact with you soon.")}}</b></p>
         {% if organization  %}
             <p>{{_("In the meantime, if you have any questions or need assistance, please contact your team at %(organization)s directly. They're happy to help.", organization=organization)}}</p>
@@ -270,8 +273,8 @@
 <!--sub-study macro -->
 {%- macro empro_thankyou_modal(user) -%}
     <!-- sub-study modal for display domain topic(s), resources link and summary report link to the user -->
-    <div class="modal fade" tabindex="-1" role="dialog" id="emproModal" {% if user and user.current_encounter().auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
-        <div class="modal-dialog">
+    <div class="modal fade" role="dialog" id="emproModal" tabindex="-1" aria-hidden="true" {% if user and user.current_encounter().auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <button type="button" class="close" data-dismiss="modal" aria-label="{{_('Close')}}">
                     <span aria-hidden="true">&times;</span>
@@ -310,6 +313,71 @@
         </div>
     </div>
     {{empro_script()}}
+{%- endmacro -%}
+<!--sub-study optout modal macro -->
+{%- macro empro_optout_modal(user) -%}
+    <!-- sub-study modal for display domain topic(s), resources link and summary report link to the user -->
+    <div class="modal fade" role="dialog" id="emproOptOutModal" data-backdrop="static" tabindex="-1" aria-hidden="true" {% if user and user.current_encounter().auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <button type="button" class="close btn-dismiss" data-dismiss="modal" aria-label="{{_('Close')}}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal-body">
+                    <div class="header-section">
+                        <h2 class="title">{{_("We want to check with you ...")}}</h2>
+                        <div class="subtitle" style="margin-bottom: 8px">
+                            {{_("About your preference to be contacted by your care team for these ongoing issues.")}}
+                        </div>
+                    </div>
+                    <!-- <div class="items-section">
+                        <div class="item wrap">
+                            <ul>
+                                <li>anxious</li>
+                                <li>discouraged</li>
+                                <li>fatigue</li>
+                            </ul>
+                        </div>
+                    </div> -->
+                    <p>{{_("We’ve noticed you’re continuing to experience challenges with the issues listed below.")}}</p>
+                    <p class="text-warning">
+                        <b>{{_("If you prefer not to be contacted by your care team for any (or all) of these issues, please check the box(es) below.")}}</b>
+                    </p>
+                    <p>
+                        {{_("Your care team will continue to contact you as usual for other identified issues.")}}<br/>
+                        {{_("If you have any questions or need assistance, please contact your team directly at  %(organization)s. They'll be happy to help.", organization=user.organizations[0].name if user else "")}}
+                    </p>
+                    <div class="items-wrapper">
+                        <p><b>{{_("Please do not contact me about:")}}</b></p>
+                        <div class="items optout-domains-checkbox-list">
+                            <!-- 
+                            <div class="item">
+                                <input type="checkbox">
+                                <span>anxious</span>
+                            </div>
+                            <div class="item">
+                                <input type="checkbox">
+                                <span>discouraged</span>
+                            </div>
+                            -->
+                        </div>
+                    </div>
+                    <div class="error-message"></div>
+                    <div class="continue-container hide">
+                        <button class="btn btn-default continue-button">Continue</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div>
+                        <button class="btn btn-empro-primary btn-submit">Submit</button>
+                        <button class="btn btn-default btn-dismiss">Dismiss</button>
+                    </div>
+                    <div class="saving-indicator-container hide"><i class="fa fa-spinner fa-spin"></i> {{_("Saving your choices...")}}</div>
+                    <div class="save-success-indicator-container text-success hide"><i class="fa fa-check"></i> {{_("Your choices are saved successfully.")}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 {%- endmacro -%}
 {%- macro empro_script() -%}
     <script src="{{ url_for('static', filename='js/dist/empro.bundle.js') }}" defer></script>

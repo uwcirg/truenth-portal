@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, abort, jsonify, make_response, request
 from flask_user import roles_required
 
-from .empro_states import extract_observations, users_trigger_state
+from .empro_states import extract_observations, fire_trigger_events, users_trigger_state
 from .models import TriggerState
+from ..database import db
 from ..extensions import oauth
 from ..models.role import ROLE
 from ..models.user import get_user
@@ -55,6 +56,35 @@ def user_triggers(user_id):
     # confirm view access
     get_user(user_id, 'view', allow_on_url_authenticated_encounters=True)
     return jsonify(users_trigger_state(user_id).as_json())
+
+
+@trigger_states.route('/api/patient/<int:user_id>/triggers/opt_out', methods=['POST', 'PUT'])
+@crossdomain()
+@oauth.require_oauth()
+def opt_out(user_id):
+    """Takes a JSON object defining the domains for which to opt-out
+
+    The ad-hoc JSON expected resembles that returned from `user_triggers()`
+    simplified to only interpret the domains for which the user chooses to
+    opt-out.
+
+    :returns: TriggerState in JSON for the requested visit month
+    """
+    get_user(user_id, 'edit', allow_on_url_authenticated_encounters=True)
+    ts = users_trigger_state(user_id)
+    try:
+        ts = ts.apply_opt_out(request.json)
+    except ValueError as e:
+        abort(400, str(e))
+
+    # persist the change
+    db.session.commit()
+
+    if ts.opted_out_domains():
+        # if user opted out of at least one, process immediately
+        fire_trigger_events()
+
+    return jsonify(ts.as_json())
 
 
 @trigger_states.route('/api/patient/<int:user_id>/trigger_history')
