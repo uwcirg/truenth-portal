@@ -14,7 +14,7 @@ def mock_triggers():
             'joint_pain': {
                 'ironman_ss.4': 'hard', 'ironman_ss.6': 'soft'},
             'insomnia': {
-                '_sequential_hard_trigger_count': 2,
+                '_sequential_hard_trigger_count': 3,
                 '_opt_out_this_visit': True},
             'fatigue': {'ironman_ss.9': 'hard'},
             'anxious': {'ironman_ss.12': 'soft'},

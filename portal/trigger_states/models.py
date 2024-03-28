@@ -162,7 +162,7 @@ class TriggerState(db.Model):
     def sequential_threshold_reached(self):
         """Returns True IFF at least one domain above sequential threshold
 
-        Business rule says when >= 2 sequential hard triggers for a given
+        Business rule says when >= 3 sequential hard triggers for a given
         domain are achieved, the user gets the option to opt-out of follow
         up from clinician.  This convenience method looks through all domains
         in triggers to see if at least one has adequate sequential count of
@@ -175,7 +175,7 @@ class TriggerState(db.Model):
             return
 
         for domain, link_triggers in self.triggers['domain'].items():
-            if link_triggers.get(sequential_hard_trigger_count_key, 0) > 1:
+            if link_triggers.get(sequential_hard_trigger_count_key, 0) > 2:
                 return True
 
     def reminder_due(self, as_of_date=None):
