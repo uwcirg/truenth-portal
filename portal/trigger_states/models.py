@@ -9,8 +9,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime, weekday_delta
 from ..models.audit import Audit
 
-opt_out_next_visit_key = '_opt_out_next_visit'
-opted_out_previous_key = '_opted_out_previous_visit'
+opt_out_this_visit_key = '_opt_out_this_visit'
 
 
 trigger_state_enum = ENUM(
@@ -110,16 +109,16 @@ class TriggerState(db.Model):
 
         opt_out_of_domains = set()
         for d, vals in opt_out_dict['triggers']['domains'].items():
-            if vals.get(opt_out_next_visit_key) is True:
+            if vals.get(opt_out_this_visit_key) is True:
                 opt_out_of_domains.add(d)
 
         tc = deepcopy(self.triggers)
         for domain, link_triggers in tc['domain'].items():
             if domain in opt_out_of_domains:
-                link_triggers[opt_out_next_visit_key] = True
+                link_triggers[opt_out_this_visit_key] = True
                 opt_out_of_domains.remove(domain)
-            elif opt_out_next_visit_key in link_triggers:
-                link_triggers.pop(opt_out_next_visit_key)
+            elif opt_out_this_visit_key in link_triggers:
+                link_triggers.pop(opt_out_this_visit_key)
 
         if opt_out_of_domains:
             raise ValueError(
@@ -146,25 +145,38 @@ class TriggerState(db.Model):
         return sorted(results)
 
     def opted_out_domains(self):
-        """Convenience function to return list of opted out previous visit domains
+        """Convenience function to return list of opted out visit domains
 
-        :returns: list of domains user opted out of on previous visit, or empty list.
+        :returns: list of domains user opted out of on current visit, or empty list.
         """
         results = []
         if not self.triggers:
             return results
 
-        # need previous month triggers for this one
-        prev = self.query.filter(TriggerState.user_id == self.user_id).filter(
-            TriggerState.visit_month == self.visit_month - 1).filter(
-            TriggerState.state == 'resolved').first()
-        if not (prev and prev.triggers):
-            return results
-
-        for domain, link_triggers in prev.triggers['domain'].items():
-            if opt_out_next_visit_key in link_triggers:
+        results = []
+        for domain, link_triggers in self.triggers['domain'].items():
+            if opt_out_this_visit_key in link_triggers:
                 results.append(domain)
-        return results
+        return sorted(results)
+
+    def sequential_threshold_reached(self):
+        """Returns True IFF at least one domain above sequential threshold
+
+        Business rule says when >= 2 sequential hard triggers for a given
+        domain are achieved, the user gets the option to opt-out of follow
+        up from clinician.  This convenience method looks through all domains
+        in triggers to see if at least one has adequate sequential count of
+        hard triggers.
+
+        :returns: True if at least one domain has adequate sequential hard triggers
+        """
+        from .empro_domains import sequential_hard_trigger_count_key
+        if not self.triggers:
+            return
+
+        for domain, link_triggers in self.triggers['domain'].items():
+            if link_triggers.get(sequential_hard_trigger_count_key, 0) > 1:
+                return True
 
     def reminder_due(self, as_of_date=None):
         """Determine if reminder is due from internal state"""
