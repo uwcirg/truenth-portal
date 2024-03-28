@@ -13,7 +13,9 @@ def mock_triggers():
                 'ironman_ss.1': 'soft', 'ironman_ss.2': 'hard'},
             'joint_pain': {
                 'ironman_ss.4': 'hard', 'ironman_ss.6': 'soft'},
-            'insomnia': {'_opt_out_next_visit': True},
+            'insomnia': {
+                '_sequential_hard_trigger_count': 2,
+                '_opt_out_this_visit': True},
             'fatigue': {'ironman_ss.9': 'hard'},
             'anxious': {'ironman_ss.12': 'soft'},
         }
@@ -62,10 +64,10 @@ def opt_out_submission():
         "triggers": {
             "domains": {
                 "general_pain": {
-                    "_opt_out_next_visit": True
+                    "_opt_out_this_visit": True
                 },
                 "fatigue": {
-                    "_opt_out_next_visit": True
+                    "_opt_out_this_visit": True
                 }
             }
         }
