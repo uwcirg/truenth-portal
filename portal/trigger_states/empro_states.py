@@ -4,7 +4,7 @@ See also:
     [IRONMAN EMPRO Study Experience](https://promowiki.movember.com/display/ISS/Product+Development+-+IRONMAN+EMPRO+Study)
 """
 import copy
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import current_app
 from requests import post
 from smtplib import SMTPRecipientsRefused
@@ -288,7 +288,7 @@ def fire_trigger_events():
 
         # check time since row transitioned to current state.  delay
         # till threshold reached
-        if ts.timestamp + datetime.timedelta(seconds=OPT_OUT_DELAY) < datetime.utcnow():
+        if ts.timestamp + timedelta(seconds=OPT_OUT_DELAY) < datetime.utcnow():
             return True
 
     def send_n_report(em, context, record):
