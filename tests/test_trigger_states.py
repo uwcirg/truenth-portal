@@ -187,7 +187,7 @@ def test_apply_opt_out(initialized_patient, processed_ts, opt_out_submission):
     user = db.session.merge(initialized_patient)
     ts = users_trigger_state(user.id)
     result = ts.apply_opt_out(opt_out_submission)
-    found = [k for k,v in result.triggers['domain'].items() if opt_out_this_visit_key in v]
+    found = [k for k, v in result.triggers['domain'].items() if opt_out_this_visit_key in v]
     assert len(found) == 2
 
 

@@ -366,7 +366,8 @@ def rebuild_trigger_states(patient):
     if not tl_query.count():
         # User has no timeline data for EMPRO, likely not eligible
         if TriggerState.query.filter(TriggerState.user_id == patient.id).count():
-            current_app.logging.error(f"no EMPRO timeline, yet trigger_states rows for {patient.id}")
+            current_app.logging.error(
+                f"no EMPRO timeline, yet trigger_states rows for {patient.id}")
         return
 
     # Capture state in memory for potential reuse when rebuilding

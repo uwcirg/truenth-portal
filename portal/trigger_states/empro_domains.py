@@ -97,7 +97,8 @@ class DomainTriggers(object):
                 sequential_hard_trigger_count and
                 self.previous_triggers and
                 sequential_hard_trigger_count_key in self.previous_triggers):
-            sequential_hard_trigger_count = self.previous_triggers[sequential_hard_trigger_count_key] + 1
+            sequential_hard_trigger_count = (
+                    self.previous_triggers[sequential_hard_trigger_count_key] + 1)
         self._triggers[sequential_hard_trigger_count_key] = sequential_hard_trigger_count
 
 
