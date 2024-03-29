@@ -213,16 +213,15 @@ def evaluate_triggers(qnr):
         sm = EMPRO_state(ts)
 
         # include previous month resolved row, if available
-        previous = TriggerState.query.filter(
+        query = TriggerState.query.filter(
             TriggerState.user_id == qnr.subject_id).filter(
-            TriggerState.state == 'resolved').order_by(
-            TriggerState.timestamp.desc()).first()
+            TriggerState.state.in_(('resolved', 'triggered', 'processed'))).filter(
+            TriggerState.visit_month == ts.visit_month - 1)
+        previous = query.first()
 
         # bring together and evaluate available data for triggers
         dm = DomainManifold(qnr)
-        previous_triggers = (
-            previous.triggers if previous and previous.visit_month + 1 == ts.visit_month
-            else None)
+        previous_triggers = previous.triggers if previous else None
         ts.triggers = dm.eval_triggers(previous_triggers)
         ts.questionnaire_response_id = qnr.id
 
@@ -395,7 +394,7 @@ def fire_trigger_events():
 
         if ts.reminder_due():
             pending_emails = staff_emails(
-                patient, ts.hard_trigger_list(), ts.opted_out_domains, False)
+                patient, ts.hard_trigger_list(), ts.opted_out_domains(), False)
 
             # necessary to make deep copy in order to update DB JSON
             triggers = copy.deepcopy(ts.triggers)
