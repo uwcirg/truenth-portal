@@ -1,7 +1,7 @@
 from flask import Blueprint, abort, jsonify, make_response, request
 from flask_user import roles_required
 
-from .empro_states import extract_observations, users_trigger_state
+from .empro_states import extract_observations, fire_trigger_events, users_trigger_state
 from .models import TriggerState
 from ..database import db
 from ..extensions import oauth
@@ -79,6 +79,11 @@ def opt_out(user_id):
 
     # persist the change
     db.session.commit()
+
+    if ts.opted_out_domains():
+        # if user opted out of at least one, process immediately
+        fire_trigger_events()
+
     return jsonify(ts.as_json())
 
 

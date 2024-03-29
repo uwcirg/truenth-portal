@@ -63,6 +63,7 @@ DEFAULT_PASSWORD = 'fakePa$$'
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
+TEST_BIRTHDAY = '1999-12-31'
 FIRST_NAME = '✓'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
@@ -159,6 +160,7 @@ class TestCase(Base):
             test_user = self.add_user(
                 username=TEST_USERNAME, first_name=FIRST_NAME,
                 last_name=LAST_NAME, image_url=IMAGE_URL)
+            test_user.birthdate = TEST_BIRTHDAY
         except IntegrityError:
             db.session.rollback()
             test_user = User.query.filter_by(username=TEST_USERNAME).one()

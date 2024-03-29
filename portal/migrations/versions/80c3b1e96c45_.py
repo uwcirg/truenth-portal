@@ -1,7 +1,7 @@
 """Add sequential hard trigger count to EMPRO trigger_states.triggers domains.
 
 Revision ID: 80c3b1e96c45
-Revises: 3c871e710277
+Revises: 5caf794c70a7
 Create Date: 2023-07-24 17:08:35.128975
 
 """
@@ -21,7 +21,7 @@ from portal.trigger_states.models import TriggerState
 
 # revision identifiers, used by Alembic.
 revision = '80c3b1e96c45'
-down_revision = '3c871e710277'
+down_revision = '5caf794c70a7'
 
 Session = sessionmaker()
 
@@ -94,7 +94,7 @@ def upgrade():
         sequential_by_domain = defaultdict(list)
         trigger_states = db.session.query(TriggerState).filter(
             TriggerState.user_id == pid).filter(
-            TriggerState.state == "resolved").order_by(
+            TriggerState.state.in_(("resolved", "triggered", "processed"))).order_by(
             TriggerState.timestamp.asc())
         for ts in trigger_states:
             improved_triggers = deepcopy(ts.triggers)
@@ -125,7 +125,7 @@ def upgrade():
             output.write(f"{k}: {v}; ")
 
         db.session.commit()
-        print(output.getvalue())
+        # print(output.getvalue())  # useful for debugging, too noisy
 
 
 def downgrade():
@@ -145,7 +145,7 @@ def downgrade():
         output.write(f"\n\nPatient: {pid}\n")
         trigger_states = db.session.query(TriggerState).filter(
             TriggerState.user_id == pid).filter(
-            TriggerState.state == "resolved").order_by(
+            TriggerState.state.in_(("resolved", "triggered", "processed"))).order_by(
             TriggerState.timestamp.asc())
         for ts in trigger_states:
             improved_triggers = deepcopy(ts.triggers)
@@ -161,4 +161,4 @@ def downgrade():
             ts.triggers = improved_triggers
 
         db.session.commit()
-        print(output.getvalue())
+        # print(output.getvalue())  # useful for debugging, too noisy

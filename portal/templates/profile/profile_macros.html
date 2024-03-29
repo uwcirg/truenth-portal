@@ -871,6 +871,16 @@
         </div>
     {% endcall %}
 {%- endmacro -%}
+{% macro postInterventionOptoutDomains() %}
+    <div class="item text-warning" v-if="hasSubStudyOptOutDomains()">
+        <p>
+            {{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted about some issues.")}}
+            <br/>
+            {{_("High distressed areas ( <em>Do not contact</em> ): ")}}
+            <span v-text="getSubStudyOptoutDomainsDisplay()"></span>
+        </p>
+    </div>
+{% endmacro %}
 {%- macro postInterventionQuestionnaire(person) -%}
 <!-- require a static bookmark link for post intervention questionnaire section for the dynamically generated content. Othewise the hash location won't go to the section correctly -->
 <a href="#postInterventionQuestionnaireLoc"></a>
@@ -890,6 +900,7 @@
                             <li v-for="item in subStudyTriggers.domains" v-text="item.replace(/_/g, ' ')" class="text"></li>
                         </ul>
                     </div>
+                    {{postInterventionOptoutDomains()}}
                 </div>
                 <!-- no triggers indicated -->
                 <!-- show the last completed EMPRO date && indicate no triggers -->
@@ -900,7 +911,8 @@
                             <span class="text" v-text="getLastSubStudyAssessmentDate()"></span>
                         </div>
                         <!-- IF no triggers are indicated, ONLY display as such for assessment that has been COMPLETED, as triggers aren't calculated yet for assessment still in progress -->
-                        <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No high distress areas indicated")}}</div>
+                        <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No action required")}}</div>
+                        {{postInterventionOptoutDomains()}}
                     </div>
                 </div>
                 <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>

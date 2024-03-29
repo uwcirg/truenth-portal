@@ -4,7 +4,7 @@ See also:
     [IRONMAN EMPRO Study Experience](https://promowiki.movember.com/display/ISS/Product+Development+-+IRONMAN+EMPRO+Study)
 """
 import copy
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import current_app
 from requests import post
 from smtplib import SMTPRecipientsRefused
@@ -13,7 +13,7 @@ from statemachine.exceptions import TransitionNotAllowed
 
 from .empro_domains import DomainManifold
 from .empro_messages import invite_email, patient_email, staff_emails
-from .models import TriggerState
+from .models import TriggerState, opt_out_this_visit_key
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..models.qb_status import QB_Status
@@ -26,7 +26,7 @@ from ..models.user import User
 from ..timeout_lock import TimeoutLock
 
 EMPRO_LOCK_KEY = "empro-trigger-state-lock-{user_id}"
-
+OPT_OUT_DELAY = 300  # seconds to allow user to provide opt-out choices
 
 class EMPRO_state(StateMachine):
     """States a user repeatedly transitions through as an EMPRO participant
@@ -213,6 +213,7 @@ def evaluate_triggers(qnr):
         sm = EMPRO_state(ts)
 
         # include previous month resolved row, if available
+<<<<<<< HEAD
         previous = TriggerState.query.filter(
             TriggerState.user_id == qnr.subject_id).filter(
             TriggerState.state == 'resolved').order_by(
@@ -223,6 +224,17 @@ def evaluate_triggers(qnr):
         previous_triggers = (
             previous.triggers if previous and previous.visit_month + 1 == ts.visit_month
             else None)
+=======
+        query = TriggerState.query.filter(
+            TriggerState.user_id == qnr.subject_id).filter(
+            TriggerState.state.in_(('resolved', 'triggered', 'processed'))).filter(
+            TriggerState.visit_month == ts.visit_month - 1)
+        previous = query.first()
+
+        # bring together and evaluate available data for triggers
+        dm = DomainManifold(qnr)
+        previous_triggers = previous.triggers if previous else None
+>>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
         ts.triggers = dm.eval_triggers(previous_triggers)
         ts.questionnaire_response_id = qnr.id
 
@@ -233,9 +245,19 @@ def evaluate_triggers(qnr):
             "persist-trigger_states-new record state change to 'processed' "
             f"from evaluate_triggers() {ts}")
 
+<<<<<<< HEAD
         # a submission closes the window of availability for the
         # post-intervention clinician follow up.  mark state if
         # one is found
+=======
+        # a patient submission closes the window of availability for the
+        # post-intervention clinician follow up from any previous visits.
+        # mark state if one is found
+        previous = TriggerState.query.filter(
+            TriggerState.user_id == qnr.subject_id).filter(
+            TriggerState.state == 'resolved').order_by(
+            TriggerState.timestamp.desc()).first()
+>>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
         if previous and previous.triggers.get('action_state') not in (
                 'completed', 'missed', 'not applicable', 'withdrawn'):
             triggers = copy.deepcopy(previous.triggers)
@@ -260,12 +282,32 @@ def fire_trigger_events():
     events from the user's trigger state.  Said rows will be in the
     'processed' state.
 
+    NB, the opt-out feature requires a user has adequate time to provide
+    feedback (user-input).  Therefore, if the set of triggers has at least
+    one domain for which opt-out may apply, skip over processing that one
+    until opt-out results are present, or the OPT_OUT_DELAY has expired.
+
     Actions are recorded in trigger_states.triggers and the row's state
     is transitioned to 'triggered' or should no further action be necessary,
     'resolved'.
 
     """
     now = datetime.utcnow()
+
+    def delay_processing(ts):
+        """Give user time to respond to opt-out prompt if applicable"""
+        if not ts.sequential_threshold_reached():
+            # not applicable unless at least one domain has adequate count
+            return
+
+        if ts.opted_out_domains():
+            # user must have already replied, if opted out of at least one
+            return
+
+        # check time since row transitioned to current state.  delay
+        # till threshold reached
+        if ts.timestamp + timedelta(seconds=OPT_OUT_DELAY) < datetime.utcnow():
+            return True
 
     def send_n_report(em, context, record):
         """Send email, append success/fail w/ context to record"""
@@ -295,11 +337,18 @@ def fire_trigger_events():
         # on hard triggers.  Patient gets 'thank you' email regardless.
         hard_triggers = ts.hard_trigger_list()
         soft_triggers = ts.soft_trigger_list()
+        opted_out = ts.opted_out_domains()
+        actionable_triggers = list(set(hard_triggers) - set(opted_out))
+        # persist all opted out for front-end use as well
+        for domain, link_triggers in triggers['domain'].items():
+            if domain in opted_out:
+                link_triggers[opt_out_this_visit_key] = True
+
         pending_emails = []
         patient = User.query.get(ts.user_id)
 
         # Patient always gets mail
-        if patient.email_ready():
+        if patient.email_ready()[0]:
             pending_emails.append((
                 patient_email(patient, soft_triggers, hard_triggers),
                 "patient thank you"))
@@ -308,10 +357,10 @@ def fire_trigger_events():
                 f"EMPRO Patient({patient.id}) w/o email!  Can't send message")
 
         if hard_triggers:
-            triggers['action_state'] = 'required'
-
+            if actionable_triggers:
+                triggers['action_state'] = 'required'
             # In the event of hard_triggers, clinicians/staff get mail
-            for msg in staff_emails(patient, hard_triggers, True):
+            for msg in staff_emails(patient, hard_triggers, opted_out, True):
                 pending_emails.append((msg, "initial staff alert"))
 
         for em, context in pending_emails:
@@ -322,8 +371,8 @@ def fire_trigger_events():
         sm = EMPRO_state(ts)
         sm.fired_events()
 
-        # Without hard triggers, no further action is necessary
-        if not hard_triggers:
+        # Without actionable triggers, no further action is necessary
+        if not actionable_triggers:
             sm.resolve()
 
         current_app.logger.debug(
@@ -332,10 +381,6 @@ def fire_trigger_events():
     def process_pending_actions(ts):
         """Process a trigger states row needing subsequent action"""
 
-        # Need to consider state == resolved, as the subsequent
-        # EMPRO may have become due, but the previous hasn't yet
-        # received a post intervention QB from staff, noted by
-        # the action_state:
         if (
                 'action_state' not in ts.triggers or
                 ts.triggers['action_state'] in (
@@ -364,7 +409,7 @@ def fire_trigger_events():
 
         if ts.reminder_due():
             pending_emails = staff_emails(
-                patient, ts.hard_trigger_list(), False)
+                patient, ts.hard_trigger_list(), ts.opted_out_domains(), False)
 
             # necessary to make deep copy in order to update DB JSON
             triggers = copy.deepcopy(ts.triggers)
@@ -380,7 +425,7 @@ def fire_trigger_events():
                 f"persist-trigger_states-change reminder_due clause {ts}")
 
     # Main loop for this task function.  Two locks employed to avoid race
-    # race conditions with other threads updating trigger_states rows.
+    # conditions with other threads updating trigger_states rows.
     #
     # As this is a recurring, scheduled job, simply skip over any locked keys
     # to pick up next run.
@@ -392,6 +437,8 @@ def fire_trigger_events():
         # seek out any pending "processed" work, i.e. triggers recently
         # evaluated
         for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
+            if delay_processing(ts):
+                continue
             with TimeoutLock(
                     key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
                     timeout=NEVER_WAIT):
@@ -399,8 +446,7 @@ def fire_trigger_events():
         db.session.commit()
 
         # Now seek out any pending actions, such as reminders to staff
-        for ts in TriggerState.query.filter(
-                TriggerState.state.in_(('triggered', 'resolved'))):
+        for ts in TriggerState.query.filter(TriggerState.state == 'triggered'):
             with TimeoutLock(
                     key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
                     timeout=NEVER_WAIT):

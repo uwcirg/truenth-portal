@@ -9,7 +9,8 @@ from ..database import db
 from ..date_tools import FHIR_datetime, weekday_delta
 from ..models.audit import Audit
 
-opt_out_key = '_opt_out_next_visit'
+opt_out_this_visit_key = '_opt_out_this_visit'
+
 
 trigger_state_enum = ENUM(
     'unstarted',
@@ -108,16 +109,27 @@ class TriggerState(db.Model):
 
         opt_out_of_domains = set()
         for d, vals in opt_out_dict['triggers']['domains'].items():
+<<<<<<< HEAD
             if vals.get(opt_out_key) is True:
+=======
+            if vals.get(opt_out_this_visit_key) is True:
+>>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
                 opt_out_of_domains.add(d)
 
         tc = deepcopy(self.triggers)
         for domain, link_triggers in tc['domain'].items():
             if domain in opt_out_of_domains:
+<<<<<<< HEAD
                 link_triggers[opt_out_key] = True
                 opt_out_of_domains.remove(domain)
             elif opt_out_key in link_triggers:
                 link_triggers.pop(opt_out_key)
+=======
+                link_triggers[opt_out_this_visit_key] = True
+                opt_out_of_domains.remove(domain)
+            elif opt_out_this_visit_key in link_triggers:
+                link_triggers.pop(opt_out_this_visit_key)
+>>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
 
         if opt_out_of_domains:
             raise ValueError(
@@ -142,6 +154,40 @@ class TriggerState(db.Model):
             if 'hard' in link_triggers.values():
                 results.append(domain)
         return sorted(results)
+
+    def opted_out_domains(self):
+        """Convenience function to return list of opted out visit domains
+
+        :returns: list of domains user opted out of on current visit, or empty list.
+        """
+        results = []
+        if not self.triggers:
+            return results
+
+        results = []
+        for domain, link_triggers in self.triggers['domain'].items():
+            if opt_out_this_visit_key in link_triggers:
+                results.append(domain)
+        return sorted(results)
+
+    def sequential_threshold_reached(self):
+        """Returns True IFF at least one domain above sequential threshold
+
+        Business rule says when >= 3 sequential hard triggers for a given
+        domain are achieved, the user gets the option to opt-out of follow
+        up from clinician.  This convenience method looks through all domains
+        in triggers to see if at least one has adequate sequential count of
+        hard triggers.
+
+        :returns: True if at least one domain has adequate sequential hard triggers
+        """
+        from .empro_domains import sequential_hard_trigger_count_key
+        if not self.triggers:
+            return
+
+        for domain, link_triggers in self.triggers['domain'].items():
+            if link_triggers.get(sequential_hard_trigger_count_key, 0) > 2:
+                return True
 
     def reminder_due(self, as_of_date=None):
         """Determine if reminder is due from internal state"""
@@ -331,7 +377,12 @@ def rebuild_trigger_states(patient):
     if not tl_query.count():
         # User has no timeline data for EMPRO, likely not eligible
         if TriggerState.query.filter(TriggerState.user_id == patient.id).count():
+<<<<<<< HEAD
             current_app.logging.error(f"no EMPRO timeline, yet trigger_states rows for {patient.id}")
+=======
+            current_app.logging.error(
+                f"no EMPRO timeline, yet trigger_states rows for {patient.id}")
+>>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
         return
 
     # Capture state in memory for potential reuse when rebuilding
