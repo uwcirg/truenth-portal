@@ -94,7 +94,7 @@ def upgrade():
         sequential_by_domain = defaultdict(list)
         trigger_states = db.session.query(TriggerState).filter(
             TriggerState.user_id == pid).filter(
-            TriggerState.state == "resolved").order_by(
+            TriggerState.state.in_(("resolved", "triggered", "processed"))).order_by(
             TriggerState.timestamp.asc())
         for ts in trigger_states:
             improved_triggers = deepcopy(ts.triggers)
@@ -145,7 +145,7 @@ def downgrade():
         output.write(f"\n\nPatient: {pid}\n")
         trigger_states = db.session.query(TriggerState).filter(
             TriggerState.user_id == pid).filter(
-            TriggerState.state == "resolved").order_by(
+            TriggerState.state.in_(("resolved", "triggered", "processed"))).order_by(
             TriggerState.timestamp.asc())
         for ts in trigger_states:
             improved_triggers = deepcopy(ts.triggers)
