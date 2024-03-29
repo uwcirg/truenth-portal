@@ -3721,9 +3721,13 @@ section.header {
       position: relative;
       top: 2px;
     }
+    .no-contact-legend {
+      display: inline-block;
+      margin-left: 8px;
+    }
   }
   .nav-arrow {
-    //position: absolute;
+    position: absolute;
     z-index: 5;
     cursor: pointer;
     font-size: 14px;
@@ -3739,22 +3743,22 @@ section.header {
     border: 1px solid @mutedColor;
     &.start {
       margin-right: 8px;
-      //left: 40%;
+      left: 40%;
     }
     &.end {
       padding-left: 12px;
-      margin-left: 8px;
+      right: 16px;
     }
     &.disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
   }
-  // .has-legend {
-  //   .nav-arrow {
-  //     top: 36px;
-  //   }
-  // }
+  .has-legend {
+    .nav-arrow {
+      top: 36px;
+    }
+  }
   .report-table {
     margin-top: 8px;
     TR:hover {

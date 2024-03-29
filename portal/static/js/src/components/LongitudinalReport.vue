@@ -10,22 +10,22 @@
                         <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
                         <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
                         <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
-                        <div v-show="hasOptOutTriggers()">ⓘ (do not contact)</div>
+                        <span class="no-contact-legend" v-show="hasOptOutTriggers()">ⓘ (do not contact)</span>
                     </div>
                 </div>
             </div>
+            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
+            <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}">&gt;</span>
             <table class="report-table" v-show="!hasValue(errorMessage)">
                 <THEAD>
                     <TH class="title">
                         <div class="flex-in-between">
                             <span v-text="questionTitleHeader"></span>
-                            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
                         </div>
                     </TH>
                     <TH class="cell date" :data-column-index="index+1" v-for="(item, index) in questionnaireDates" :key="'head_'+index">
                         <span v-html="item"></span>
                         <span class="in-progress-legend" aria-hidden="true" v-show="isAssessmentInProgress(index)"></span>
-                        <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}" v-if="index === questionnaireDates.length-1">&gt;</span>
                     </TH>
                 </THEAD>
                 <TBODY>
