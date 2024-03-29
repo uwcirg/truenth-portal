@@ -109,27 +109,16 @@ class TriggerState(db.Model):
 
         opt_out_of_domains = set()
         for d, vals in opt_out_dict['triggers']['domains'].items():
-<<<<<<< HEAD
-            if vals.get(opt_out_key) is True:
-=======
             if vals.get(opt_out_this_visit_key) is True:
->>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
                 opt_out_of_domains.add(d)
 
         tc = deepcopy(self.triggers)
         for domain, link_triggers in tc['domain'].items():
             if domain in opt_out_of_domains:
-<<<<<<< HEAD
-                link_triggers[opt_out_key] = True
-                opt_out_of_domains.remove(domain)
-            elif opt_out_key in link_triggers:
-                link_triggers.pop(opt_out_key)
-=======
                 link_triggers[opt_out_this_visit_key] = True
                 opt_out_of_domains.remove(domain)
             elif opt_out_this_visit_key in link_triggers:
                 link_triggers.pop(opt_out_this_visit_key)
->>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
 
         if opt_out_of_domains:
             raise ValueError(
@@ -377,12 +366,8 @@ def rebuild_trigger_states(patient):
     if not tl_query.count():
         # User has no timeline data for EMPRO, likely not eligible
         if TriggerState.query.filter(TriggerState.user_id == patient.id).count():
-<<<<<<< HEAD
-            current_app.logging.error(f"no EMPRO timeline, yet trigger_states rows for {patient.id}")
-=======
             current_app.logging.error(
                 f"no EMPRO timeline, yet trigger_states rows for {patient.id}")
->>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
         return
 
     # Capture state in memory for potential reuse when rebuilding

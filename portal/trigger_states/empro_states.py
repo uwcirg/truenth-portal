@@ -213,18 +213,6 @@ def evaluate_triggers(qnr):
         sm = EMPRO_state(ts)
 
         # include previous month resolved row, if available
-<<<<<<< HEAD
-        previous = TriggerState.query.filter(
-            TriggerState.user_id == qnr.subject_id).filter(
-            TriggerState.state == 'resolved').order_by(
-            TriggerState.timestamp.desc()).first()
-
-        # bring together and evaluate available data for triggers
-        dm = DomainManifold(qnr)
-        previous_triggers = (
-            previous.triggers if previous and previous.visit_month + 1 == ts.visit_month
-            else None)
-=======
         query = TriggerState.query.filter(
             TriggerState.user_id == qnr.subject_id).filter(
             TriggerState.state.in_(('resolved', 'triggered', 'processed'))).filter(
@@ -234,7 +222,6 @@ def evaluate_triggers(qnr):
         # bring together and evaluate available data for triggers
         dm = DomainManifold(qnr)
         previous_triggers = previous.triggers if previous else None
->>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
         ts.triggers = dm.eval_triggers(previous_triggers)
         ts.questionnaire_response_id = qnr.id
 
@@ -245,11 +232,6 @@ def evaluate_triggers(qnr):
             "persist-trigger_states-new record state change to 'processed' "
             f"from evaluate_triggers() {ts}")
 
-<<<<<<< HEAD
-        # a submission closes the window of availability for the
-        # post-intervention clinician follow up.  mark state if
-        # one is found
-=======
         # a patient submission closes the window of availability for the
         # post-intervention clinician follow up from any previous visits.
         # mark state if one is found
@@ -257,7 +239,6 @@ def evaluate_triggers(qnr):
             TriggerState.user_id == qnr.subject_id).filter(
             TriggerState.state == 'resolved').order_by(
             TriggerState.timestamp.desc()).first()
->>>>>>> ab2226d02c0b3a4f12d694acdbb0343374a898a2
         if previous and previous.triggers.get('action_state') not in (
                 'completed', 'missed', 'not applicable', 'withdrawn'):
             triggers = copy.deepcopy(previous.triggers)

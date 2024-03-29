@@ -2,6 +2,7 @@ import EMPRO_DOMAIN_MAPPINGS from "./data/common/empro_domain_mappings.json";
 import {
   EPROMS_SUBSTUDY_ID,
   EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+  EMPRO_TRIGGER_STATE_OPTOUT_KEY
 } from "./data/common/consts.js";
 import tnthAjax from "./modules/TnthAjax.js";
 import tnthDate from "./modules/TnthDate.js";
@@ -113,7 +114,7 @@ emproObj.prototype.setOptoutSubmitData = function () {
   var triggerObject = {};
   EmproObj.selectedOptOutDomains.forEach((item) => {
     triggerObject[item] = {
-      _opt_out_next_visit: true,
+     [EMPRO_TRIGGER_STATE_OPTOUT_KEY]: true,
     };
   });
   var submitData = {

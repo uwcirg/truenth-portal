@@ -405,6 +405,9 @@ a.btn {
   padding: 0;
   margin: 1em 0.2em;
 }
+.sub {
+  font-size: smaller;
+}
 .chips-list {
   margin-bottom: 16px;
 }
@@ -3720,7 +3723,7 @@ section.header {
     }
   }
   .nav-arrow {
-    position: absolute;
+    //position: absolute;
     z-index: 5;
     cursor: pointer;
     font-size: 14px;
@@ -3736,22 +3739,22 @@ section.header {
     border: 1px solid @mutedColor;
     &.start {
       margin-right: 8px;
-      left: 40%;
+      //left: 40%;
     }
     &.end {
       padding-left: 12px;
-      right: 16px;
+      margin-left: 8px;
     }
     &.disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
   }
-  .has-legend {
-    .nav-arrow {
-      top: 36px;
-    }
-  }
+  // .has-legend {
+  //   .nav-arrow {
+  //     top: 36px;
+  //   }
+  // }
   .report-table {
     margin-top: 8px;
     TR:hover {
@@ -5442,6 +5445,10 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
     padding: 4px 12px 4px 0;
     max-width: 100%;
   }
+}
+.flex-in-between {
+  display: flex;
+  justify-content: space-between;
 }
 .btn-group>.btn:first-child {
   font-size: @mediumText * 0.89 !important;

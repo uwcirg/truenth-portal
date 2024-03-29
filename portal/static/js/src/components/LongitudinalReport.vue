@@ -4,19 +4,28 @@
 		<div class="error-message" v-show="hasValue(errorMessage)" v-html="errorMessage"></div>
         <div class="content" :class="{'has-legend':shouldShowLegend()}" v-show="!loading">
             <div v-show="shouldShowLegend()" class="text-muted text-right report-legend" :class="{active: shouldShowLegend()}">
-                <span class="title" v-text="triggerLegendTitle"></span>
-                <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
-                <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
-                <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
+                <div class="flex" style="justify-content: flex-end; gap: 8px">
+                    <span class="title" v-text="triggerLegendTitle"></span>
+                    <div>
+                        <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
+                        <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
+                        <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
+                        <div v-show="hasOptOutTriggers()">ⓘ (do not contact)</div>
+                    </div>
+                </div>
             </div>
-            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
-            <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}">&gt;</span>
             <table class="report-table" v-show="!hasValue(errorMessage)">
                 <THEAD>
-                    <TH class="title" v-text="questionTitleHeader"></TH>
+                    <TH class="title">
+                        <div class="flex-in-between">
+                            <span v-text="questionTitleHeader"></span>
+                            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
+                        </div>
+                    </TH>
                     <TH class="cell date" :data-column-index="index+1" v-for="(item, index) in questionnaireDates" :key="'head_'+index">
                         <span v-html="item"></span>
                         <span class="in-progress-legend" aria-hidden="true" v-show="isAssessmentInProgress(index)"></span>
+                        <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}" v-if="index === questionnaireDates.length-1">&gt;</span>
                     </TH>
                 </THEAD>
                 <TBODY>
@@ -39,7 +48,10 @@
     import AssessmentReportData from "../data/common/AssessmentReportData.js";
     import tnthDates from "../modules/TnthDate.js";
     import SYSTEM_IDENTIFIER_ENUM from "../modules/SYSTEM_IDENTIFIER_ENUM";
-    import {EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
+    import {
+        EMPRO_TRIGGER_STATE_OPTOUT_KEY,
+        EMPRO_TRIGGER_PROCCESSED_STATES
+    } from "../data/common/consts.js";
 	export default {
     data () {
         return {
@@ -201,6 +213,7 @@
                     if (!Object.keys(item.triggers.domain[domain]).length) {
                         continue;
                     }
+                    const hasOptOut = !!item.triggers.domain[domain][EMPRO_TRIGGER_STATE_OPTOUT_KEY];
                     for (let q in item.triggers.domain[domain]) {
                         if (!item.triggers.source || !item.triggers.source.authored) {
                             continue;
@@ -211,7 +224,8 @@
                         if (item.triggers.domain[domain][q] === "hard") {
                             self.triggerData.hardTriggers.push({
                                 "authored": item.triggers.source.authored,
-                                "questionLinkId": q
+                                "questionLinkId": q,
+                                "optOut": hasOptOut
                             });
                         }
                         /*
@@ -226,6 +240,7 @@
                     }
                 }
             });
+            console.log("trigger data: ", self.triggerData);
         },
         hasTriggers() {
             return this.hasSoftTriggers() || this.hasHardTriggers();
@@ -235,6 +250,9 @@
         },
         hasHardTriggers() {
             return this.triggerData.hardTriggers.length;
+        },
+        hasOptOutTriggers() {
+            return this.triggerData.hardTriggers.find((item) => item.optOut);
         },
         hasInProgressData() {
             return this.assessmentData.filter(item => {
@@ -279,13 +297,19 @@
                     let hardTriggers = $.grep(this.triggerData.hardTriggers, subitem => {
                         let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
                         let linkIdComparison = subitem.questionLinkId === entry.linkId;
-                        return timeStampComparison && linkIdComparison
+                        return !subitem.optOut && timeStampComparison && linkIdComparison
                     });
 
                     let softTriggers = $.grep(this.triggerData.softTriggers, subitem => {
                         let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
                         let linkIdComparison = subitem.questionLinkId === entry.linkId;
                         return timeStampComparison && linkIdComparison;
+                    });
+
+                    let optedOutTriggers =  $.grep(this.triggerData.hardTriggers, subitem => {
+                        let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
+                        let linkIdComparison = subitem.questionLinkId === entry.linkId;
+                        return subitem.optOut && timeStampComparison && linkIdComparison
                     });
         
                     /*
@@ -301,7 +325,7 @@
                     let optionsLength = this.getQuestionOptions(entry.linkId);
                     let answerObj = {
                         q: q,
-                        a: a + (hardTriggers.length?" **": (softTriggers.length?" *": "")),
+                        a: a + (hardTriggers.length?" **": (softTriggers.length?" *": (optedOutTriggers.length? "&nbsp;&nbsp;<span class='sub'>ⓘ</span>":""))),
                         linkId: entry.linkId,
                         value: answerValue,
                         cssClass: 
