@@ -362,10 +362,6 @@ def fire_trigger_events():
     def process_pending_actions(ts):
         """Process a trigger states row needing subsequent action"""
 
-        # Need to consider state == resolved, as the subsequent
-        # EMPRO may have become due, but the previous hasn't yet
-        # received a post intervention QB from staff, noted by
-        # the action_state:
         if (
                 'action_state' not in ts.triggers or
                 ts.triggers['action_state'] in (
@@ -431,8 +427,7 @@ def fire_trigger_events():
         db.session.commit()
 
         # Now seek out any pending actions, such as reminders to staff
-        for ts in TriggerState.query.filter(
-                TriggerState.state.in_(('triggered', 'resolved'))):
+        for ts in TriggerState.query.filter(TriggerState.state == 'triggered'):
             with TimeoutLock(
                     key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
                     timeout=NEVER_WAIT):
