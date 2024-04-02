@@ -15,6 +15,7 @@ import {
   EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
   EMPRO_TRIGGER_STATE_OPTOUT_KEY,
   EMPRO_TRIGGER_UNPROCCESSED_STATES,
+  EMPRO_TRIGGER_WITHDRAWN_STATE,
   REQUIRED_PI_ROLES,
   REQUIRED_PI_ROLES_WARNING_MESSAGE,
 } from "./data/common/consts.js";
@@ -1594,6 +1595,7 @@ export default (function() {
                 if (!this.subStudyTriggers.data) {
                     return true;
                 }
+                if (this.getPostTxActionStatus() === EMPRO_TRIGGER_WITHDRAWN_STATE) return true; // subject withdrawn
                 return this.getPostTxActionStatus() === "completed" || this.subStudyTriggers.data.resolution;
             },
             onResponseChangeFieldEvent: function(event) {

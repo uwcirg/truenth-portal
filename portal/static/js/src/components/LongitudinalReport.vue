@@ -6,7 +6,7 @@
             <div v-show="shouldShowLegend()" class="text-muted text-right report-legend" :class="{active: shouldShowLegend()}">
                 <div class="flex" style="justify-content: flex-end; gap: 8px">
                     <span class="title" v-text="triggerLegendTitle"></span>
-                    <div>
+                    <div class="legend-list">
                         <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
                         <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
                         <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
@@ -14,33 +14,35 @@
                     </div>
                 </div>
             </div>
-            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
-            <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}">&gt;</span>
-            <table class="report-table" v-show="!hasValue(errorMessage)">
-                <THEAD>
-                    <TH class="title">
-                        <div class="flex-in-between">
-                            <span v-text="questionTitleHeader"></span>
-                        </div>
-                    </TH>
-                    <TH class="cell date" :data-column-index="index+1" v-for="(item, index) in questionnaireDates" :key="'head_'+index">
-                        <span v-html="item"></span>
-                        <span class="in-progress-legend" aria-hidden="true" v-show="isAssessmentInProgress(index)"></span>
-                    </TH>
-                </THEAD>
-                <TBODY>
-                    <TR v-for="(item, qindex) in questions" :key="'question_'+ qindex">
-                        <TD class="item question domain" v-if="item.displayDomain">
-                            <span class= "domainText">{{item.code[0].display}}</span>
-                            {{item.text}}
-                        </TD>
-                        <TD class="item question" v-html="item.text" v-else></TD>
-                        <TD class="cell item" v-for="(d, index) in item.data" :key="'answer_'+qindex+'_'+index" :data-column-index="index+1">
-                            <span class="answer" v-html="d.a" v-bind:class="d.cssClass"></span>
-                        </TD>
-                    </TR>
-                </TBODY>
-            </table>
+            <div class="table-container">
+                <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
+                <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}">&gt;</span>
+                <table class="report-table" v-show="!hasValue(errorMessage)">
+                    <THEAD>
+                        <TH class="title">
+                            <div class="flex-in-between">
+                                <span v-text="questionTitleHeader"></span>
+                            </div>
+                        </TH>
+                        <TH class="cell date" :data-column-index="index+1" v-for="(item, index) in questionnaireDates" :key="'head_'+index">
+                            <span v-html="item"></span>
+                            <span class="in-progress-legend" aria-hidden="true" v-show="isAssessmentInProgress(index)"></span>
+                        </TH>
+                    </THEAD>
+                    <TBODY>
+                        <TR v-for="(item, qindex) in questions" :key="'question_'+ qindex">
+                            <TD class="item question domain" v-if="item.displayDomain">
+                                <span class= "domainText">{{item.code[0].display}}</span>
+                                {{item.text}}
+                            </TD>
+                            <TD class="item question" v-html="item.text" v-else></TD>
+                            <TD class="cell item" v-for="(d, index) in item.data" :key="'answer_'+qindex+'_'+index" :data-column-index="index+1">
+                                <span class="answer" v-html="d.a" v-bind:class="d.cssClass"></span>
+                            </TD>
+                        </TR>
+                    </TBODY>
+                </table>
+            </div>
         </div>
 	</div>
 </template>
@@ -213,7 +215,7 @@
                     if (!Object.keys(item.triggers.domain[domain]).length) {
                         continue;
                     }
-                    const hasOptOut = !!item.triggers.domain[domain][EMPRO_TRIGGER_STATE_OPTOUT_KEY];
+                    const hasOptOut = item.triggers.domain[domain][EMPRO_TRIGGER_STATE_OPTOUT_KEY];
                     for (let q in item.triggers.domain[domain]) {
                         if (!item.triggers.source || !item.triggers.source.authored) {
                             continue;
@@ -329,11 +331,15 @@
                         linkId: entry.linkId,
                         value: answerValue,
                         cssClass: 
-                        //last
-                        answerValue >= optionsLength.length ? "darkest" : 
-                        //penultimate
-                        (answerValue >= optionsLength.length - 1 ? "darker": 
-                        (answerValue <= 1 ? "no-value": ""))
+                        optedOutTriggers.length ?
+                            "warning" :
+                            //last
+                            (
+                                answerValue >= optionsLength.length ? "darkest" : 
+                                //penultimate
+                                (answerValue >= optionsLength.length - 1 ? "darker": 
+                                (answerValue <= 1 ? "no-value": ""))
+                            )
                     };
                     this.data[index].data.push(answerObj);
                     let currentDomain = "";

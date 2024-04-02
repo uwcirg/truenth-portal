@@ -299,6 +299,12 @@ emproObj.prototype.initOptOutModal = function (autoShow) {
   }
   $("#emproOptOutModal").modal(autoShow ? "show" : "hide");
 };
+emproObj.prototype.onDetectOptOutDomains = function() {
+  this.populateOptoutInputItems();
+  this.initOptOutElementEvents();
+  this.initOptOutModal(true);
+  this.initThankyouModal(false);
+};
 emproObj.prototype.initReportLink = function () {
   if (!this.hasThankyouModal()) return;
 
@@ -417,7 +423,7 @@ emproObj.prototype.init = function () {
 
           this.initTriggerDomains(
             {
-              maxTryAttempts: isDebugging && !autoShowModal ? 1 : 5,
+              maxTryAttempts: !autoShowModal ? 1 : 5,
               clearCache: autoShowModal,
             },
             (result) => {
@@ -436,10 +442,7 @@ emproObj.prototype.init = function () {
                 localStorage.setItem(this.cachedAccessKey, `true`);
                 // console.log("Opt out domain? ", this.optOutDomains);
                 if (this.optOutDomains.length > 0) {
-                  this.populateOptoutInputItems();
-                  this.initOptOutElementEvents();
-                  this.initOptOutModal(true);
-                  this.initThankyouModal(false);
+                  this.onDetectOptOutDomains();
                   return;
                 }
               }

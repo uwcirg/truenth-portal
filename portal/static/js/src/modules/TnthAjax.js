@@ -32,6 +32,7 @@ export default { /*global $ */
         var fieldHelper = this.FieldLoaderHelper, targetField = params.targetField || null;
         callback = callback || function() {};
         params.attempts++;
+        params.checkAuth = ["post", "put", "delete"].indexOf(String(method).toLowerCase()) !== -1;
         fieldHelper.showLoader(targetField);
         if (params.useWorker && window.Worker && !Utility.isTouchDevice()) { /*global isTouchDevice()*/
             Utility.initWorker(url, params, function(result) { /*global initWorker*/
@@ -63,31 +64,45 @@ export default { /*global $ */
                 "pragma": "no-cache"
             };
         }
-        $.ajax(params).done(function(data) {
-            params.attempts = 0;
-            if (data) {
-                fieldHelper.showUpdate(targetField);
-                callback(data);
-            } else {
-                fieldHelper.showError(targetField);
-                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
-            }
-        }).fail(function(xhr) {
-            if (params.attempts < params.max_attempts) {
-                (function(self, url, method, userId, params, callback) {
-                    setTimeout(function () {
-                      self.sendRequest(url, method, userId, params, callback);
-                    }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
-                })(self, url, method, userId, params, callback);
-            } else {
-                fieldHelper.showError(targetField);
-                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": xhr});
-                self.sendError(xhr, url, userId, params);
-                //reset attempts after reporting error so we know how many attempts have been made
-                //multiple attempts can signify server not being responsive or busy network
-                params.attempts = 0;
-            }
-        });
+        var ajaxCall = () => $.ajax(params).done(function(data) {
+                            params.attempts = 0;
+                            if (data) {
+                                fieldHelper.showUpdate(targetField);
+                                callback(data);
+                            } else {
+                                fieldHelper.showError(targetField);
+                                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
+                            }
+                        }).fail(function(xhr) {
+                            if (params.attempts < params.max_attempts) {
+                                (function(self, url, method, userId, params, callback) {
+                                    setTimeout(function () {
+                                    self.sendRequest(url, method, userId, params, callback);
+                                    }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
+                                })(self, url, method, userId, params, callback);
+                            } else {
+                                fieldHelper.showError(targetField);
+                                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": xhr});
+                                self.sendError(xhr, url, userId, params);
+                                //reset attempts after reporting error so we know how many attempts have been made
+                                //multiple attempts can signify server not being responsive or busy network
+                                params.attempts = 0;
+                            }
+                        });
+        if (params.checkAuth && params.attempts <= 1) {
+            $.ajax("/api/me").done(
+                function() {
+                    console.log("user authorized");
+                    ajaxCall();
+                }
+            ).fail(function() {
+                if (callback) {
+                    callback({"error": DEFAULT_SERVER_DATA_ERROR});
+                }
+            });
+            return;
+        }
+        ajaxCall();
     },
     "sendError": function(xhr, url, userId, params) {
         if (!xhr) { return false; }
@@ -356,7 +371,7 @@ export default { /*global $ */
                 params.retryAttempt++;
                 setTimeout(function() {
                     this.getSubStudyTriggers(userId, params, callback);
-                }.bind(this), 1000*params.retryAttempt);
+                }.bind(this), 1500*params.retryAttempt);
                 return false;
             }
             params.retryAttempt = 0;

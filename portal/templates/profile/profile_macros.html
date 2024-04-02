@@ -895,7 +895,9 @@
                 <div id="triggersSection" v-if="hasSubStudyTriggers()">
                     <h5 class="muted" v-show="!isSubStudyTriggersResolved()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
                     <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-html="subStudyTriggers.displaydate"></span></div>
-                    <div class="item">{{_("ACTION REQUIRED for high distress areas:")}}
+                    <div class="item">
+                        <p v-if="!isSubStudyTriggersResolved()">{{_("ACTION REQUIRED for high distress areas:")}}</p>
+                        <p v-else>{{_("High distress areas")}}</p>
                         <ul class="list">
                             <li v-for="item in subStudyTriggers.domains" v-text="item.replace(/_/g, ' ')" class="text"></li>
                         </ul>

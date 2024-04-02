@@ -14,6 +14,7 @@ export var EMPRO_TRIGGER_UNPROCCESSED_STATES = [
 ];
 export var EMPRO_TRIGGER_STATE_OPTOUT_KEY = "_opt_out_this_visit";
 export var EMPRO_TRIGGER_IN_PROCESS_STATE = "inprocess"; // see /trigger_states/empro_states.py for explanation of different trigger states
+export var EMPRO_TRIGGER_WITHDRAWN_STATE = "withdrawn"; // patient withdrawn
 export var EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER = "ironman_ss";
 export var EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER = "ironman_ss_post_tx";
 //pre-existing translated text
