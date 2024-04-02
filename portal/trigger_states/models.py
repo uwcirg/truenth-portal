@@ -172,11 +172,13 @@ class TriggerState(db.Model):
         """
         from .empro_domains import sequential_hard_trigger_count_key
         if not self.triggers:
+            current_app.logger.debug("QQQ no triggers in sequential_threshold_reached")
             return
 
         for domain, link_triggers in self.triggers['domain'].items():
             if link_triggers.get(sequential_hard_trigger_count_key, 0) > 2:
                 return True
+            current_app.logger.debug(f"QQQ sequential not found in {link_triggers} sequential_threshold_reached")
 
     def reminder_due(self, as_of_date=None):
         """Determine if reminder is due from internal state"""

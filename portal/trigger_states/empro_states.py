@@ -23,7 +23,7 @@ from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.observation import Observation
 from ..models.research_study import EMPRO_RS_ID, withdrawn_from_research_study
 from ..models.user import User
-from ..timeout_lock import TimeoutLock
+from ..timeout_lock import TimeoutLock, LockTimeout
 
 EMPRO_LOCK_KEY = "empro-trigger-state-lock-{user_id}"
 OPT_OUT_DELAY = 300  # seconds to allow user to provide opt-out choices
@@ -279,10 +279,12 @@ def fire_trigger_events():
         """Give user time to respond to opt-out prompt if applicable"""
         if not ts.sequential_threshold_reached():
             # not applicable unless at least one domain has adequate count
+            current_app.logger.debug("QQQ sequential_threshold_reached false, bail")
             return
 
         if ts.opted_out_domains():
             # user must have already replied, if opted out of at least one
+            current_app.logger.debug("QQQ user already opted out")
             return
 
         # check time since row transitioned to current state.  delay
@@ -405,34 +407,41 @@ def fire_trigger_events():
             current_app.logger.debug(
                 f"persist-trigger_states-change reminder_due clause {ts}")
 
-    # Main loop for this task function.  Two locks employed to avoid race
-    # conditions with other threads updating trigger_states rows.
+    # Main loop for this task function.
     #
     # As this is a recurring, scheduled job, simply skip over any locked keys
     # to pick up next run.
     #
-    # 1. single task concurrency (key='fire_trigger_events')
-    # 2. per user lock also checked elsewhere (key=EMPRO_LOCK_KEY(user_id))
+    # The per-user lock also is checked elsewhere (key=EMPRO_LOCK_KEY(user_id)),
+    # to prevent concurrent state transitions on a given user.
     NEVER_WAIT = 0
-    with TimeoutLock(key='fire_trigger_events', timeout=NEVER_WAIT):
-        # seek out any pending "processed" work, i.e. triggers recently
-        # evaluated
-        for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
-            if delay_processing(ts):
-                continue
+
+    # seek out any pending "processed" work, i.e. triggers recently
+    # evaluated
+    for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
+        if delay_processing(ts):
+            continue
+        try:
             with TimeoutLock(
                     key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
                     timeout=NEVER_WAIT):
                 process_processed(ts)
-        db.session.commit()
+                db.session.commit()
+        except LockTimeout:
+            # will get picked up next scheduled run - ignore
+            pass
 
         # Now seek out any pending actions, such as reminders to staff
         for ts in TriggerState.query.filter(TriggerState.state == 'triggered'):
-            with TimeoutLock(
-                    key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
-                    timeout=NEVER_WAIT):
-                process_pending_actions(ts)
-        db.session.commit()
+            try:
+                with TimeoutLock(
+                        key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
+                        timeout=NEVER_WAIT):
+                    process_pending_actions(ts)
+                    db.session.commit()
+            except LockTimeout:
+                # will get picked up next scheduled run - ignore
+                pass
 
 
 def empro_staff_qbd_accessor(qnr):
