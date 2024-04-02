@@ -7,6 +7,7 @@ from ..database import db
 from ..extensions import oauth
 from ..models.role import ROLE
 from ..models.user import get_user
+from ..timeout_lock import LockTimeout
 from ..views.crossdomain import crossdomain
 
 trigger_states = Blueprint('trigger_states', __name__)
@@ -82,7 +83,12 @@ def opt_out(user_id):
 
     if ts.opted_out_domains():
         # if user opted out of at least one, process immediately
-        fire_trigger_events()
+        try:
+            fire_trigger_events()
+        except LockTimeout:
+            # deadlock of sorts - skip out expecting the scheduled
+            # job to pick up the state next run
+            pass
 
     return jsonify(ts.as_json())
 
