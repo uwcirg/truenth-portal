@@ -2283,7 +2283,7 @@ div.footer-wrapper.right-panel {
   }
 }
 #longitudinalReportContainer {
-  margin-top: 24px;
+  margin-top: 16px;
 }
 #timeWarpContainer {
   cursor: pointer;
@@ -2292,6 +2292,9 @@ div.footer-wrapper.right-panel {
   }
   .prompt .edit-icon {
     margin-right: 8px;
+  }
+  .text {
+    line-height: 2;
   }
   .text:hover {
     color: darken(@mutedColor, 10%);
@@ -3695,6 +3698,12 @@ section.header {
     .title {
       font-weight: 500;
     }
+    .legend-list {
+      display: flex;
+      flex-direction: row;
+      gap: 2px;
+      justify-content: flex-start;
+    }
     .soft-trigger-legend,
     .hard-trigger-legend,
     .in-progress-legend {
@@ -3724,6 +3733,7 @@ section.header {
     .no-contact-legend {
       display: inline-block;
       margin-left: 8px;
+      color: @warningColor;
     }
   }
   .nav-arrow {
@@ -3741,6 +3751,7 @@ section.header {
     padding-top: 4px;
     color: @mutedColor;
     border: 1px solid @mutedColor;
+    z-index: 100;
     &.start {
       margin-right: 8px;
       left: 40%;
@@ -3754,10 +3765,8 @@ section.header {
       cursor: not-allowed;
     }
   }
-  .has-legend {
-    .nav-arrow {
-      top: 36px;
-    }
+  .table-container {
+    position: relative;
   }
   .report-table {
     margin-top: 8px;
@@ -3783,6 +3792,9 @@ section.header {
     color: @mutedColor;
     padding: 16px 16px 16px 24px;
     letter-spacing: 0.1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
   TH.title {
     text-transform: uppercase;
@@ -3799,6 +3811,10 @@ section.header {
     padding: 8px 16px;
     min-width: 132px;
     text-align: center;
+    &.warning {
+      background-color: darken(@warningColor, 1%);
+      color: #FFF
+    }
     &.darker {
       background: lighten(@mutedColor, 5%);
       color: #FFF;
@@ -4084,6 +4100,7 @@ section.header {
     }
     p {
       margin: 0 0 12px;
+      line-height: 1.535;
     }
     .item {
       .ck-input {
@@ -4297,6 +4314,9 @@ section.header {
     .item {
       display: flex;
       gap: 8px;
+      input:hover {
+        cursor: pointer;
+      }
       &:not(:last-of-type) {
         margin-bottom:8px;
       }
@@ -4308,6 +4328,11 @@ section.header {
   }
   .modal-footer {
     text-align: center;
+    .btn {
+      font-size: 0.9em;
+      padding: 1em;
+      min-width: 112px;
+    }
     .btn-empro-primary {
       background-color: @emproBtnPrimaryColor;
       color: #FFF;
@@ -5114,6 +5139,11 @@ input.clinic {
   margin-left: -1%;
   th, td {
     padding: 8px;
+  }
+  th {
+    position: sticky;
+    top: 0;
+    background-color: #FFF;
   }
 }
 
