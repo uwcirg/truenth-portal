@@ -291,7 +291,8 @@ def fire_trigger_events():
         # check time since row transitioned to current state.  delay
         # till threshold reached
         current_app.logger.debug(f"QQQ {ts.timestamp + timedelta(seconds=OPT_OUT_DELAY)} {datetime.utcnow()}")
-        if ts.timestamp + timedelta(seconds=OPT_OUT_DELAY) < datetime.utcnow():
+        if ts.timestamp < timedelta(seconds=OPT_OUT_DELAY) + datetime.utcnow():
+            current_app.logger.debug(f"QQQ return True from delay_processing")
             return True
 
     def send_n_report(em, context, record):
