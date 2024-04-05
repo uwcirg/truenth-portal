@@ -276,6 +276,7 @@ def fire_trigger_events():
     now = datetime.utcnow()
 
     def delay_processing(ts):
+        current_app.logger.debug("QQQ enter sequential_threshold_reached")
         """Give user time to respond to opt-out prompt if applicable"""
         if not ts.sequential_threshold_reached():
             # not applicable unless at least one domain has adequate count
@@ -289,7 +290,9 @@ def fire_trigger_events():
 
         # check time since row transitioned to current state.  delay
         # till threshold reached
-        if ts.timestamp + timedelta(seconds=OPT_OUT_DELAY) < datetime.utcnow():
+        current_app.logger.debug(f"QQQ {ts.timestamp + timedelta(seconds=OPT_OUT_DELAY)} {datetime.utcnow()}")
+        if ts.timestamp < timedelta(seconds=OPT_OUT_DELAY) + datetime.utcnow():
+            current_app.logger.debug(f"QQQ return True from delay_processing")
             return True
 
     def send_n_report(em, context, record):
@@ -419,8 +422,10 @@ def fire_trigger_events():
     # seek out any pending "processed" work, i.e. triggers recently
     # evaluated
     for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
+        current_app.logger.debug("QQQ call delay_processing")
         if delay_processing(ts):
             continue
+        current_app.logger.debug("QQQ delay_processing didn't work")
         try:
             with TimeoutLock(
                     key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
