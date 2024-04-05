@@ -216,7 +216,7 @@ emproObj.prototype.handleSubmitOptoutData = function () {
     EmproObj.userId,
     {
       data: JSON.stringify(EmproObj.optOutSubmitData),
-      max_attempts: 2,
+      max_attempts: 3,
     },
     (data) => {
       return EmproObj.onAfterSubmitOptoutData(data);

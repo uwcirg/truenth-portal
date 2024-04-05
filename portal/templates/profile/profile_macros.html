@@ -873,12 +873,9 @@
 {%- endmacro -%}
 {% macro postInterventionOptoutDomains() %}
     <div class="item text-warning" v-if="hasSubStudyOptOutDomains()">
-        <p>
-            {{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted about some issues.")}}
-            <br/>
-            {{_("High distressed areas ( <em>Do not contact</em> ): ")}}
-            <span v-text="getSubStudyOptoutDomainsDisplay()"></span>
-        </p>
+        <p v-if="hasSubStudyTriggers()">{{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted about some issues.")}}</p>
+        <p v-else>{{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted.")}}</p>
+        <p>{{_("High distressed areas ( <em>Do not contact</em> ): ")}} <span v-text="getSubStudyOptoutDomainsDisplay()"></span></p>
     </div>
 {% endmacro %}
 {%- macro postInterventionQuestionnaire(person) -%}
