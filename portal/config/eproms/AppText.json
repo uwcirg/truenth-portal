@@ -191,18 +191,13 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=faab8398-fa93-f1ca-9d81-3ddc38769d96",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=73361f9b-f79a-ddaa-7437-c304af8953ef",
       "name": "empro clinician trigger notification all opted out",
       "resourceType": "AppText"
     },
     {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=86b1c0ef-e3ee-e264-0190-71678d21b6a5",
       "name": "empro clinician trigger reminder",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=86b1c0ef-e3ee-e264-0190-71678d21b6a5",
-      "name": "empro clinician trigger reminder all opted out",
       "resourceType": "AppText"
     },
     {
