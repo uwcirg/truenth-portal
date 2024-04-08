@@ -890,10 +890,10 @@
                 <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
                 <!-- display trigger areas if indicated -->
                 <div id="triggersSection" v-if="hasSubStudyTriggers()">
-                    <h5 class="muted" v-show="!isSubStudyTriggersResolved()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
+                    <h5 class="muted" v-show="isPostTxActionRequired()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
                     <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-html="subStudyTriggers.displaydate"></span></div>
                     <div class="item">
-                        <p v-if="!isSubStudyTriggersResolved()">{{_("ACTION REQUIRED for high distress areas:")}}</p>
+                        <p v-if="isPostTxActionRequired()">{{_("ACTION REQUIRED for high distress areas:")}}</p>
                         <p v-else>{{_("High distress areas")}}</p>
                         <ul class="list">
                             <li v-for="item in subStudyTriggers.domains" v-text="item.replace(/_/g, ' ')" class="text"></li>

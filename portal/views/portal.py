@@ -908,6 +908,7 @@ def config_settings(config_key):
         'LOCALIZED_AFFILIATE_ORG',
         'LR_',
         'MAINTENANCE_',
+        'OPT_OUT_DISABLED_ORG_IDS',
         'PROTECTED_FIELDS',
         'PROTECTED_ORG',
         'PATIENT_LIST_ADDL_FIELDS',

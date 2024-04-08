@@ -2,10 +2,11 @@ import EMPRO_DOMAIN_MAPPINGS from "./data/common/empro_domain_mappings.json";
 import {
   EPROMS_SUBSTUDY_ID,
   EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
-  EMPRO_TRIGGER_STATE_OPTOUT_KEY
+  EMPRO_TRIGGER_STATE_OPTOUT_KEY,
 } from "./data/common/consts.js";
 import tnthAjax from "./modules/TnthAjax.js";
 import tnthDate from "./modules/TnthDate.js";
+import { CurrentUserObj } from "./mixins/CurrentUser.js";
 import TestResponsesJson from "./data/common/test/SubStudyQuestionnaireTestData.json";
 import TestTriggersJson from "./data/common/test/TestTriggersData.json";
 import { getUrlParameter } from "./modules/Utility";
@@ -25,6 +26,7 @@ var emproObj = function () {
   this.visitMonth = 0;
   this.authorDate = null;
   this.cachedAccessKey = null;
+  this.optOutNotAllowed = false;
 };
 emproObj.prototype.getDomainDisplay = function (domain) {
   if (!domain) return "";
@@ -114,7 +116,7 @@ emproObj.prototype.setOptoutSubmitData = function () {
   var triggerObject = {};
   EmproObj.selectedOptOutDomains.forEach((item) => {
     triggerObject[item] = {
-     [EMPRO_TRIGGER_STATE_OPTOUT_KEY]: true,
+      [EMPRO_TRIGGER_STATE_OPTOUT_KEY]: true,
     };
   });
   var submitData = {
@@ -299,7 +301,7 @@ emproObj.prototype.initOptOutModal = function (autoShow) {
   }
   $("#emproOptOutModal").modal(autoShow ? "show" : "hide");
 };
-emproObj.prototype.onDetectOptOutDomains = function() {
+emproObj.prototype.onDetectOptOutDomains = function () {
   this.populateOptoutInputItems();
   this.initOptOutElementEvents();
   this.initOptOutModal(true);
@@ -327,7 +329,27 @@ emproObj.prototype.initTriggerItemsVis = function () {
     return;
   }
 };
+emproObj.prototype.checkUserOrgAllowOptOut = function (userId, callback) {
+  callback = callback || function () {};
+  const OPT_OUT_ORGS_KEY = "OPT_OUT_DISABLED_ORG_IDS";
+  tnthAjax.setting(OPT_OUT_ORGS_KEY, userId, null, (data) => {
+    if (!data || data.error) callback(false);
+    if (!data[OPT_OUT_ORGS_KEY]) return false;
+    const orgsToCompare = data[OPT_OUT_ORGS_KEY].map((orgId) =>
+      parseInt(orgId)
+    );
+    CurrentUserObj.initCurrentUser(() => {
+      const userOrgs = CurrentUserObj.getUserOrgs();
+      if (!userOrgs || !userOrgs.length) callback(false);
+      // callback return true if the userOrg is in the OPT OUT disabled org list
+      callback(
+        !!userOrgs.find((orgId) => orgsToCompare.indexOf(parseInt(orgId)) !== -1)
+      );
+    });
+  });
+};
 emproObj.prototype.init = function () {
+  const self = this;
   tnthAjax.getCurrentUser((data) => {
     if (!data || !data.id) return;
     this.userId = data.id;
@@ -335,123 +357,129 @@ emproObj.prototype.init = function () {
     const isDebugging = getUrlParameter("debug");
 
     this.setLoadingVis(true);
-
-    tnthAjax.getUserResearchStudies(this.userId, "patient", false, (data) => {
-      if (
-        !isDebugging &&
-        (!data[EPROMS_SUBSTUDY_ID] ||
-          (data[EPROMS_SUBSTUDY_ID] &&
-            data[EPROMS_SUBSTUDY_ID].errors &&
-            data[EPROMS_SUBSTUDY_ID].errors.length))
-      ) {
-        //don't present popup if errors e.g. base study questionnaire due
-        this.setLoadingVis();
-        return false;
-      }
-      /*
-       * construct user report URL
-       */
-      this.initReportLink();
-
-      tnthAjax.assessmentReport(
-        this.userId,
-        EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
-        (data) => {
-          if (isDebugging) {
-            data = TestResponsesJson;
-            data.entry[0].authored = new Date().toISOString();
-          }
-          console.log("Questionnaire response data: ", data);
-          // no questionnaire data, just return here
-          if (!data || !data.entry || !data.entry.length) {
-            this.setLoadingVis(); // hide loading indicator
-            return;
-          }
-          /*
-           * make sure data item with the latest authored date is first
-           */
-          let assessmentData = data.entry.sort(function (a, b) {
-            return new Date(b.authored) - new Date(a.authored);
-          });
-          let assessmentDate = assessmentData[0]["authored"];
-          let [today, authoredDate, status, identifier] = [
-            tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
-            tnthDate.getDateWithTimeZone(
-              new Date(assessmentDate),
-              "yyyy-mm-dd"
-            ),
-            assessmentData[0].status,
-            assessmentData[0].identifier && assessmentData[0].identifier.value
-              ? assessmentData[0].identifier.value
-              : assessmentDate,
-          ];
-          let assessmentCompleted =
-            String(status).toLowerCase() === "completed";
-          console.log(
-            "today ",
-            today,
-            "author date ",
-            authoredDate,
-            " assessment completed ",
-            assessmentCompleted,
-            " identifier ",
-            identifier
-          );
-
-          this.authorDate = authoredDate;
-
-          /*
-           * associating each thank you modal popup accessed by assessment date
-           */
-          let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${authoredDate}_${identifier}`;
-          this.cachedAccessKey = cachedAccessKey;
-
-          const clearCacheData = getUrlParameter("clearCache");
-          if (clearCacheData) {
-            localStorage.removeItem(this.cachedAccessKey);
-          }
-          /*
-           * automatically pops up thank you modal IF sub-study assessment is completed,
-           * and sub-study assessment is completed today and the thank you modal has not already popped up today
-           */
-          let autoShowModal =
-            !localStorage.getItem(cachedAccessKey) &&
-            assessmentCompleted &&
-            today === authoredDate;
-
-          console.log("Should show EMPRO thank you modal ", autoShowModal);
-
-          this.initTriggerDomains(
-            {
-              maxTryAttempts: !autoShowModal ? 1 : 5,
-              clearCache: autoShowModal,
-            },
-            (result) => {
-              this.setLoadingVis(); // hide loading indicator when done
-              if (result && result.error) {
-                console.log("Error retrieving trigger data");
-                if (result.reason) {
-                  console.log("Error retrieving trigger data: ", result.reason);
-                }
-              }
-
-              /*
-               * set thank you modal accessed flag here
-               */
-              if (autoShowModal) {
-                localStorage.setItem(this.cachedAccessKey, `true`);
-                // console.log("Opt out domain? ", this.optOutDomains);
-                if (this.optOutDomains.length > 0) {
-                  this.onDetectOptOutDomains();
-                  return;
-                }
-              }
-
-              this.initThankyouModal(autoShowModal);
-            }
-          );
+    this.checkUserOrgAllowOptOut(this.userId, (isOptOutDisabled) => {
+      this.optOutNotAllowed = isOptOutDisabled;
+      console.log("Opt out is disabled ", isOptOutDisabled);
+      tnthAjax.getUserResearchStudies(this.userId, "patient", false, (data) => {
+        if (
+          !isDebugging &&
+          (!data[EPROMS_SUBSTUDY_ID] ||
+            (data[EPROMS_SUBSTUDY_ID] &&
+              data[EPROMS_SUBSTUDY_ID].errors &&
+              data[EPROMS_SUBSTUDY_ID].errors.length))
+        ) {
+          //don't present popup if errors e.g. base study questionnaire due
+          this.setLoadingVis();
+          return false;
         }
-      );
+        /*
+         * construct user report URL
+         */
+        this.initReportLink();
+
+        tnthAjax.assessmentReport(
+          this.userId,
+          EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+          (data) => {
+            if (isDebugging) {
+              data = TestResponsesJson;
+              data.entry[0].authored = new Date().toISOString();
+            }
+            console.log("Questionnaire response data: ", data);
+            // no questionnaire data, just return here
+            if (!data || !data.entry || !data.entry.length) {
+              this.setLoadingVis(); // hide loading indicator
+              return;
+            }
+            /*
+             * make sure data item with the latest authored date is first
+             */
+            let assessmentData = data.entry.sort(function (a, b) {
+              return new Date(b.authored) - new Date(a.authored);
+            });
+            let assessmentDate = assessmentData[0]["authored"];
+            let [today, authoredDate, status, identifier] = [
+              tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
+              tnthDate.getDateWithTimeZone(
+                new Date(assessmentDate),
+                "yyyy-mm-dd"
+              ),
+              assessmentData[0].status,
+              assessmentData[0].identifier && assessmentData[0].identifier.value
+                ? assessmentData[0].identifier.value
+                : assessmentDate,
+            ];
+            let assessmentCompleted =
+              String(status).toLowerCase() === "completed";
+            console.log(
+              "today ",
+              today,
+              "author date ",
+              authoredDate,
+              " assessment completed ",
+              assessmentCompleted,
+              " identifier ",
+              identifier
+            );
+
+            this.authorDate = authoredDate;
+
+            /*
+             * associating each thank you modal popup accessed by assessment date
+             */
+            let cachedAccessKey = `EMPRO_MODAL_ACCESSED_${this.userId}_${today}_${authoredDate}_${identifier}`;
+            this.cachedAccessKey = cachedAccessKey;
+
+            const clearCacheData = getUrlParameter("clearCache");
+            if (clearCacheData) {
+              localStorage.removeItem(this.cachedAccessKey);
+            }
+            /*
+             * automatically pops up thank you modal IF sub-study assessment is completed,
+             * and sub-study assessment is completed today and the thank you modal has not already popped up today
+             */
+            let autoShowModal =
+              !localStorage.getItem(cachedAccessKey) &&
+              assessmentCompleted &&
+              today === authoredDate;
+
+            console.log("Should show EMPRO thank you modal ", autoShowModal);
+
+            this.initTriggerDomains(
+              {
+                maxTryAttempts: !autoShowModal ? 1 : 5,
+                clearCache: autoShowModal,
+              },
+              (result) => {
+                this.setLoadingVis(); // hide loading indicator when done
+                if (result && result.error) {
+                  console.log("Error retrieving trigger data");
+                  if (result.reason) {
+                    console.log(
+                      "Error retrieving trigger data: ",
+                      result.reason
+                    );
+                  }
+                }
+
+                /*
+                 * set thank you modal accessed flag here
+                 */
+                if (autoShowModal) {
+                  localStorage.setItem(this.cachedAccessKey, `true`);
+                  // console.log("Opt out domain? ", this.optOutDomains);
+                  if (this.optOutDomains.length > 0) {
+                    this.onDetectOptOutDomains();
+                    return;
+                  }
+                }
+
+                this.initThankyouModal(autoShowModal);
+              }
+            );
+          }
+        );
+      });
     });
   });
 };
@@ -494,6 +522,7 @@ emproObj.prototype.processTriggerData = function (data) {
     for (let q in data.triggers.domain[key]) {
       // if sequence count >= 3, the user can choose to opt_out of respective domain
       if (
+        !self.optOutNotAllowed &&
         q === "_sequential_hard_trigger_count" &&
         parseInt(data.triggers.domain[key][q]) >= 3
       ) {
