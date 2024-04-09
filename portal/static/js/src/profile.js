@@ -1581,8 +1581,9 @@ export default (function() {
                 return this.hasSubStudyTriggers() && this.getPostTxActionStatus() === "missed";
             },
             isPostTxActionRequired: function() {
+                const actionStatus = this.getPostTxActionStatus();
                 return this.subStudyTriggers.data &&
-                (["due", "overdue", "required"].indexOf(this.getPostTxActionStatus()) !== -1
+                (["due", "overdue", "required"].indexOf(actionStatus) !== -1
                 );
             },
             isPostTxActionNotApplicable: function() {

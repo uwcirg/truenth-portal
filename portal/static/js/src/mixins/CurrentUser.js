@@ -95,6 +95,9 @@ var CurrentUser = { /* global $ i18next */
         getRoleType: function() {
             return this.isPatientUser()?"patient":"staff";
         },
+        getUserResearchStudies: function() {
+            return this.userResearchStudyIds;
+        },
         setUserResearchStudies: function(callback) {
             callback = callback || function() {};
             tnthAjax.getUserResearchStudies(this.userId, this.getRoleType(), "", data => {
