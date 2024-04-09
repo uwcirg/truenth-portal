@@ -332,7 +332,7 @@ emproObj.prototype.initTriggerItemsVis = function () {
 };
 emproObj.prototype.checkUserOrgAllowOptOut = function (userId,  userOrgs, callback) {
   callback = callback || function () {};
-  if (!userId || !userOrgs) {
+  if (!userId || !userOrgs || !userOrgs.length) {
     callback(false);
     return;
   }
@@ -362,7 +362,7 @@ emproObj.prototype.init = function () {
     this.userId = CurrentUserObj.getUserId();
     this.userOrgs = CurrentUserObj.getUserOrgs();
     const isDebugging = getUrlParameter("debug");
-    if (!this.userId || !this.userOrgs) {
+    if (!this.userId || !this.userOrgs || !this.userOrgs.length) {
       this.setLoadingVis(false);
       return;
     }
