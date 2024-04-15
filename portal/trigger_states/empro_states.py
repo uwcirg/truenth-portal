@@ -26,7 +26,7 @@ from ..models.user import User
 from ..timeout_lock import TimeoutLock, LockTimeout
 
 EMPRO_LOCK_KEY = "empro-trigger-state-lock-{user_id}"
-OPT_OUT_DELAY = 300  # seconds to allow user to provide opt-out choices
+OPT_OUT_DELAY = 1800  # seconds to allow user to provide opt-out choices
 
 class EMPRO_state(StateMachine):
     """States a user repeatedly transitions through as an EMPRO participant
