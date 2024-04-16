@@ -4055,7 +4055,11 @@ section.header {
   #postTxQuestionnaireContainer {
     #triggersSection {
       .list {
-        width: 50%;
+        width: 100%;
+        display: grid;
+        align-content: space-evenly;
+        grid-template-columns: repeat(2, 180px);
+        gap: 8px;
       }
     }
   }
@@ -4064,10 +4068,7 @@ section.header {
   #postTxQuestionnaireContainer {
     #triggersSection {
       .list {
-        width: 60%;
-        -webkit-columns: 3;
-        -moz-columns: 3;
-        columns: 3;
+        grid-template-columns: repeat(3, 180px);
       }
     }
   }

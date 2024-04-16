@@ -1121,6 +1121,10 @@ export default { /*global $ */
         params = params || {};
         params.data = JSON.stringify(data);
         this.sendRequest("/api/patient/" + userId + "/assessment", "POST", userId, params, function(data) {
+            if (data && data.error) {
+                callback({"error": true});
+                return;
+            }
             callback({data: data});
         });
     },
