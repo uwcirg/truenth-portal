@@ -380,6 +380,17 @@ class TriggerStatesReporting:
         if ts:
             return ts.soft_trigger_list()
 
+    def opted_out_domains_for_visit(self, visit_month):
+        """Return list of opted-out domains for given visit month
+
+        :param visit_month: zero indexed month value
+        :returns list of domains user opted-out of, or None if n/a
+
+        """
+        ts = self.latest_by_visit[visit_month]
+        if ts:
+            return ts.opted_out_domains()
+
 
 def rebuild_trigger_states(patient):
     """If a user's consent moves, need to re-build the trigger states for user
