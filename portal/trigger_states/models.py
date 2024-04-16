@@ -247,7 +247,7 @@ class TriggerState(db.Model):
         # mark state if one is found
         outstanding = TriggerState.query.filter(
             TriggerState.user_id == self.user_id).filter(
-            TriggerState.state.in_('triggered', 'resolved')).filter(
+            TriggerState.state.in_(('triggered', 'resolved'))).filter(
             TriggerState.visit_month < visit_month)
         for row in outstanding:
             dirty = False
