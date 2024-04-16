@@ -145,9 +145,19 @@ def initiate_trigger(user_id, as_of_date=None, rebuilding=False):
         # `due` row that was found above.
         visit_month = lookup_visit_month(user_id, as_of_date)
         if ts.visit_month != visit_month:
-            current_app.logger.warn(f"{user_id} skipped EMPRO visit {ts.visit_month}")
-            ts.visit_month = visit_month
-            ts.timestamp = as_of_date
+            # another test case, can't persist 2 rows with same user, visit, state
+            # confirm time warp isn't overlapping with existing
+            already_there = TriggerState.query.filter(
+                TriggerState.visit_month == visit_month).filter(
+                TriggerState.state == 'due').filter(
+                TriggerState.user_id == user_id).first()
+            if already_there is not None:
+                already_there.timestamp = as_of_date
+                ts = already_there
+            else:
+                current_app.logger.warn(f"{user_id} skipped EMPRO visit {ts.visit_month}")
+                ts.visit_month = visit_month
+                ts.timestamp = as_of_date
             db.session.commit()
 
         # Allow idempotent call - skip out if in correct state
