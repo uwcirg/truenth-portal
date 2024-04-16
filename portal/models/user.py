@@ -142,6 +142,7 @@ def permanently_delete_user(
                 "Contradicting username and user_id values given")
 
     def purge_user(user, acting_user):
+        from ..trigger_states.models import TriggerState
         if not user:
             raise ValueError("No such user: {}".format(username))
         if acting_user.id == user.id:
@@ -157,6 +158,17 @@ def permanently_delete_user(
         tous = ToU.query.join(Audit).filter(Audit.subject_id == user.id)
         for t in tous:
             db.session.delete(t)
+
+        TriggerState.query.filter(TriggerState.user_id == user.id).delete()
+
+        # possible this user generated a temp user for auth flows - that
+        # user's deleted audit record holds a key to the user being purged.
+        # update to that user id
+        auds = Audit.query.filter(Audit.user_id == user.id).filter(
+            Audit.subject_id != user.id)
+        for a in auds:
+            if a.comment.startswith("marking deleted user"):
+                a.user_id = a.subject_id
 
         # the rest should die on cascade rules
         db.session.delete(user)
