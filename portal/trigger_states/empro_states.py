@@ -105,6 +105,7 @@ def users_trigger_state(user_id, as_of_date=None):
     for ts_row in rows:
         # most recent with a timestamp prior to as_of_date, in case this is a rebuild
         if as_of_date < ts_row.timestamp:
+            current_app.logger.debug(f"skipping over newer trigger_states({ts_row.id}) row")
             continue
         ts = ts_row
         if ts.visit_month < vm and not withdrawal_date:
@@ -137,7 +138,7 @@ def initiate_trigger(user_id, as_of_date=None, rebuilding=False):
     if as_of_date is None:
         as_of_date = datetime.utcnow()
 
-    ts = users_trigger_state(user_id)
+    ts = users_trigger_state(user_id, as_of_date)
     if ts.state == 'due':
         # Possible the user took no action, as in skipped the last month
         # (or multiple months may have been skipped if time-warping).
@@ -145,22 +146,12 @@ def initiate_trigger(user_id, as_of_date=None, rebuilding=False):
         # `due` row that was found above.
         visit_month = lookup_visit_month(user_id, as_of_date)
         if ts.visit_month != visit_month:
-            # another test case, can't persist 2 rows with same user, visit, state
-            # confirm time warp isn't overlapping with existing
-            already_there = TriggerState.query.filter(
-                TriggerState.visit_month == visit_month).filter(
-                TriggerState.state == 'due').filter(
-                TriggerState.user_id == user_id).first()
-            if already_there is not None:
-                already_there.timestamp = as_of_date
-                ts = already_there
-            else:
-                current_app.logger.warn(f"{user_id} skipped EMPRO visit {ts.visit_month}")
-                ts.visit_month = visit_month
-                ts.timestamp = as_of_date
+            current_app.logger.warn(f"{user_id} skipped EMPRO visit {ts.visit_month}")
+            ts.visit_month = visit_month
+            ts.timestamp = as_of_date
             db.session.commit()
 
-        # Allow idempotent call - skip out if in correct state
+        # Allow idempotent call - skip out when in correct state
         return ts
 
     # Check and update the status of pending work.
