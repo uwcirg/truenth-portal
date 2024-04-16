@@ -231,23 +231,6 @@ def evaluate_triggers(qnr):
         current_app.logger.debug(
             "persist-trigger_states-new record state change to 'processed' "
             f"from evaluate_triggers() {ts}")
-
-        # a patient submission closes the window of availability for the
-        # post-intervention clinician follow up from any previous visits.
-        # mark state if one is found
-        previous = TriggerState.query.filter(
-            TriggerState.user_id == qnr.subject_id).filter(
-            TriggerState.state == 'resolved').order_by(
-            TriggerState.timestamp.desc()).first()
-        if previous and previous.triggers.get('action_state') not in (
-                'completed', 'missed', 'not applicable', 'withdrawn'):
-            triggers = copy.deepcopy(previous.triggers)
-            triggers['action_state'] = 'missed'
-            previous.triggers = triggers
-            current_app.logger.debug(
-                f"persist-trigger_states-change previous {previous}")
-            db.session.commit()
-
         return ts
 
     except TransitionNotAllowed as e:
@@ -584,6 +567,10 @@ def extract_observations(questionnaire_response_id, override_state=False):
             current_app.logger.debug(
                 "persist-trigger_states-new from"
                 f" enter_user_trigger_critical_section() {ts}")
+
+            # As we now have a new EMPRO to score, clean up any unfinished
+            # rows, as they can no longer be acted on.
+            ts.resolve_outstanding(ts.visit_month)
 
         if not ts.state == 'inprocess':
             raise ValueError(

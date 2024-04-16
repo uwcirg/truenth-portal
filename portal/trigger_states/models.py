@@ -234,6 +234,39 @@ class TriggerState(db.Model):
             TriggerState.visit_month == visit_month).order_by(
             TriggerState.id.desc()).first()
 
+    def resolve_outstanding(self, visit_month):
+        """resolve any visits prior to visit_month during transition
+
+        Once the next EMPRO is posted, the window closes for any outstanding
+        clinician follow-ups.  Clean up state if any such rows are found
+        """
+        from .empro_states import EMPRO_state
+
+        # a patient submission closes the window of availability for the
+        # post-intervention clinician follow up from any previous visits.
+        # mark state if one is found
+        outstanding = TriggerState.query.filter(
+            TriggerState.user_id == self.user_id).filter(
+            TriggerState.state.in_('triggered', 'resolved')).filter(
+            TriggerState.visit_month < visit_month)
+        for row in outstanding:
+            dirty = False
+            if row.state == 'triggered':
+                sm = EMPRO_state(row)
+                sm.resolve()
+                dirty = True
+
+            if row.triggers.get('action_state') not in (
+                    'completed', 'missed', 'not applicable', 'withdrawn'):
+                triggers = deepcopy(row.triggers)
+                triggers['action_state'] = 'missed'
+                row.triggers = triggers
+                dirty = True
+                current_app.logger.debug(
+                    f"persist-trigger_states-change outstanding {row}")
+            if dirty:
+                db.session.commit()
+
 
 class TriggerStatesReporting:
     """Manage reporting details for a given patient"""
