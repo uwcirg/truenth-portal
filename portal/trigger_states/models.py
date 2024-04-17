@@ -134,7 +134,7 @@ class TriggerState(db.Model):
 
         for row in previous_visits:
             # accumulate counts of previous opt-outs for current request
-            for domain, link_triggers in row.triggers['domain']:
+            for domain, link_triggers in row.triggers['domain'].items():
                 if domain not in opt_out_of_domains:
                     continue
                 if link_triggers.get(opt_out_this_visit_key, False):
