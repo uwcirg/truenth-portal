@@ -112,18 +112,36 @@ class TriggerState(db.Model):
             if vals.get(opt_out_this_visit_key) is True:
                 opt_out_of_domains.add(d)
 
+        if not opt_out_of_domains:
+            # no changes to persist
+            return self
+
         tc = deepcopy(self.triggers)
         for domain, link_triggers in tc['domain'].items():
             if domain in opt_out_of_domains:
                 link_triggers[opt_out_this_visit_key] = True
-                opt_out_of_domains.remove(domain)
             elif opt_out_this_visit_key in link_triggers:
                 link_triggers.pop(opt_out_this_visit_key)
 
-        if opt_out_of_domains:
-            raise ValueError(
-                f"user_id({self.user_id}):visit_month({self.visit_month}) missing domains "
-                f"requested in opt_out: {opt_out_of_domains}")
+        # Given the business rule to only allow 3 total opt-outs, bump counts
+        # which requires full trigger history
+        total_opt_outs_by_domain = {domain: 1 for domain in opt_out_of_domains}
+        previous_visits = TriggerState.query.filter(
+            TriggerState.visit_month < self.visit_month).filter(
+            TriggerState.user_id == self.user_id).filter(
+            TriggerState.state == 'resolved').order_by(
+            TriggerState.visit_month)
+
+        for row in previous_visits:
+            # accumulate counts of previous opt-outs for current request
+            for domain, link_triggers in row.triggers['domain']:
+                if domain not in opt_out_of_domains:
+                    continue
+                if link_triggers.get(opt_out_this_visit_key, False):
+                    total_opt_outs_by_domain[domain] += 1
+
+        for domain, count in total_opt_outs_by_domain.items():
+            tc['domain'][domain]['_total_opted_out'] = count
 
         self.triggers = tc
         return self

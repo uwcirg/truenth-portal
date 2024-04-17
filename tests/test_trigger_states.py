@@ -190,6 +190,13 @@ def test_apply_opt_out(initialized_patient, processed_ts, opt_out_submission):
     found = [k for k, v in result.triggers['domain'].items() if opt_out_this_visit_key in v]
     assert len(found) == 2
 
+    # confirm running counts for `_total_opted_out` match input
+    for domain, data in result.triggers['domain'].items():
+        if domain in ('fatigue', 'general_pain'):
+            assert data['_total_opted_out'] == 1
+        else:
+            assert '_total_opted_out' not in data.keys()
+
 
 def test_opted_out(mock_triggers):
     ts = TriggerState(state='processed', triggers=mock_triggers, user_id=1)
