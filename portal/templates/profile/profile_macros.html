@@ -878,7 +878,17 @@
         <p>{{_("High distressed areas ( <em>Do not contact</em> ): ")}} <span v-text="getSubStudyOptoutDomainsDisplay()"></span></p>
     </div>
 {% endmacro %}
-{%- macro postInterventionQuestionnaire(person) -%}
+{%- macro adminTriggerLinks(person, current_user) %}
+    {% if (current_user.has_role(ROLE.ADMIN.value)) %}
+        <p class="text-muted">ADMIN USE ONLY</p>
+        <!-- triggers links, ease of access, for debugging -->
+        <p>
+            <a href="/api/patient/{{person.id}}/triggers" target="_blank">Current Triggers</a> |
+            <a href="/api/patient/{{person.id}}/trigger_history" target="_blank">Trigger History</a>
+        </p>
+    {% endif %}
+{% endmacro %}
+{%- macro postInterventionQuestionnaire(person, current_user) -%}
 <!-- require a static bookmark link for post intervention questionnaire section for the dynamically generated content. Othewise the hash location won't go to the section correctly -->
 <a href="#postInterventionQuestionnaireLoc"></a>
 <div id="postInterventionQuestionnaireLoc">&nbsp;</div>
@@ -998,6 +1008,7 @@
                     <span v-html="getSubStudyStatusErrors()" ></span>
                 </div>
                 <div class="post-intervention-questionnaire-error error-message"></div>
+                {{adminTriggerLinks(person, current_user)}}
             </div>
         {% endcall %}
     </div>

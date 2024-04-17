@@ -60,7 +60,7 @@
     </div>
     <!-- post intervention questionnaire, EMPRO only -->
     {%- if enrolled_in_substudy -%}
-      {{profile_macro.postInterventionQuestionnaire(user)}}
+      {{profile_macro.postInterventionQuestionnaire(user, current_user)}}
     {%- endif -%}
   {%- endif -%}
   {{profile_macro.profileDemoDetail(user, current_user)}}
