@@ -105,6 +105,8 @@ def staff_emails(patient, hard_triggers, opted_out_domains, initial_notification
     if not (set(hard_triggers) - set(opted_out_domains)):
         # All triggered were opted out of - pick up different email template
         app_text_name += " all opted out"
+    elif opted_out_domains:
+        app_text_name += " partially opted out"
 
     # According to spec, args need at least:
     # - study ID
