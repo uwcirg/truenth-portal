@@ -220,6 +220,7 @@ emproObj.prototype.handleSubmitOptoutData = function () {
     {
       data: JSON.stringify(EmproObj.optOutSubmitData),
       max_attempts: 3,
+      timeout: 10000 // 10 seconds
     },
     (data) => {
       return EmproObj.onAfterSubmitOptoutData(data);
@@ -392,8 +393,10 @@ emproObj.prototype.init = function () {
         EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
         (data) => {
           if (isDebugging) {
-            data = TestResponsesJson;
-            data.entry[0].authored = new Date().toISOString();
+            if (!data) {
+              data = TestResponsesJson;
+            }
+          
           }
           console.log("Questionnaire response data: ", data);
           // no questionnaire data, just return here
@@ -407,6 +410,10 @@ emproObj.prototype.init = function () {
           let assessmentData = data.entry.sort(function (a, b) {
             return new Date(b.authored) - new Date(a.authored);
           });
+          if (isDebugging) {
+            assessmentData[0].authored = new Date().toISOString();
+            assessmentData[0].status = "completed";
+          }
           let assessmentDate = assessmentData[0]["authored"];
           let [today, authoredDate, status, identifier] = [
             tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
@@ -618,11 +625,11 @@ emproObj.prototype.initTriggerDomains = function (params, callbackFunc) {
           results[1] && results[1].status === "fulfilled" && results[1].value
             ? results[1].value
             : null;
-        if (isDebugging) {
+        if (isDebugging && !currentTriggerData) {
           currentTriggerData = TestTriggersJson;
         }
         if (!currentTriggerData) {
-          callback({ error: true, reason: "no trigger data" });
+          callback({ error: true, reason: "no trigger data"});
           return false;
         }
         this.processTriggerData(currentTriggerData, historyTriggerData);
