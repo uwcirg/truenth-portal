@@ -167,7 +167,7 @@ def permanently_delete_user(
         auds = Audit.query.filter(Audit.user_id == user.id).filter(
             Audit.subject_id != user.id)
         for a in auds:
-            if a.comment.startswith("marking deleted user"):
+            if a.comment and a.comment.startswith("marking deleted user"):
                 a.user_id = a.subject_id
 
         # the rest should die on cascade rules
