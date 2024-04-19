@@ -878,7 +878,18 @@
         <p>{{_("High distressed areas ( <em>Do not contact</em> ): ")}} <span v-text="getSubStudyOptoutDomainsDisplay()"></span></p>
     </div>
 {% endmacro %}
-{%- macro postInterventionQuestionnaire(person) -%}
+{%- macro adminTriggerLinks(person, current_user) %}
+    {% if (current_user.has_role(ROLE.ADMIN.value)) %}
+        <hr/>
+        <p class="text-muted">ADMIN USE ONLY</p>
+        <!-- triggers links, ease of access, for debugging -->
+        <p>
+            <a href="/api/patient/{{person.id}}/triggers" target="_blank">Current Triggers</a> |
+            <a href="/api/patient/{{person.id}}/trigger_history" target="_blank">Trigger History</a>
+        </p>
+    {% endif %}
+{% endmacro %}
+{%- macro postInterventionQuestionnaire(person, current_user) -%}
 <!-- require a static bookmark link for post intervention questionnaire section for the dynamically generated content. Othewise the hash location won't go to the section correctly -->
 <a href="#postInterventionQuestionnaireLoc"></a>
 <div id="postInterventionQuestionnaireLoc">&nbsp;</div>
@@ -909,9 +920,9 @@
                             <span class="text" v-text="getSubStudyAssessmentStatusDisplay()"></span>
                             <span class="text" v-text="getLastSubStudyAssessmentDate()"></span>
                         </div>
+                        {{postInterventionOptoutDomains()}}
                         <!-- IF no triggers are indicated, ONLY display as such for assessment that has been COMPLETED, as triggers aren't calculated yet for assessment still in progress -->
                         <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No action required")}}</div>
-                        {{postInterventionOptoutDomains()}}
                     </div>
                 </div>
                 <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
@@ -993,11 +1004,16 @@
                     <span>{{_("Action status:")}}</span>
                     <span class="text error-message" v-text="getPostTxActionStatus()"></span>
                 </div>
-                <div class="study-error error-message" v-show="shouldDisableSubstudyPostTx() && hasPostTxQuestionnaireErrors()">
-                    <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
-                    <span v-html="getSubStudyStatusErrors()" ></span>
+                <div class="study-error error-message" v-show="shouldShowPostTxError()">
+                    <div>
+                        <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
+                        <span v-html="getSubStudyStatusErrors()"></span>
+                    </div>
+                    <br/>
+                    <div><button class="btn btn-default sm-btn" onclick="refresh()">{{_("Refresh")}}</button></div>
                 </div>
                 <div class="post-intervention-questionnaire-error error-message"></div>
+                {{adminTriggerLinks(person, current_user)}}
             </div>
         {% endcall %}
     </div>

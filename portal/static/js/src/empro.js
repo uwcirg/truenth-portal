@@ -220,6 +220,7 @@ emproObj.prototype.handleSubmitOptoutData = function () {
     {
       data: JSON.stringify(EmproObj.optOutSubmitData),
       max_attempts: 3,
+      timeout: 10000 // 10 seconds
     },
     (data) => {
       return EmproObj.onAfterSubmitOptoutData(data);
@@ -330,18 +331,22 @@ emproObj.prototype.initTriggerItemsVis = function () {
     return;
   }
 };
-emproObj.prototype.checkUserOrgAllowOptOut = function (userId,  userOrgs, callback) {
+emproObj.prototype.checkUserOrgAllowOptOut = function (
+  userId,
+  userOrgs,
+  callback
+) {
   callback = callback || function () {};
   if (!userId || !userOrgs || !userOrgs.length) {
     callback(false);
     return;
   }
   const OPT_OUT_ORGS_KEY = "OPT_OUT_DISABLED_ORG_IDS";
-   // get opt out disabled orgs from setting
-   tnthAjax.setting(OPT_OUT_ORGS_KEY, userId, null, (data) => {
+  // get opt out disabled orgs from setting
+  tnthAjax.setting(OPT_OUT_ORGS_KEY, userId, null, (data) => {
     if (!data || !data[OPT_OUT_ORGS_KEY]) {
-       callback(false);
-       return;
+      callback(false);
+      return;
     }
     const optOutDisabledOrgs = data[OPT_OUT_ORGS_KEY];
     if (!optOutDisabledOrgs.length) {
@@ -388,8 +393,10 @@ emproObj.prototype.init = function () {
         EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
         (data) => {
           if (isDebugging) {
-            data = TestResponsesJson;
-            data.entry[0].authored = new Date().toISOString();
+            if (!data) {
+              data = TestResponsesJson;
+            }
+          
           }
           console.log("Questionnaire response data: ", data);
           // no questionnaire data, just return here
@@ -403,6 +410,10 @@ emproObj.prototype.init = function () {
           let assessmentData = data.entry.sort(function (a, b) {
             return new Date(b.authored) - new Date(a.authored);
           });
+          if (isDebugging) {
+            assessmentData[0].authored = new Date().toISOString();
+            assessmentData[0].status = "completed";
+          }
           let assessmentDate = assessmentData[0]["authored"];
           let [today, authoredDate, status, identifier] = [
             tnthDate.getDateWithTimeZone(new Date(), "yyyy-mm-dd"),
@@ -493,13 +504,21 @@ emproObj.prototype.setLoadingVis = function (loading) {
   }
   $(LOADING_INDICATOR_ID).removeClass("hide");
 };
-emproObj.prototype.processTriggerData = function (data) {
+emproObj.prototype.processTriggerData = function (data, historyData) {
   if (!data || data.error || !data.triggers || !data.triggers.domain) {
-    //this.initThankyouModal(false);
     console.log("No trigger data");
     return false;
   }
   var self = this;
+
+  let processedHistoryData = [];
+  if (historyData) {
+    processedHistoryData = historyData
+      .filter((item) => item.triggers && item.triggers.domain)
+      .map((item) => item.triggers.domain);
+  }
+
+  console.log("processed history data ", processedHistoryData);
 
   // set visit month related to trigger data
   this.visitMonth = data.visit_month;
@@ -522,17 +541,6 @@ emproObj.prototype.processTriggerData = function (data) {
       self.mappedDomains.push(mappedDomain);
     }
     for (let q in data.triggers.domain[key]) {
-      // if sequence count >= 3, the user can choose to opt_out of respective domain
-      if (
-        !self.optOutNotAllowed &&
-        q === "_sequential_hard_trigger_count" &&
-        parseInt(data.triggers.domain[key][q]) >= 3
-      ) {
-        // console.log("domain? ", key, " sequence ", parseInt(data.triggers.domain[key][q]));
-        if (self.optOutDomains.indexOf(key) === -1) {
-          self.optOutDomains.push(key);
-        }
-      }
       if (data.triggers.domain[key][q] === "hard") {
         self.hasHardTrigger = true;
         /*
@@ -551,6 +559,26 @@ emproObj.prototype.processTriggerData = function (data) {
           self.softTriggerDomains.push(key);
         }
       }
+      
+      if (self.optOutNotAllowed) {
+        continue;
+      }
+      const MAX_ALLOWED_OPT_OUT_NUM = 3;
+      // check if user has chosen to opt out this domain 3 times before
+      const hasReachedMaxOptOut = processedHistoryData.find(
+        (item) => parseInt(item[key]["_total_opted_out"]) >= MAX_ALLOWED_OPT_OUT_NUM
+      );
+      // if sequence count >= 3, the user can choose to opt_out of respective domain
+      if (
+        !hasReachedMaxOptOut &&
+        q === "_sequential_hard_trigger_count" &&
+        parseInt(data.triggers.domain[key][q]) >= 3
+      ) {
+        // console.log("domain? ", key, " sequence ", parseInt(data.triggers.domain[key][q]));
+        if (self.optOutDomains.indexOf(key) === -1) {
+          self.optOutDomains.push(key);
+        }
+      }
     }
   }
 };
@@ -561,37 +589,63 @@ emproObj.prototype.initTriggerDomains = function (params, callbackFunc) {
     return;
   }
   const isDebugging = getUrlParameter("debug");
-  this.checkUserOrgAllowOptOut(this.userId, this.userOrgs, (isOptOutDisabled) => {
-    this.optOutNotAllowed = isOptOutDisabled;
-    console.log("Opt out is disabled ", isOptOutDisabled);
-    tnthAjax.getSubStudyTriggers(this.userId, params, (data) => {
-      if (isDebugging) {
-        data = TestTriggersJson;
-      }
-      console.log("Trigger data: ", data);
-      if (!data || data.error || !data.triggers || !data.triggers.domain) {
-        callback({ error: true, reason: "no trigger data" });
-        return false;
-      }
+  this.checkUserOrgAllowOptOut(
+    this.userId,
+    this.userOrgs,
+    (isOptOutDisabled) => {
+      this.optOutNotAllowed = isOptOutDisabled;
+      console.log("Opt out is disabled ", isOptOutDisabled);
+      Promise.allSettled([
+        // current triggers
+        new Promise((resolve, reject) =>
+          tnthAjax.getSubStudyTriggers(this.userId, params, (data) => {
+            if (data && data.error) {
+              reject({ error: true });
+              return;
+            }
+            resolve(data);
+          })
+        ),
+        // trigger history
+        new Promise((resolve, reject) =>
+          tnthAjax.getTriggersHistory(this.userId, params, (data) => {
+            if (data && data.error) {
+              reject({ error: true });
+              return;
+            }
+            resolve(data);
+          })
+        ),
+      ]).then((results) => {
+        const currentTriggerData =
+          results[0] && results[0].status === "fulfilled" && results[0].value
+            ? results[0].value
+            : null;
+        const historyTriggerData =
+          results[1] && results[1].status === "fulfilled" && results[1].value
+            ? results[1].value
+            : null;
+        if (isDebugging && !currentTriggerData) {
+          currentTriggerData = TestTriggersJson;
+        }
+        if (!currentTriggerData) {
+          callback({ error: true, reason: "no trigger data"});
+          return false;
+        }
+        this.processTriggerData(currentTriggerData, historyTriggerData);
+        /*
+         * display user domain topic(s)
+         */
+        this.populateDomainDisplay();
+        /*
+         * show/hide sections based on triggers
+         */
+        this.initTriggerItemsVis();
 
-      this.processTriggerData(data);
-
-      /*
-       * display user domain topic(s)
-       */
-      this.populateDomainDisplay();
-      /*
-       * show/hide sections based on triggers
-       */
-      this.initTriggerItemsVis();
-
-      callback(data);
-
-      //console.log("self.domains? ", self.domains);
-      //console.log("has hard triggers ", self.hasHardTrigger);
-      //console.log("has soft triggers ", self.hasSoftTrigger);
-    });
-  });
+        callback(currentTriggerData);
+      });
+    }
+  );
 };
 let EmproObj = new emproObj();
 $(document).ready(function () {

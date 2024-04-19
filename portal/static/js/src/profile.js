@@ -1568,6 +1568,9 @@ export default (function() {
                 this.hasSubStudyStatusErrors()
               );
             },
+            shouldShowPostTxError: function() {
+                return this.shouldDisableSubstudyPostTx() && this.hasPostTxQuestionnaireErrors();
+            },
             getPostTxActionStatus: function() {
                 if (!this.subStudyTriggers.data || !this.subStudyTriggers.data.action_state) {
                     return "";
@@ -3598,6 +3601,9 @@ export default (function() {
                     }[a];
                 });
             }
+        },
+        refresh: function() {
+            window.location.reload();
         }
     });
     return ProfileObj;
