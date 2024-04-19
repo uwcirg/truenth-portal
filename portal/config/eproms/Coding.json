@@ -5863,12 +5863,6 @@
       "system": "http://snomed.info/sct"
     },
     {
-      "code": "",
-      "display": "",
-      "resourceType": "Coding",
-      "system": "http://us.truenth.org/clinical-codes"
-    },
-    {
       "code": "111",
       "display": "biopsy",
       "resourceType": "Coding",
