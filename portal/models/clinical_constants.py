@@ -1,4 +1,6 @@
 """ TrueNTH Clinical Codes """
+import json
+import os
 import requests
 
 from ..database import db
@@ -90,12 +92,23 @@ def parse_concepts(elements, system):
     return ccs
 
 
-def fetch_HL7_V3_Namespace(valueSet):
+def fetch_HL7_V3_Namespace(valueSet, pull_from_hl7=False):
     """Pull and parse the published FHIR ethnicity namespace"""
+    # NB, this used to be pulled on every deploy, but hl7.org now requires human
+    # intervention, to bypass the captcha - now pulling cached version off file
+    # system.
     src_url = 'http://hl7.org/fhir/STU3/v3/{valueSet}/v3-{valueSet}.cs.json'.format(
         valueSet=valueSet)
-    response = requests.get(src_url)
-    return parse_concepts(response.json()['concept'],
+    if pull_from_hl7:
+        response = requests.get(src_url)
+        concept_source = response.json()
+    else:
+        cwd = os.path.dirname(__file__)
+        fp = os.path.join(cwd, f'code_systems/v3-{valueSet}.cs.json')
+        with open(fp, 'r') as jfile:
+            concept_source = json.load(jfile)
+
+    return parse_concepts(concept_source['concept'],
                           system='http://hl7.org/fhir/v3/{}'.format(valueSet))
 
 
