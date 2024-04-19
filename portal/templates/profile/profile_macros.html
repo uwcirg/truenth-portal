@@ -880,6 +880,7 @@
 {% endmacro %}
 {%- macro adminTriggerLinks(person, current_user) %}
     {% if (current_user.has_role(ROLE.ADMIN.value)) %}
+        <hr/>
         <p class="text-muted">ADMIN USE ONLY</p>
         <!-- triggers links, ease of access, for debugging -->
         <p>
@@ -919,9 +920,9 @@
                             <span class="text" v-text="getSubStudyAssessmentStatusDisplay()"></span>
                             <span class="text" v-text="getLastSubStudyAssessmentDate()"></span>
                         </div>
+                        {{postInterventionOptoutDomains()}}
                         <!-- IF no triggers are indicated, ONLY display as such for assessment that has been COMPLETED, as triggers aren't calculated yet for assessment still in progress -->
                         <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No action required")}}</div>
-                        {{postInterventionOptoutDomains()}}
                     </div>
                 </div>
                 <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
@@ -1003,9 +1004,13 @@
                     <span>{{_("Action status:")}}</span>
                     <span class="text error-message" v-text="getPostTxActionStatus()"></span>
                 </div>
-                <div class="study-error error-message" v-show="shouldDisableSubstudyPostTx() && hasPostTxQuestionnaireErrors()">
-                    <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
-                    <span v-html="getSubStudyStatusErrors()" ></span>
+                <div class="study-error error-message" v-show="shouldShowPostTxError()">
+                    <div>
+                        <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
+                        <span v-html="getSubStudyStatusErrors()"></span>
+                    </div>
+                    <br/>
+                    <div><button class="btn btn-default sm-btn" onclick="refresh()">{{_("Refresh")}}</button></div>
                 </div>
                 <div class="post-intervention-questionnaire-error error-message"></div>
                 {{adminTriggerLinks(person, current_user)}}
