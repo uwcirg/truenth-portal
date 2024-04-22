@@ -99,14 +99,19 @@ def staff_emails(patient, hard_triggers, opted_out_domains, initial_notification
         if c.id not in staff_list_ids:
             staff_list.append(c)
 
+    # opt-in holds hard triggers the user did NOT opt-out of
+    opt_in_domains = hard_triggers
+
     app_text_name = 'empro clinician trigger reminder'
     if initial_notification:
         app_text_name = 'empro clinician trigger notification'
     if not (set(hard_triggers) - set(opted_out_domains)):
         # All triggered were opted out of - pick up different email template
         app_text_name += " all opted out"
+        opt_in_domains = []
     elif opted_out_domains:
         app_text_name += " partially opted out"
+        opt_in_domains = list(set(hard_triggers) - set(opted_out_domains))
 
     # According to spec, args need at least:
     # - study ID
@@ -134,7 +139,7 @@ def staff_emails(patient, hard_triggers, opted_out_domains, initial_notification
             label=_('View Participant Details')))
     opted_out = ", ".join(opted_out_domains) if opted_out_domains else ""
     opted_out_display = "<b>{opted_out}</b>".format(opted_out=opted_out)
-    triggered_domains = ", ".join(hard_triggers) if hard_triggers else ""
+    triggered_domains = ", ".join(opt_in_domains) if opt_in_domains else ""
     triggered_domains_display = "<b>{triggered_domains}</b>".format(
         triggered_domains=triggered_domains)
     args = {
