@@ -275,9 +275,12 @@ def fire_trigger_events():
 
         # check time since row transitioned to current state.  delay
         # till threshold reached
-        current_app.logger.debug(f"QQQ{ts.user_id} row timestamp: {ts.timestamp} now: {datetime.utcnow()}")
-        assert((ts.timestamp + timedelta(seconds=OPT_OUT_DELAY)).tzinfo == datetime.utcnow().tzinfo)
-        if ts.timestamp + timedelta(seconds=OPT_OUT_DELAY) < datetime.utcnow():
+        now = datetime.utcnow()
+        current_app.logger.debug(f"QQQ{ts.user_id} row timestamp: {ts.timestamp} now: {now}")
+        filed_n_delay = ts.timestamp + timedelta(seconds=OPT_OUT_DELAY)
+        current_app.logger.debug(f"QQQ{ts.user_id} {filed_n_delay} < {now} : {filed_n_delay < now}")
+        current_app.logger.debug(f"QQQ{ts.user_id} {filed_n_delay.tzinfo}")
+        if filed_n_delay < now:
             current_app.logger.debug(f"QQQ{ts.user_id} return True from delay_processing")
             return True
         current_app.logger.debug(f"QQQ{ts.user_id} return None from delay_processing")
