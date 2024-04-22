@@ -1578,7 +1578,12 @@ export default (function() {
                 const paramActionState = getUrlParameter("trigger_action_state");
                 // for debugging
                 if (paramActionState) return paramActionState.toLowerCase();
-                return String(this.subStudyTriggers.data.action_state).toLowerCase();
+                const actionState = this.subStudyTriggers.data.action_state;
+                if (!actionState &&
+                    !this.shouldDisableSubstudyPostTx() &&
+                    this.hasSubStudyTriggers()
+                ) return "required";
+                return String(actionState).toLowerCase();
             },
             hasMissedPostTxAction: function() {
                 return this.hasSubStudyTriggers() && this.getPostTxActionStatus() === "missed";
