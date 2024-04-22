@@ -229,6 +229,7 @@ def evaluate_triggers(qnr):
         # transition and persist state
         sm.processed_triggers()
         ts.insert(from_copy=True)
+        current_app.logger.debug(f"QQQ{ts.user_id} post processed_triggers")
         current_app.logger.debug(
             "persist-trigger_states-new record state change to 'processed' "
             f"from evaluate_triggers() {ts}")
@@ -260,27 +261,26 @@ def fire_trigger_events():
     now = datetime.utcnow()
 
     def delay_processing(ts):
-        current_app.logger.debug("QQQ enter sequential_threshold_reached")
+        current_app.logger.debug(f"QQQ{ts.user_id} enter sequential_threshold_reached")
         """Give user time to respond to opt-out prompt if applicable"""
         if not ts.sequential_threshold_reached():
             # not applicable unless at least one domain has adequate count
-            current_app.logger.debug("QQQ sequential_threshold_reached false, bail")
+            current_app.logger.debug(f"QQQ{ts.user_id} sequential_threshold_reached false, bail")
             return
 
         if ts.opted_out_domains():
             # user must have already replied, if opted out of at least one
-            current_app.logger.debug("QQQ user already opted out")
+            current_app.logger.debug(f"QQQ{ts.user_id} user already opted out")
             return
 
         # check time since row transitioned to current state.  delay
         # till threshold reached
-        current_app.logger.debug(f"QQQ row timestamp: {ts.timestamp} now: {datetime.utcnow()}")
-        current_app.logger.debug(f"QQQ row + delay {ts.timestamp + timedelta(seconds=OPT_OUT_DELAY)}")
-        current_app.logger.debug(f"QQQ tzinfo: {ts.timestamp.tzinfo} tz2: {(ts.timestamp + timedelta(seconds=OPT_OUT_DELAY)).tzinfo} tz3: {datetime.utcnow().tzinfo}")
+        current_app.logger.debug(f"QQQ{ts.user_id} row timestamp: {ts.timestamp} now: {datetime.utcnow()}")
         assert((ts.timestamp + timedelta(seconds=OPT_OUT_DELAY)).tzinfo == datetime.utcnow().tzinfo)
         if ts.timestamp + timedelta(seconds=OPT_OUT_DELAY) < datetime.utcnow():
-            current_app.logger.debug(f"QQQ return True from delay_processing")
+            current_app.logger.debug(f"QQQ{ts.user_id} return True from delay_processing")
             return True
+        current_app.logger.debug(f"QQQ{ts.user_id} return None from delay_processing")
 
     def send_n_report(em, context, record):
         """Send email, append success/fail w/ context to record"""
@@ -409,10 +409,10 @@ def fire_trigger_events():
     # seek out any pending "processed" work, i.e. triggers recently
     # evaluated
     for ts in TriggerState.query.filter(TriggerState.state == 'processed'):
-        current_app.logger.debug("QQQ call delay_processing")
         if delay_processing(ts):
+            current_app.logger.debug(f"QQQ{ts.user_id} delayed!!")
             continue
-        current_app.logger.debug("QQQ delay_processing didn't work")
+        current_app.logger.debug(f"QQQ{ts.user_id} NOT delayed!!")
         try:
             with TimeoutLock(
                     key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
