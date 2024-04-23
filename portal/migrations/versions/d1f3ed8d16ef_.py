@@ -1,7 +1,7 @@
 """remove Zulu locale
 
 Revision ID: d1f3ed8d16ef
-Revises: 80c3b1e96c45
+Revises: 2e9b9e696bb8
 Create Date: 2023-12-05 14:09:10.442328
 
 """
