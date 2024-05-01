@@ -319,3 +319,13 @@ def test_subsequent_reminder_skips_weekends(initialized_patient):
     # until Monday
     assert ts.reminder_due(as_of_date=datetime.strptime(
         "2021-02-15T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+
+
+def test_counts_from_db_triggers(initialized_patient, mock_opted_out_triggers):
+    user_id = db.session.merge(initialized_patient).id
+    ts = TriggerState(user_id=user_id, triggers=mock_opted_out_triggers)
+    opted_out_domains = ts.opted_out_domains()
+    hard_triggers = ts.hard_trigger_list()
+    assert set(["sad", "social_isolation"]) == set(opted_out_domains)
+    assert 7 == len(hard_triggers)
+    assert (set(hard_triggers) - set(opted_out_domains))

@@ -109,6 +109,12 @@ def staff_emails(patient, hard_triggers, opted_out_domains, initial_notification
         # All triggered were opted out of - pick up different email template
         app_text_name += " all opted out"
         opt_in_domains = []
+        if not initial_notification:
+            # seen on test, no idea how - include details in exception
+            msg = (f"Patient {patient.id} all opted out: {opted_out_domains} "
+                   f"shouldn't be eligible for a reminder!")
+            current_app.logger.error(msg)
+            app_text_name = 'empro clinician trigger notification all opted out'
     elif opted_out_domains:
         app_text_name += " partially opted out"
         opt_in_domains = list(set(hard_triggers) - set(opted_out_domains))
