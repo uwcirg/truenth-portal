@@ -55,7 +55,7 @@ def user_triggers(user_id):
 
     """
     # confirm view access
-    get_user(user_id, 'view', allow_on_url_authenticated_encounters=True)
+    get_user(user_id, permission='view', allow_on_url_authenticated_encounters=True)
     return jsonify(users_trigger_state(user_id).as_json())
 
 
@@ -71,7 +71,7 @@ def opt_out(user_id):
 
     :returns: TriggerState in JSON for the requested visit month
     """
-    get_user(user_id, 'edit', allow_on_url_authenticated_encounters=True)
+    get_user(user_id, permission='edit', allow_on_url_authenticated_encounters=True)
     ts = users_trigger_state(user_id)
     try:
         ts = ts.apply_opt_out(request.json)
@@ -114,7 +114,7 @@ def user_trigger_history(user_id):
 
     """
     # confirm view access
-    get_user(user_id, 'view')
+    get_user(user_id, permission='view', allow_on_url_authenticated_encounters=True)
 
     history = TriggerState.query.filter(
         TriggerState.user_id == user_id).order_by(TriggerState.id)
