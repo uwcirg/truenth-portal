@@ -359,6 +359,9 @@ def fire_trigger_events():
                 f"Invalid action_state {ts.triggers['action_state']} "
                 f"for patient {ts.user_id}")
 
+        if not ts.hard_trigger_list():
+            raise ValueError(f"{ts.user_id} should not require action without any hard triggers")
+
         patient = User.query.get(ts.user_id)
 
         # Withdrawn users should never receive reminders, nor staff
@@ -375,7 +378,10 @@ def fire_trigger_events():
 
         if ts.reminder_due():
             pending_emails = staff_emails(
-                patient, ts.hard_trigger_list(), ts.opted_out_domains(), False)
+                patient=patient,
+                hard_triggers=ts.hard_trigger_list(),
+                opted_out_domains=ts.opted_out_domains(),
+                initial_notification=False)
 
             # necessary to make deep copy in order to update DB JSON
             triggers = copy.deepcopy(ts.triggers)
