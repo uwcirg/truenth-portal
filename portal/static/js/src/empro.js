@@ -474,7 +474,7 @@ emproObj.prototype.init = function () {
 
           this.initTriggerDomains(
             {
-              maxTryAttempts: !autoShowModal ? 0 : 5, //no need to retry if thank you modal isn't supposed to show
+              maxTryAttempts: !autoShowModal ? 0 : isDebugging ? 0 : 5, //no need to retry if thank you modal isn't supposed to show
               clearCache: autoShowModal,
             },
             (result) => {
@@ -519,6 +519,10 @@ emproObj.prototype.processTriggerData = function (data, historyData) {
     console.log("No trigger data");
     return false;
   }
+
+  // set visit month related to trigger data
+  this.visitMonth = data.visit_month;
+
   var self = this;
 
   let processedHistoryData = [];
@@ -530,8 +534,9 @@ emproObj.prototype.processTriggerData = function (data, historyData) {
 
   console.log("processed history data ", processedHistoryData);
 
-  // set visit month related to trigger data
-  this.visitMonth = data.visit_month;
+  if (!data || !data.triggers || !data.triggers.domain) {
+    return;
+  }
 
   for (let key in data.triggers.domain) {
     if (!Object.keys(data.triggers.domain[key]).length) {
@@ -577,6 +582,7 @@ emproObj.prototype.processTriggerData = function (data, historyData) {
       // check if user has chosen to opt out this domain 3 times before
       const hasReachedMaxOptOut = processedHistoryData.find(
         (item) =>
+          item[key] &&
           parseInt(item[key]["_total_opted_out"]) >= MAX_ALLOWED_OPT_OUT_NUM
       );
       // if sequence count >= 3, the user can choose to opt_out of respective domain
@@ -628,7 +634,7 @@ emproObj.prototype.initTriggerDomains = function (params, callbackFunc) {
           })
         ),
       ]).then((results) => {
-        const currentTriggerData =
+        let currentTriggerData =
           results[0] && results[0].status === "fulfilled" && results[0].value
             ? results[0].value
             : null;
@@ -636,7 +642,11 @@ emproObj.prototype.initTriggerDomains = function (params, callbackFunc) {
           results[1] && results[1].status === "fulfilled" && results[1].value
             ? results[1].value
             : null;
-        if (isDebugging && !currentTriggerData) {
+        if (
+          isDebugging &&
+          (!currentTriggerData ||
+            (currentTriggerData && !currentTriggerData.triggers))
+        ) {
           currentTriggerData = TestTriggersJson;
         }
         if (!currentTriggerData) {
