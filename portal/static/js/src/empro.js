@@ -284,9 +284,7 @@ emproObj.prototype.initOptOutElementEvents = function () {
     EmproObj.setOptoutError("");
     var domain = $(this).attr("data-domain");
     var associatedCkInput = $("#emproOptOutModal .ck-input-" + domain);
-    if (associatedCkInput.is(":checked"))
-      associatedCkInput.prop("checked", false);
-    else associatedCkInput.prop("checked", true);
+    associatedCkInput.trigger("click");
   });
 
   // continue button that displays when error
