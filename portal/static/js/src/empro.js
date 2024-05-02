@@ -1,5 +1,6 @@
 import EMPRO_DOMAIN_MAPPINGS from "./data/common/empro_domain_mappings.json";
 import {
+  EPROMS_MAIN_STUDY_ID,
   EPROMS_SUBSTUDY_ID,
   EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
   EMPRO_TRIGGER_STATE_OPTOUT_KEY,
@@ -220,7 +221,7 @@ emproObj.prototype.handleSubmitOptoutData = function () {
     {
       data: JSON.stringify(EmproObj.optOutSubmitData),
       max_attempts: 3,
-      timeout: 10000 // 10 seconds
+      timeout: 10000, // 10 seconds
     },
     (data) => {
       return EmproObj.onAfterSubmitOptoutData(data);
@@ -374,12 +375,22 @@ emproObj.prototype.init = function () {
     tnthAjax.getUserResearchStudies(this.userId, "patient", false, (data) => {
       if (
         !isDebugging &&
+        data[EPROMS_MAIN_STUDY_ID] &&
+        data[EPROMS_MAIN_STUDY_ID].ready
+      ) {
+        //don't present popup if main study is due
+        this.setLoadingVis();
+        return false;
+      }
+      if (
+        !isDebugging &&
         (!data[EPROMS_SUBSTUDY_ID] ||
           (data[EPROMS_SUBSTUDY_ID] &&
-            data[EPROMS_SUBSTUDY_ID].errors &&
-            data[EPROMS_SUBSTUDY_ID].errors.length))
+            (data[EPROMS_SUBSTUDY_ID].ready ||
+              (data[EPROMS_SUBSTUDY_ID].errors &&
+                data[EPROMS_SUBSTUDY_ID].errors.length))))
       ) {
-        //don't present popup if errors e.g. base study questionnaire due
+        //don't present popup if EMPRO study errors or EMPRO is due
         this.setLoadingVis();
         return false;
       }
@@ -396,7 +407,6 @@ emproObj.prototype.init = function () {
             if (!data) {
               data = TestResponsesJson;
             }
-          
           }
           console.log("Questionnaire response data: ", data);
           // no questionnaire data, just return here
@@ -464,7 +474,7 @@ emproObj.prototype.init = function () {
 
           this.initTriggerDomains(
             {
-              maxTryAttempts: !autoShowModal ? 1 : 5,
+              maxTryAttempts: !autoShowModal ? 0 : 5, //no need to retry if thank you modal isn't supposed to show
               clearCache: autoShowModal,
             },
             (result) => {
@@ -559,14 +569,15 @@ emproObj.prototype.processTriggerData = function (data, historyData) {
           self.softTriggerDomains.push(key);
         }
       }
-      
+
       if (self.optOutNotAllowed) {
         continue;
       }
       const MAX_ALLOWED_OPT_OUT_NUM = 3;
       // check if user has chosen to opt out this domain 3 times before
       const hasReachedMaxOptOut = processedHistoryData.find(
-        (item) => parseInt(item[key]["_total_opted_out"]) >= MAX_ALLOWED_OPT_OUT_NUM
+        (item) =>
+          parseInt(item[key]["_total_opted_out"]) >= MAX_ALLOWED_OPT_OUT_NUM
       );
       // if sequence count >= 3, the user can choose to opt_out of respective domain
       if (
@@ -629,7 +640,7 @@ emproObj.prototype.initTriggerDomains = function (params, callbackFunc) {
           currentTriggerData = TestTriggersJson;
         }
         if (!currentTriggerData) {
-          callback({ error: true, reason: "no trigger data"});
+          callback({ error: true, reason: "no trigger data" });
           return false;
         }
         this.processTriggerData(currentTriggerData, historyTriggerData);

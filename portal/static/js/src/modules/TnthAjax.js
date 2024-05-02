@@ -341,7 +341,7 @@ export default { /*global $ */
         callback = callback || function() {};
         params = params || {};
         params.retryAttempt = params.retryAttempt || 0;
-        params.maxTryAttempts = params.maxTryAttempts || MAX_ATTEMPTS;
+        params.maxTryAttempts = !isNaN(params.maxTryAttempts) ? params.maxTryAttempts : MAX_ATTEMPTS;
 
         if (!userId) {
             callback({error: i18next.t("User id is required.")});
