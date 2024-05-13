@@ -141,7 +141,7 @@ def single_patient_adherence_data(patient_id, research_study_id):
             or "")
         ht = ts_reporting.hard_triggers_for_visit(visit_month)
         row['hard_trigger_domains'] = ', '.join(ht) if ht else ""
-        oo = ts_reporting.soft_triggers_for_visit(visit_month)
+        oo = ts_reporting.opted_out_domains_for_visit(visit_month)
         row['opted_out_domains'] = ', '.join(oo) if oo else ""
         st = ts_reporting.soft_triggers_for_visit(visit_month)
         row['soft_trigger_domains'] = ', '.join(st) if st else ""
