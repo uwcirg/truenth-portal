@@ -98,6 +98,7 @@ export default { /*global $ */
             ).fail(function() {
                 if (callback) {
                     callback({"error": DEFAULT_SERVER_DATA_ERROR});
+                    fieldHelper.showError(targetField);
                 }
             });
             return;
@@ -159,7 +160,7 @@ export default { /*global $ */
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         successField.animate({"opacity": 1}, __timeout, function() {
                             setTimeout(function() {
-                                successField.animate({"opacity": 0}, __timeout * 2);
+                                successField.animate({"opacity": 0}, __timeout * 4);
                             }, __timeout * 2);
                         });
                     });
@@ -182,7 +183,7 @@ export default { /*global $ */
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         errorField.animate({"opacity": 1}, __timeout, function() {
                             setTimeout(function() {
-                                errorField.animate({"opacity": 0}, __timeout * 2);
+                                errorField.animate({"opacity": 0}, __timeout * 4);
                             }, __timeout * 2);
                         });
                     });

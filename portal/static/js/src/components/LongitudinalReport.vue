@@ -10,13 +10,12 @@
                         <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
                         <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
                         <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
-                        <span class="no-contact-legend" v-show="hasOptOutTriggers()">ⓘ (do not contact)</span>
                     </div>
                 </div>
             </div>
             <div class="table-container">
-                <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
-                <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}">&gt;</span>
+                <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex(), hide: shouldHideNav()}">&lt;</span>
+                <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex(), hide: shouldHideNav()}">&gt;</span>
                 <table class="report-table" v-show="!hasValue(errorMessage)">
                     <THEAD>
                         <TH class="title">
@@ -54,6 +53,7 @@
         EMPRO_TRIGGER_STATE_OPTOUT_KEY,
         EMPRO_TRIGGER_PROCCESSED_STATES
     } from "../data/common/consts.js";
+    let resizeVisIntervalId = 0;
 	export default {
     data () {
         return {
@@ -113,9 +113,7 @@
             /*
              * display column(s) responsively based on viewport width
              */
-            if (bodyWidth >= 1400) {
-                this.maxToShow = 4;
-            } else if (bodyWidth >= 992) {
+            if (bodyWidth >= 992) {
                 this.maxToShow = 3;
             } else if (bodyWidth >= 699) {
                 this.maxToShow = 2;
@@ -124,12 +122,15 @@
             }
             return;
         },
+        shouldHideNav() {
+            return this.questionnaireDates.length <= 1;
+        },
         setNavIndexes() {
             /*
              * set initial indexes for start and end navigation buttons
              */
-            this.navEndIndex = this.maxToShow >= this.questionnaireDates.length ? this.questionnaireDates.length: this.maxToShow;
-            this.navStartIndex = 1;
+            this.navEndIndex = this.questionnaireDates.length > 0 ? this.questionnaireDates.length : 1;
+            this.navStartIndex = this.navEndIndex - this.maxToShow + 1;
         },
         setGoForward() {
             /*
@@ -327,19 +328,17 @@
                     let optionsLength = this.getQuestionOptions(entry.linkId);
                     let answerObj = {
                         q: q,
-                        a: a + (hardTriggers.length?" **": (softTriggers.length?" *": (optedOutTriggers.length? "&nbsp;&nbsp;<span class='sub'>ⓘ</span>":""))),
+                        a: a + (hardTriggers.length?" **": ((optedOutTriggers.length || softTriggers.length)?" *": (optedOutTriggers.length? "&nbsp;&nbsp;<span class='sub'>ⓘ</span>":""))),
                         linkId: entry.linkId,
                         value: answerValue,
-                        cssClass: 
-                        optedOutTriggers.length ?
-                            "warning" :
-                            //last
-                            (
-                                answerValue >= optionsLength.length ? "darkest" : 
+                        cssClass: (
+                            answerValue >= optionsLength.length ? 
+                                "darkest" : 
                                 //penultimate
-                                (answerValue >= optionsLength.length - 1 ? "darker": 
-                                (answerValue <= 1 ? "no-value": ""))
-                            )
+                                answerValue >= optionsLength.length - 1 ?
+                                    "darker" : 
+                                    (answerValue <= 1 ? "no-value": "")
+                        )
                     };
                     this.data[index].data.push(answerObj);
                     let currentDomain = "";
@@ -370,7 +369,11 @@
             }
             $(window).on("resize", () => {
                 window.requestAnimationFrame(() => {
-                    this.setInitVis();
+                    if (this.shouldHideNav()) return;
+                    clearTimeout(resizeVisIntervalId);
+                    resizeVisIntervalId = setTimeout(() => {
+                        this.setInitVis();
+                    }, 250);
                 });
             });
         },
