@@ -11,6 +11,7 @@ from .reference import Reference
 from .research_study import research_study_id_from_questionnaire
 from .user import User
 
+
 class ResearchData(db.Model):
     """ Cached adherence report data
 
@@ -80,21 +81,26 @@ def cache_research_data(job_id=None, manual_run=None):
         QuestionnaireResponse.subject_id.notin_(deleted_subjects)).filter(
         QuestionnaireResponse.id.notin_(already_cached))
 
-    current_app.logger.info(f"found {qnrs.count()} questionnaire responses missing from research_data cache")
+    current_app.logger.info(
+        f"found {qnrs.count()} questionnaire responses missing from research_data cache")
     for qnr in qnrs:
         # research_study_id of None triggers a lookup
         add_questionnaire_response(qnr, research_study_id=None)
 
+
 def invalidate_qnr_research_data(questionnaire_response):
     """invalidate row for given questionnaire response"""
-    ResearchData.query.filter(ResearchData.questionnaire_response_id == questionnaire_response.id).delete()
+    ResearchData.query.filter(
+        ResearchData.questionnaire_response_id == questionnaire_response.id).delete()
     db.session.commit()
+
 
 def invalidate_users_research_data(user_id, research_study_id):
     """invalidate applicable rows via removal"""
     ResearchData.query.filter(ResearchData.patient_id == user_id).filter(
         ResearchData.research_study_id == research_study_id).delete()
     db.session.commit()
+
 
 def update_single_patient_research_data(user_id):
     """back door to build research data for single patient"""
@@ -105,6 +111,7 @@ def update_single_patient_research_data(user_id):
     for qnr in qnrs:
         # research_study_id of None triggers a lookup
         add_questionnaire_response(qnr, research_study_id=None)
+
 
 def add_questionnaire_response(questionnaire_response, research_study_id):
     """Insert single questionnaire response details into ResearchData table
