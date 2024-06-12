@@ -357,8 +357,7 @@ class QuestionnaireResponse(db.Model):
         questionnaire_map = questionnaire.questionnaire_code_map()
 
         for question in document.get('group', {}).get('question', ()):
-
-            combined_answers = consolidate_answer_pairs(question['answer'])
+            combined_answers = consolidate_answer_pairs(question.get('answer', ()))
 
             # Separate out text and coded answer, then override text
             text_and_coded_answers = []
@@ -373,7 +372,8 @@ class QuestionnaireResponse(db.Model):
                         answer['valueCoding'].get('text')
                     )
 
-                    text_and_coded_answers.append({'valueString': text_answer})
+                    if text_answer is not None:
+                        text_and_coded_answers.append({'valueString': text_answer})
                 elif 'valueString' in answer and '"' in answer['valueString']:
                     answer['valueString'] = quote_double_quote(answer['valueString'])
 
@@ -845,7 +845,7 @@ class QNR_indef_results(QNR_results):
 
 def aggregate_responses(
         instrument_ids, current_user, research_study_id, patch_dstu2=False,
-        ignore_qb_requirement=False, celery_task=None, patient_ids=None):
+        celery_task=None, patient_ids=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
@@ -853,7 +853,6 @@ def aggregate_responses(
         to list of patients the current_user has permission to see
     :param research_study_id: study being processed
     :param patch_dstu2: set to make bundle DSTU2 compliant
-    :param ignore_qb_requirement: set to include all questionnaire responses
     :param celery_task: if defined, send occasional progress updates
     :param patient_ids: if defined, limit result set to given patient list
 

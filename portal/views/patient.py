@@ -483,7 +483,6 @@ def patient_timeline(patient_id):
         'current_user': current_user(),
         'research_study_id': research_study_id,
         'patch_dstu2': True,
-        'ignore_qb_requirement': False,
         'patient_ids': [patient_id],
     }
     qnr_responses = aggregate_responses(**agg_args)
