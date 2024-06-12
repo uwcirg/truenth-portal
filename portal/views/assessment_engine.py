@@ -851,7 +851,6 @@ def get_assessments():
 
     research_studies = set()
     questionnaire_list = request.args.getlist('instrument_id')
-    ignore_qb_requirement = request.args.get("ignore_qb_requirement", False)
     for q in questionnaire_list:
         research_studies.add(research_study_id_from_questionnaire(q))
     if len(research_studies) != 1:
@@ -872,7 +871,6 @@ def get_assessments():
         'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
         'lock_key': "research_report_task_lock",
-        'ignore_qb_requirement': request.args.get("ignore_qb_requirement"),
         'response_format': request.args.get('format', 'json').lower()
     }
 
