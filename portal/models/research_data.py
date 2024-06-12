@@ -121,12 +121,10 @@ def add_questionnaire_response(questionnaire_response, research_study_id):
 
     """
     from .qb_timeline import qb_status_visit_name
-    ignore_qb_requirement = False  # no longer parameterized - rebuild entire table if changed
 
     # TN-3250, don't include QNRs without assigned visits, i.e. qb_id > 0
-    if not ignore_qb_requirement:
-        if not questionnaire_response.questionnaire_bank_id:
-            return
+    if not questionnaire_response.questionnaire_bank_id:
+        return
 
     instrument = questionnaire_response.document['questionnaire']['reference'].split('/')[-1]
     if research_study_id is None:
