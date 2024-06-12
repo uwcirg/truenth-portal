@@ -1741,7 +1741,6 @@ def assessment_add(patient_id):
                     context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
 
-
     if research_study_id is not None:
         invalidate_users_QBT(patient.id, research_study_id=research_study_id)
     add_questionnaire_response(questionnaire_response, research_study_id)
