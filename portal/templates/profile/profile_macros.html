@@ -559,7 +559,7 @@
                 <div class="help-block with-errors"></div>
             </div>
         </div>
-        {{saveLoaderDiv("clinics")}}
+        {{saveLoaderDiv("clinics")}}  
     {% endcall %}
     <div class="get-orgs-error error-message"></div>
     <div class="get-demo-error error-message"></div>
@@ -937,20 +937,24 @@
                         <!-- question text -->
                         <span class="title" :class="item.type" v-text="item.text"></span>
                         <!-- date type answer-->
-                        <input type="text" class="data-datepicker form-control answer" readonly placeholder="DD MMM YYYY"
-                                :class="{disabled: isSubStudyTriggersResolved()}"
-                                :dataType="item.type"
-                                :linkId="item.linkId"
-                                @change="onResponseChangeFieldEvent"
-                                v-if="item.type == 'date'"
-                        >
+                         <div class="flex flex-column">
+                            <input type="text" class="data-datepicker form-control answer" readonly placeholder="DD MMM YYYY"
+                                    :class="{disabled: isSubStudyTriggersResolved()}"
+                                    :dataType="item.type"
+                                    :linkId="item.linkId"
+                                    :dataRequired="getDataRequiredAttribute(item)"
+                                    @change="onResponseChangeFieldEvent"
+                                    v-if="item.type == 'date'"
+                            >
+                        </div>
                         <!-- boolean type answer-->
                         <input type="checkbox"
                             class="bool answer"
                             :dataType = "item.type"
                             :linkId="item.linkId"
                             @change="onResponseChangeFieldEvent"
-                            v-if="item.type == 'boolean'">
+                            :dataRequired="getDataRequiredAttribute(item)"
+                            v-if="item.type == 'boolean'" />
                         <!-- open-choice (checkboxes) type answer -->
                         <div class="choices answer" v-if="item.type == 'open-choice'">
                             <div v-for="option in item.option">
@@ -962,6 +966,7 @@
                                         :dataType="item.type"
                                         :linkId="item.linkId"
                                         :value="option.valueCoding.display"
+                                        :dataRequired="getDataRequiredAttribute(item)"
                                         @change="onResponseChangeFieldEvent"
                                     >
                                     <span class="text" v-text="option.valueCoding.display"></span>
@@ -971,6 +976,7 @@
                                     dataType="string"
                                     :code="option.valueCoding.code"
                                     :linkId="item.linkId"
+                                    :dataRequired="getDataRequiredAttribute(item)"
                                     @change="onResponseChangeFieldEvent"
                                     v-if="/other/gi.test(option.valueCoding.display)"
                                 ></textarea>
@@ -980,6 +986,7 @@
                         <select class="form-control answer" v-if="item.type == 'choice'"
                             :linkId="item.linkId"
                             :dataType="item.type"
+                            :dataRequired="getDataRequiredAttribute(item)"
                             @change="onResponseChangeFieldEvent"
                         >
                             <option value="">{{_("Select")}}</option>

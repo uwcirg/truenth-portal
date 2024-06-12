@@ -8333,6 +8333,19 @@
           "text": "Date action taken"
         },
         {
+          "type": "open-choice",
+          "linkId": "ironman_ss_post_tx.2.1",
+          "option": [
+            {
+              "valueCoding": {
+                "code": "ironman_ss_post_tx.2.1",
+                "display": "Delayed due to local public holiday"
+              }
+            }
+          ],
+          "required": false
+        },
+        {
           "type": "choice",
           "linkId": "ironman_ss_post_tx.3",
           "text": "Action taken by",
