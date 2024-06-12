@@ -494,28 +494,28 @@ def patient_timeline(patient_id):
 
     # filter qnr data to a manageable result data set
     qnr_data = []
-    for row in qnr_responses['entry']:
+    for d in qnr_responses['entry']:
         i = {}
-        i['questionnaire'] = row['questionnaire']['reference'].split('/')[-1]
+        i['questionnaire'] = d['questionnaire']['reference'].split('/')[-1]
 
         # qnr_responses return all.  filter to requested research_study
         study_id = research_study_id_from_questionnaire(i['questionnaire'])
         if study_id != research_study_id:
             continue
 
-        i['auth_method'] = row['encounter']['auth_method']
-        i['encounter_period'] = row['encounter']['period']
-        i['document_authored'] = row['authored']
+        i['auth_method'] = d['encounter']['auth_method']
+        i['encounter_period'] = d['encounter']['period']
+        i['document_authored'] = d['authored']
         try:
-            i['ae_session'] = row['identifier']['value']
+            i['ae_session'] = d['identifier']['value']
         except KeyError:
             # happens with sub-study follow up, skip ae_session
             pass
-        i['status'] = row['status']
+        i['status'] = d['status']
         i['org'] = ': '.join((
-            row['subject']['careProvider'][0]['identifier'][0]['value'],
-            row['subject']['careProvider'][0]['display']))
-        i['visit'] = row['timepoint']
+            d['subject']['careProvider'][0]['identifier'][0]['value'],
+            d['subject']['careProvider'][0]['display']))
+        i['visit'] = d['timepoint']
         qnr_data.append(i)
 
     consent_date, withdrawal_date = consent_withdrawal_dates(user, research_study_id)
