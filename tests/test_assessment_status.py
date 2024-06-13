@@ -1,6 +1,5 @@
 """Module to test assessment_status"""
 
-import copy
 from datetime import datetime
 from pytz import timezone, utc
 from random import choice
@@ -13,11 +12,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from portal.date_tools import FHIR_datetime, utcnow_sans_micro
 from portal.extensions import db
-from portal.models.audit import Audit
-from portal.models.clinical_constants import CC
 from portal.models.encounter import Encounter
 from portal.models.identifier import Identifier
-from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.overall_status import OverallStatus
 from portal.models.qb_status import QB_Status
@@ -34,6 +30,10 @@ from portal.models.questionnaire_response import (
     qnr_document_id,
 )
 from portal.models.recur import Recur
+from portal.models.research_data import (
+    add_questionnaire_response,
+    invalidate_qnr_research_data,
+)
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
 from portal.models.user import User
@@ -95,6 +95,9 @@ def mock_qr(
         db.session.add(qr)
         db.session.commit()
     invalidate_users_QBT(user_id=user_id, research_study_id='all')
+    qr = db.session.merge(qr)
+    invalidate_qnr_research_data(qr)
+    add_questionnaire_response(questionnaire_response=qr, research_study_id=0)
 
 
 localized_instruments = {'eproms_add', 'epic26', 'comorb'}
