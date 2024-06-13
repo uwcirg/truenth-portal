@@ -41,7 +41,7 @@ def upgrade():
         op.f('ix_research_data_patient_id'), 'research_data', ['patient_id'], unique=False)
     op.create_index(
         op.f('ix_research_data_questionnaire_response_id'),
-        'research_data', ['questionnaire_response_id'], unique=False)
+        'research_data', ['questionnaire_response_id'], unique=True)
     op.create_index(
         op.f('ix_research_data_research_study_id'),
         'research_data', ['research_study_id'], unique=False)
