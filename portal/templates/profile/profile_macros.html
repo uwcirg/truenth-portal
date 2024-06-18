@@ -875,7 +875,7 @@
     <div class="item text-warning" v-if="hasSubStudyOptOutDomains()">
         <p v-if="hasSubStudyTriggers()">{{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted about some issues.")}}</p>
         <p v-else>{{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted.")}}</p>
-        <p>{{_("High distressed areas ( <em>Do not contact</em> ): ")}} <span v-text="getSubStudyOptoutDomainsDisplay()"></span></p>
+        <p>{{_("High distress areas ( <em>do not contact</em> ): ")}} <span v-text="getSubStudyOptoutDomainsDisplay()"></span></p>
     </div>
 {% endmacro %}
 {%- macro adminTriggerLinks(person, current_user) %}
