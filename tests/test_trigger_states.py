@@ -55,7 +55,6 @@ def test_qnr_identifier(initialized_with_ss_qnr):
 
 
 def test_qnr_holiday_delay(test_user, clinician_response_holiday_delay):
-    from portal.models.questionnaire_response import QuestionnaireResponse
     tsr = TriggerStatesReporting(patient_id=test_user.id)
     mock_ts = TriggerState()
     mock_ts.triggers = {'resolution': {'qnr_id': "mocked"}}
@@ -63,7 +62,7 @@ def test_qnr_holiday_delay(test_user, clinician_response_holiday_delay):
     with patch('portal.models.questionnaire_response.QuestionnaireResponse') as mockQNR:
         getbyid = mockQNR.query.get
         getbyid.return_value = clinician_response_holiday_delay
-        assert tsr.resolution_delayed_by_holiday(0) == True
+        assert tsr.resolution_delayed_by_holiday(0) is True
 
 
 def test_initiate_trigger(test_user):
