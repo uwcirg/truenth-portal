@@ -1,6 +1,7 @@
 """Test module for trigger_states blueprint """
 from flask_webtest import SessionScope
 from datetime import datetime
+from mock import Mock, patch
 import pytest
 from statemachine.exceptions import TransitionNotAllowed
 
@@ -17,7 +18,10 @@ from portal.trigger_states.empro_states import (
     initiate_trigger,
     users_trigger_state,
 )
-from portal.trigger_states.models import TriggerState
+from portal.trigger_states.models import (
+    TriggerState,
+    TriggerStatesReporting,
+)
 from portal.views.clinician import clinician_query
 
 
@@ -48,6 +52,18 @@ def test_qnr_identifier(initialized_with_ss_qnr):
     assert ref.as_fhir()['reference'] == (
         'https://stg-ae.us.truenth.org/eproms-demo/QuestionnaireResponse/538.0'
     )
+
+
+def test_qnr_holiday_delay(test_user, clinician_response_holiday_delay):
+    from portal.models.questionnaire_response import QuestionnaireResponse
+    tsr = TriggerStatesReporting(patient_id=test_user.id)
+    mock_ts = TriggerState()
+    mock_ts.triggers = {'resolution': {'qnr_id': "mocked"}}
+    tsr.latest_by_visit[0] = mock_ts
+    with patch('portal.models.questionnaire_response.QuestionnaireResponse') as mockQNR:
+        getbyid = mockQNR.query.get
+        getbyid.return_value = clinician_response_holiday_delay
+        assert tsr.resolution_delayed_by_holiday(0) == True
 
 
 def test_initiate_trigger(test_user):
