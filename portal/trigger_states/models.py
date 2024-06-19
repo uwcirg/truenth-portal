@@ -319,6 +319,32 @@ class TriggerStatesReporting:
         if resolution_authored:
             return FHIR_datetime.parse(resolution_authored)
 
+    def resolution_delayed_by_holiday(self, visit_month):
+        """Return true if clinician questionnaire response for visit exists with holiday delay
+
+        The clinician has an optional checkbox "Delayed due to local public holiday".  Returns
+        true if a questionnaire response for visit exists and such checkbox was set.
+        """
+        from ..models.questionnaire_response import QuestionnaireResponse
+        if not getattr(
+                self.latest_by_visit[visit_month],
+                'triggers',
+                None):
+            return None
+        qnr_id = self.latest_by_visit[visit_month].triggers.get(
+            "resolution", {}).get("qnr_id")
+        if not qnr_id:
+            return None
+
+        # Pull the clinician's Questionnaire Response, return question answer, if found
+        qnr = QuestionnaireResponse.query.get(qnr_id)
+        for question_details in qnr.document.get("group", {}).get("question", []):
+            # holiday question is: "linkId": "ironman_ss_post_tx.2.1"
+            if question_details.get("linkId") == "ironman_ss_post_tx.2.1":
+                for answer in question_details.get("answer", []):
+                    if "valueBoolean" in answer:
+                        return answer["valueBoolean"]
+
     def domains_accessed(self, visit_month):
         """Return list of domains accessed for visit_month
 
