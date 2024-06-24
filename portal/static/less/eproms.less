@@ -3993,14 +3993,38 @@ section.header {
   }
   .question {
     margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    &:has(.title:empty:not(.placeholder)) {
+      margin-top: -24px;
+      margin-bottom: 0;
+    }
+    &.partOf {
+      margin-top: -12px;
+      margin-bottom: 24px;
+      input {
+        order: 1
+      }
+      .text {
+        order: 2
+      }
+    }
     .title {
       display: inline-block;
       margin-right: 8px;
       min-width: 132px;
       color: @titleTextColor;
       font-weight: 500;
+      &.placeholder {
+        min-width: 136px;
+      }
       &.boolean {
         color: @baseColor;
+      }
+    }
+    .flex {
+      input {
+        margin: 0;
       }
     }
   }
@@ -4014,6 +4038,11 @@ section.header {
       .text {
         margin-left: 8px;
       }
+    }
+  }
+  .question:first-of-type {
+    .choices {
+      margin-top: 0;
     }
   }
   select,
@@ -5488,6 +5517,21 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
     padding: 4px 12px 4px 0;
     max-width: 100%;
   }
+}
+.flex-align-center {
+  align-items: center;
+}
+.flex-row-gap-1x {
+  row-gap: 8px
+}
+.flex-column-gap-1x {
+  column-gap: 8px
+}
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: 8px;
 }
 .flex-in-between {
   display: flex;
