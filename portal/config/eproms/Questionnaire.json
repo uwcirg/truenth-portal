@@ -8333,16 +8333,9 @@
           "text": "Date action taken"
         },
         {
-          "type": "open-choice",
+          "type": "boolean",
           "linkId": "ironman_ss_post_tx.2.1",
-          "option": [
-            {
-              "valueCoding": {
-                "code": "ironman_ss_post_tx.2.1",
-                "display": "Delayed due to local public holiday"
-              }
-            }
-          ],
+          "text": "Delayed due to local public holiday",
           "required": false
         },
         {
