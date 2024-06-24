@@ -1677,6 +1677,14 @@ export default (function() {
                             return;
                         }
                         this.postTxQuestionnaire.questions = data.item;
+                        this.postTxQuestionnaire.questions.forEach(question => {
+                            const numId = (question.linkId).split(".").slice(1).join(".");
+                            // id like 2.1, 3.1 as opposed to 2, 3,
+                            if (parseFloat(numId) % 1 !== 0) {
+                                question.partOf = true;
+                            }
+                            return question;
+                        });
                         Vue.nextTick(function() {
                             /*
                              *  if the triggers are considered proccessed. check to see if they have been resolved

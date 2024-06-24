@@ -3995,9 +3995,19 @@ section.header {
     margin-bottom: 24px;
     display: flex;
     align-items: flex-start;
-    &:has(.title:empty) {
+    &:has(.title:empty:not(.placeholder)) {
       margin-top: -24px;
       margin-bottom: 0;
+    }
+    &.partOf {
+      margin-top: -12px;
+      margin-bottom: 24px;
+      input {
+        order: 1
+      }
+      .text {
+        order: 2
+      }
     }
     .title {
       display: inline-block;
@@ -4005,6 +4015,9 @@ section.header {
       min-width: 132px;
       color: @titleTextColor;
       font-weight: 500;
+      &.placeholder {
+        min-width: 136px;
+      }
       &.boolean {
         color: @baseColor;
       }

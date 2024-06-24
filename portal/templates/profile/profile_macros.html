@@ -933,9 +933,10 @@
                     will be in a disabled state if the action state is "completed" or intervention_qnr_eligible flag is set to false
                 -->
                 <div id="questionsSection" class="content" :class="{disabled: shouldDisableSubstudyPostTx(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
-                    <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
+                    <div class="question" :class="{partOf: !!item.partOf}"  v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
                         <!-- question text -->
-                        <span class="title" :class="item.type" v-text="item.text"></span>
+                        <span class="title" :class="item.type" v-text="item.text" v-if="item.type !== 'boolean'"></span>
+                        <span class="title placeholder" v-if="item.partOf"></span><!-- placeholder space for formatting -->
                         <!-- date type answer-->
                          <div class="flex flex-column">
                             <input type="text" class="data-datepicker form-control answer" readonly placeholder="DD MMM YYYY"
@@ -948,13 +949,16 @@
                             />
                         </div>
                         <!-- boolean type answer-->
-                        <input type="checkbox"
-                            class="bool answer"
-                            :dataType = "item.type"
-                            :linkId="item.linkId"
-                            @change="onResponseChangeFieldEvent"
-                            :dataRequired="getDataRequiredAttribute(item)"
-                            v-if="item.type == 'boolean'" />
+                        <div class="flex flex-column-gap-1x" v-if="item.type == 'boolean'">
+                            <span v-text="item.text" class="text"></span>
+                            <input type="checkbox"
+                                class="bool answer"
+                                :dataType = "item.type"
+                                :linkId="item.linkId"
+                                @change="onResponseChangeFieldEvent"
+                                :dataRequired="getDataRequiredAttribute(item)"
+                                v-if="item.type == 'boolean'" />
+                        </div>
                         <!-- open-choice (checkboxes) type answer -->
                         <div class="choices answer" v-if="item.type == 'open-choice'">
                             <div v-for="option in item.option">
