@@ -37,7 +37,7 @@ def invite_email(user):
     db.session.add(msg)
 
 
-def patient_email(patient, soft_triggers, hard_triggers):
+def patient_email(patient, soft_triggers, opted_in_hard_triggers):
     """Prepare email for patient, depending on trigger status"""
 
     # If the user has a pending questionnaire bank, include for due date
@@ -54,7 +54,7 @@ def patient_email(patient, soft_triggers, hard_triggers):
     args = load_template_args(
         user=patient, questionnaire_bank_id=qb_id, qb_iteration=qb_iteration)
 
-    if hard_triggers:
+    if opted_in_hard_triggers:
         name = 'empro patient both triggers email'
     elif soft_triggers:
         name = 'empro patient soft triggers email'
