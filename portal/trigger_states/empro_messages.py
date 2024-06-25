@@ -99,13 +99,13 @@ def staff_emails(patient, hard_triggers, opted_out_domains, initial_notification
         if c.id not in staff_list_ids:
             staff_list.append(c)
 
+    triggered_for_email = hard_triggers
     app_text_name = 'empro clinician trigger reminder'
     if initial_notification:
         app_text_name = 'empro clinician trigger notification'
     if not (set(hard_triggers) - set(opted_out_domains)):
         # All triggered were opted out of - pick up different email template
         app_text_name += " all opted out"
-        triggered_for_email = hard_triggers
         if not initial_notification:
             # seen on test, no idea how - include details in exception
             msg = (f"Patient {patient.id} all opted out: {opted_out_domains} "
