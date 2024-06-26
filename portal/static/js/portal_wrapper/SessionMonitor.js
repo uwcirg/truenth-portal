@@ -4,9 +4,11 @@ var SessionMonitorObj = function() { /* global $ */
     var TIMEOUT_URL = "/logout?timed_out=1";
     var LOGOUT_STORAGE_KEY = "truenthLoggedOut";
     var TIMEOUT_STORAGE_KEY="truenthTimedOut";
+    var __SESSION_MONITOR_TIMER_ID = 0;
 
     this.init = function() {
         this.clearStorage();
+        this.clearMonitorInterval();
         this.initStorageEvent();
         this.initElementEvents();
         this.initUnloadEvent();
@@ -29,6 +31,7 @@ var SessionMonitorObj = function() { /* global $ */
                     pingUrl: n + "/api/ping",
                     logoutUrl: n + LOGOUT_URL,
                     timeoutUrl: n + TIMEOUT_URL,
+                    timeOnLoadStorageKey: "TRUENTH_SESSION_TIME_ON_LOAD",
                     ping: function() {
                         var options = {
                             type: "POST",
@@ -75,7 +78,27 @@ var SessionMonitorObj = function() { /* global $ */
                             sessionStorage.clear();
                         }
                         l.setLogoutStorage();
+                        l.removeTimeOnLoad();
                         window.location.href = l.logoutUrl;
+                    },
+                    initTimeOnLoad: function() {
+                        window.localStorage.setItem(l.timeOnLoadStorageKey, Date.now());
+                    },
+                    //get last active time
+                    getLastActiveTime: function(){
+                        return window.localStorage.getItem(l.timeOnLoadStorageKey);
+                    },
+                    removeTimeOnLoad: function() {
+                        window.localStorage.removeItem(l.timeOnLoadStorageKey);
+                    },
+                    //determine if some given period of time has elapsed since last stored active time
+                    isTimeExceeded: function() {
+                        var activeDuration = (Date.now() - parseFloat(l.getLastActiveTime()));
+                        if (!isNaN(activeDuration) && activeDuration >= 0) {
+                            console.log("time in session ", (activeDuration)/1000/60, " minutes ");
+                            return activeDuration > l.sessionLifetime;
+                        }
+                        return false;
                     },
                     onwarning: function() {
                         var n = Math.round(l.timeBeforeWarning / 60 / 1e3),
@@ -96,7 +119,16 @@ var SessionMonitorObj = function() { /* global $ */
                         if (typeof(sessionStorage) !== "undefined") {
                             sessionStorage.clear();
                         }
+                        //check if session time is up before actually logging out user
+                        if (!l.isTimeExceeded()) {
+                            return;
+                        }
+                        console.log("Time exceeded, logging out...");
+                        l.timeout();
+                    },
+                    timeout: function() {
                         l.setTimeoutStorage();
+                        l.removeTimeOnLoad();
                         window.location.href = l.timeoutUrl;
                     }
                 };
@@ -109,6 +141,8 @@ var SessionMonitorObj = function() { /* global $ */
                     var n = l.sessionLifetime - l.timeBeforeWarning;
                     window.clearTimeout(r);
                     window.clearTimeout(u);
+                    console.log("Initiating time on load...");
+                    l.initTimeOnLoad();
                     r = window.setTimeout(l.onwarning, n);
                     u = window.setTimeout(s, l.sessionLifetime);
                 }
@@ -145,17 +179,17 @@ var SessionMonitorObj = function() { /* global $ */
             logoutUrl: __BASE_URL + LOGOUT_URL,
             timeoutUrl: __BASE_URL + TIMEOUT_URL,
             modalShown: !1,
-            intervalMonitor: !1,
             onwarning: function() {
                 $("#session-warning-modal").modal("show");
                 if (sessMon.modalShown) {
-                    sessMon.intervalMonitor = setInterval(function() {
+                    console.log("session timing out, start count down...");
+                    __SESSION_MONITOR_TIMER_ID = setInterval(function() {
                         sessMon.ontimeout();
                     }, 12e4);
                 }
             }
         });
-        $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false}).on("show.bs.modal", function () {sessMon.modalShown = true;}).on("hide.bs.modal", function () { sessMon.modalShown = false; if (sessMon.intervalMonitor) { clearInterval(sessMon.intervalMonitor); }}).on("click", "#stay-logged-in", sessMon.extendsess).on("click", "#log-out", sessMon.logout);
+        $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false}).on("show.bs.modal", function () {sessMon.modalShown = true;}).on("hide.bs.modal", function () { sessMon.modalShown = false;}).on("click", "#stay-logged-in", sessMon.extendsess).on("click", "#log-out", sessMon.logout);
         var warningText = ($("#session-warning-modal").find("#remaining-time").text()).replace("{time}", (sessMon.timeBeforeWarning / 1000));
         $("#session-warning-modal").find("#remaining-time").text(warningText);
     };
@@ -180,6 +214,9 @@ var SessionMonitorObj = function() { /* global $ */
     this.clearStorage = function() {
         localStorage.removeItem(LOGOUT_STORAGE_KEY);
         localStorage.removeItem(TIMEOUT_STORAGE_KEY);
+    };
+    this.clearMonitorInterval = function() {
+        clearInterval(__SESSION_MONITOR_TIMER_ID);
     };
     this.initUnloadEvent = function() {
         $(window).on("beforeunload", function() {
