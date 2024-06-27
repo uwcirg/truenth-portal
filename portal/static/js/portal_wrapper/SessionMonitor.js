@@ -95,7 +95,9 @@ var SessionMonitorObj = function() { /* global $ */
                     isTimeExceeded: function() {
                         var activeDuration = (Date.now() - parseFloat(l.getLastActiveTime()));
                         if (!isNaN(activeDuration) && activeDuration >= 0) {
+                            console.log("session lifetime is ", l.sessionLifetime/1000/60, " minutes");
                             console.log("time in session ", (activeDuration)/1000/60, " minutes ");
+                            // compare in milliseconds
                             return activeDuration > l.sessionLifetime;
                         }
                         return false;
@@ -127,7 +129,9 @@ var SessionMonitorObj = function() { /* global $ */
                         l.timeout();
                     },
                     timeout: function() {
+                        // this should communicate to any open browser tab 
                         l.setTimeoutStorage();
+                        // remove session start timestamp from localStorage
                         l.removeTimeOnLoad();
                         window.location.href = l.timeoutUrl;
                     }
@@ -136,12 +140,13 @@ var SessionMonitorObj = function() { /* global $ */
                 function s() {
                     $.when(l.onbeforetimeout()).always(l.ontimeout);
                 }
-
+                // this function is called each time on page load
                 function e() {
                     var n = l.sessionLifetime - l.timeBeforeWarning;
                     window.clearTimeout(r);
                     window.clearTimeout(u);
                     console.log("Initiating time on load...");
+                    // initialize the session start timestamp here, saved in localStorage
                     l.initTimeOnLoad();
                     r = window.setTimeout(l.onwarning, n);
                     u = window.setTimeout(s, l.sessionLifetime);
