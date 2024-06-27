@@ -15,7 +15,8 @@ var SessionMonitorObj = function() { /* global $ */
         var expiresIn = $("#sessionMonitorProps").attr("data-expires-in"); //session expires in time period from backend
         var __CRSF_TOKEN = $("#sessionMonitorProps").attr("data-crsftoken") || "";
         var __BASE_URL = $("#sessionMonitorProps").attr("data-baseurl") || "";
-        var SESSION_LIFETIME = this.calculatedLifeTime(expiresIn);
+        // expiresIn from backend is in seconds
+        var SESSION_LIFETIME = this.calculatedLifeTime(expiresIn ? expiresIn : 1800); // default to 30 minutes
         var sessMon = (function(n, o) {
             return function(t) {
                 "use strict";
@@ -142,14 +143,16 @@ var SessionMonitorObj = function() { /* global $ */
                 }
                 // this function is called each time on page load
                 function e() {
-                    var n = l.sessionLifetime - l.timeBeforeWarning;
+                    var lifeTime = l.sessionLifetime ? l.sessionLifetime : 1800000; // default to 30 minutes in miliseconds;
+                    var timeBeforeWarning = l.timeBeforeWarning ? l.timeBeforeWarning : 60000; // default to one minute in miliseconds
+                    var n = lifeTime - timeBeforeWarning;
                     window.clearTimeout(r);
                     window.clearTimeout(u);
                     console.log("Initiating time on load...");
                     // initialize the session start timestamp here, saved in localStorage
                     l.initTimeOnLoad();
                     r = window.setTimeout(l.onwarning, n);
-                    u = window.setTimeout(s, l.sessionLifetime);
+                    u = window.setTimeout(s, lifeTime);
                 }
 
                 function i(n) {
@@ -256,8 +259,9 @@ var SessionMonitorObj = function() { /* global $ */
         }
         $(window).on("storage", cleanUp);
     },
+    //configured session lifetime from backend is in seconds
     this.calculatedLifeTime = function(configuredLifeTime) {
-        var calculated = 15 * 60;
+        var calculated = 30 * 60;
         configuredLifeTime = parseInt(configuredLifeTime);
         if (!isNaN(configuredLifeTime) && configuredLifeTime > 0) {
             calculated = configuredLifeTime;
