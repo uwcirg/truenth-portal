@@ -4,11 +4,9 @@ var SessionMonitorObj = function() { /* global $ */
     var TIMEOUT_URL = "/logout?timed_out=1";
     var LOGOUT_STORAGE_KEY = "truenthLoggedOut";
     var TIMEOUT_STORAGE_KEY="truenthTimedOut";
-    var __SESSION_MONITOR_TIMER_ID = 0;
 
     this.init = function() {
         this.clearStorage();
-        this.clearMonitorInterval();
         this.initStorageEvent();
         this.initElementEvents();
         this.initUnloadEvent();
@@ -87,7 +85,8 @@ var SessionMonitorObj = function() { /* global $ */
                     },
                     //get last active time
                     getLastActiveTime: function(){
-                        return window.localStorage.getItem(l.timeOnLoadStorageKey);
+                        var storedDateTime = window.localStorage.getItem(l.timeOnLoadStorageKey);
+                        return storedDateTime ? storedDateTime : Date.now();
                     },
                     removeTimeOnLoad: function() {
                         window.localStorage.removeItem(l.timeOnLoadStorageKey);
@@ -119,12 +118,12 @@ var SessionMonitorObj = function() { /* global $ */
                     },
                     onbeforetimeout: function() {},
                     ontimeout: function() {
-                        if (typeof(sessionStorage) !== "undefined") {
-                            sessionStorage.clear();
-                        }
                         //check if session time is up before actually logging out user
                         if (!l.isTimeExceeded()) {
                             return;
+                        }
+                        if (typeof(sessionStorage) !== "undefined") {
+                            sessionStorage.clear();
                         }
                         console.log("Time exceeded, logging out...");
                         l.timeout();
@@ -143,15 +142,17 @@ var SessionMonitorObj = function() { /* global $ */
                 }
                 // this function is called each time on page load
                 function e() {
-                    var lifeTime = l.sessionLifetime ? l.sessionLifetime : 1800000; // default to 30 minutes in miliseconds;
-                    var timeBeforeWarning = l.timeBeforeWarning ? l.timeBeforeWarning : 60000; // default to one minute in miliseconds
+                    var lifeTime = l.sessionLifetime && l.sessionLifetime > 0 ? l.sessionLifetime : 1800000; // default to 30 minutes in miliseconds;
+                    var timeBeforeWarning = l.timeBeforeWarning && l.timeBeforeWarning > 0 ? l.timeBeforeWarning : 60000; // default to one minute in miliseconds
                     var n = lifeTime - timeBeforeWarning;
                     window.clearTimeout(r);
                     window.clearTimeout(u);
                     console.log("Initiating time on load...");
                     // initialize the session start timestamp here, saved in localStorage
                     l.initTimeOnLoad();
+                    // set timer for showing timeout warning modal, prior to when timeout happens
                     r = window.setTimeout(l.onwarning, n);
+                    // set timer for timing out session
                     u = window.setTimeout(s, lifeTime);
                 }
 
@@ -188,12 +189,10 @@ var SessionMonitorObj = function() { /* global $ */
             timeoutUrl: __BASE_URL + TIMEOUT_URL,
             modalShown: !1,
             onwarning: function() {
+                // showing the session about to timeout modal
                 $("#session-warning-modal").modal("show");
                 if (sessMon.modalShown) {
                     console.log("session timing out, start count down...");
-                    __SESSION_MONITOR_TIMER_ID = setInterval(function() {
-                        sessMon.ontimeout();
-                    }, 12e4);
                 }
             }
         });
@@ -222,9 +221,6 @@ var SessionMonitorObj = function() { /* global $ */
     this.clearStorage = function() {
         localStorage.removeItem(LOGOUT_STORAGE_KEY);
         localStorage.removeItem(TIMEOUT_STORAGE_KEY);
-    };
-    this.clearMonitorInterval = function() {
-        clearInterval(__SESSION_MONITOR_TIMER_ID);
     };
     this.initUnloadEvent = function() {
         $(window).on("beforeunload", function() {
