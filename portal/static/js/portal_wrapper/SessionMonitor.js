@@ -30,7 +30,7 @@ var SessionMonitorObj = function() { /* global $ */
                     pingUrl: n + "/api/ping",
                     logoutUrl: n + LOGOUT_URL,
                     timeoutUrl: n + TIMEOUT_URL,
-                    timeOnLoadStorageKey: "TRUENTH_SESSION_TIME_ON_LOAD",
+                    lastActivityStorageKey: "TRUENTH_SESSION_LAST_ACTIVITY",
                     ping: function() {
                         var options = {
                             type: "POST",
@@ -81,15 +81,15 @@ var SessionMonitorObj = function() { /* global $ */
                         window.location.href = l.logoutUrl;
                     },
                     initTimeOnLoad: function() {
-                        window.localStorage.setItem(l.timeOnLoadStorageKey, Date.now());
+                        window.localStorage.setItem(l.lastActivityStorageKey, Date.now());
                     },
                     //get last active time
                     getLastActiveTime: function(){
-                        var storedDateTime = window.localStorage.getItem(l.timeOnLoadStorageKey);
+                        var storedDateTime = window.localStorage.getItem(l.lastActivityStorageKey);
                         return storedDateTime ? storedDateTime : Date.now();
                     },
                     removeTimeOnLoad: function() {
-                        window.localStorage.removeItem(l.timeOnLoadStorageKey);
+                        window.localStorage.removeItem(l.lastActivityStorageKey);
                     },
                     //determine if some given period of time has elapsed since last stored active time
                     isTimeExceeded: function() {
