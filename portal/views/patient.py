@@ -478,19 +478,24 @@ def patient_timeline(patient_id):
         cache_single_patient_adherence_data(**kwargs)
         adherence_data = sorted_adherence_data(patient_id, research_study_id)
 
-    qnr_responses = aggregate_responses(
-        instrument_ids=None,
-        current_user=current_user(),
-        research_study_id=research_study_id,
-        patch_dstu2=True,
-        ignore_qb_requirement=True,
-        patient_ids=[patient_id]
-    )
+    agg_args = {
+        'instrument_ids': None,
+        'current_user': current_user(),
+        'research_study_id': research_study_id,
+        'patch_dstu2': True,
+        'patient_ids': [patient_id],
+    }
+    qnr_responses = aggregate_responses(**agg_args)
+
+    if qnr_responses['total'] == 0:
+        from ..models.research_data import update_single_patient_research_data
+        update_single_patient_research_data(patient_id)
+        qnr_responses = aggregate_responses(**agg_args)
+
     # filter qnr data to a manageable result data set
     qnr_data = []
-    for row in qnr_responses['entry']:
+    for d in qnr_responses['entry']:
         i = {}
-        d = row['resource']
         i['questionnaire'] = d['questionnaire']['reference'].split('/')[-1]
 
         # qnr_responses return all.  filter to requested research_study
@@ -507,7 +512,9 @@ def patient_timeline(patient_id):
             # happens with sub-study follow up, skip ae_session
             pass
         i['status'] = d['status']
-        i['org'] = d['subject']['careProvider'][0]['display']
+        i['org'] = ': '.join((
+            d['subject']['careProvider'][0]['identifier'][0]['value'],
+            d['subject']['careProvider'][0]['display']))
         i['visit'] = d['timepoint']
         qnr_data.append(i)
 
