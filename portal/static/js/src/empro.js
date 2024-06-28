@@ -185,7 +185,7 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
     EmproObj.setOptoutButtonsState(false);
     EmproObj.setOptoutError(
       i18next.t(
-        "System error: Unable to save your choices.\r\nPlease click 'Submit' to try again. \r\nOtherwise click 'Dismiss' to continue."
+        "System error: Unable to save your choices.\r\nPlease click 'Submit' to try again."
       )
     );
     return false;
@@ -198,21 +198,39 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
     EmproObj.setOptoutButtonsState(false);
     EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
     EmproObj.populateSelectedOptoutUI();
+    // TODO different text will appear in thank you modal, waiting for approval before changes
+    // EmproObj.handleFullOptout();
     EmproObj.initOptOutModal(false);
     EmproObj.initThankyouModal(true);
   }, 1000);
   return true;
 };
-emproObj.prototype.handleSubmitOptoutData = function () {
-  if (!EmproObj.hasErrorText() && !EmproObj.hasSelectedOptOutDomains()) {
-    EmproObj.setOptoutError(
-      i18next.t(
-        "You didn't select anything. Are you sure?\r\nIf so, click 'Dismiss' to continue."
-      )
-    );
-    return;
+emproObj.prototype.handleNoOptOutSelection = function() {
+    EmproObj.initOptOutModal(false);
+    EmproObj.initThankyouModal(true);
+};
+emproObj.prototype.isFullOptout = function() {
+  return this.submittedOptOutDomains.length > 0 && (
+      this.submittedOptOutDomains.length === this.hardTriggerDomains.length
+  );
+}
+emproObj.prototype.handleFullOptout = function() {
+  if (this.isFullOptout()) {
+    $(".full-optout-hide").addClass("hide");
   }
+}
+emproObj.prototype.handleSubmitOptoutData = function () {
+  // if (!EmproObj.hasErrorText() && !EmproObj.hasSelectedOptOutDomains()) {
+  //   EmproObj.setOptoutError(
+  //     i18next.t(
+  //       "You didn't select anything. Are you sure?\r\nIf so, click 'Dismiss' to continue."
+  //     )
+  //   );
+  //   return;
+  // }
   if (!EmproObj.hasSelectedOptOutDomains()) {
+    // allow user to continue without selecting any option
+    EmproObj.handleNoOptOutSelection();
     return;
   }
   EmproObj.onBeforeSubmitOptoutData();
@@ -300,6 +318,10 @@ emproObj.prototype.initOptOutModal = function (autoShow) {
   if (!this.hasOptOutModal()) {
     return;
   }
+  $("#emproOptOutModal").modal({
+    backdrop: "static",
+    keyboard: false
+  });
   $("#emproOptOutModal").modal(autoShow ? "show" : "hide");
 };
 emproObj.prototype.onDetectOptOutDomains = function () {

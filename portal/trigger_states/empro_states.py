@@ -316,7 +316,7 @@ def fire_trigger_events():
         # Patient always gets mail
         if patient.email_ready()[0]:
             pending_emails.append((
-                patient_email(patient, soft_triggers, hard_triggers),
+                patient_email(patient, soft_triggers, actionable_triggers),
                 "patient thank you"))
         else:
             current_app.logger.error(
