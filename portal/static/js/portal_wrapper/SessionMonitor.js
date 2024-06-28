@@ -142,7 +142,7 @@ var SessionMonitorObj = function() { /* global $ */
                 }
                 // this function is called each time on page load
                 function e() {
-                    var lifeTime = l.sessionLifetime && l.sessionLifetime > 0 ? l.sessionLifetime : 1800000; // default to 30 minutes in miliseconds;
+                    var lifeTime = l.sessionLifetime && l.sessionLifetime > 0 ? l.sessionLifetime : 30*60*1000; // default to 30 minutes in miliseconds;
                     var timeBeforeWarning = l.timeBeforeWarning && l.timeBeforeWarning > 0 ? l.timeBeforeWarning : 60000; // default to one minute in miliseconds
                     var n = lifeTime - timeBeforeWarning;
                     window.clearTimeout(r);
