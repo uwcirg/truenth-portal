@@ -6,7 +6,7 @@ babel==2.9.0              # via flask-babel, sphinx
 bcrypt==3.2.0             # via flask-user
 billiard==3.6.3.0         # pyup: < 4.0  # pin until celery upgraded # via celery
 blinker==1.4              # via flask-mail, flask-webtest
-celery==4.3.0
+celery==5.2.2
 certifi==2019.9.11        # via requests
 cffi==1.14.6              # via bcrypt
 chardet==3.0.4            # via requests
