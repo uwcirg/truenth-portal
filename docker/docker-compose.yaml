@@ -44,8 +44,9 @@ services:
     <<: *service_base
     command: sh -c '
       flask generate-site-cfg &&
-      celery worker
+      celery
         --app portal.celery_worker.celery
+      worker
         --loglevel debug
       '
     depends_on:
@@ -55,8 +56,9 @@ services:
     <<: *service_base
     command: sh -c '
       flask generate-site-cfg &&
-      celery worker
+      celery
         --app portal.celery_worker.celery
+      worker
         --queue low_priority
         --loglevel debug
       '
@@ -68,8 +70,9 @@ services:
     command: bash -c '
       (wait-for-it --host=redis --port=6379 --strict -- flask set-celery-beat-healthy) &
       wait-for-it --timeout=120 --host=web --port=$$PORT --strict --
-        celery beat
+        celery
           --app portal.celery_worker.celery
+        beat
           --loglevel debug
           --schedule /tmp/celerybeat-schedule.db
           --pidfile /tmp/celerybeat.pid
