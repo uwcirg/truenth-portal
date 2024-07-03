@@ -59,7 +59,7 @@ services:
       celery
         --app portal.celery_worker.celery
       worker
-        --queue low_priority
+        --queues low_priority
         --loglevel debug
       '
     depends_on:
