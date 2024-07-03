@@ -320,10 +320,9 @@
     <div class="modal fade" role="dialog" id="emproOptOutModal" data-backdrop="static" tabindex="-1" aria-hidden="true" {% if user and user.current_encounter().auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <!-- uncomment here if want close button back -->
-                <!-- <button type="button" class="close btn-dismiss" data-dismiss="modal" aria-label="{{_('Close')}}">
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{_('Close')}}">
                     <span aria-hidden="true">&times;</span>
-                </button> -->
+                </button>
                 <div class="modal-body">
                     <div class="header-section">
                         <h2 class="title">{{_("We want to check with you ...")}}</h2>
