@@ -58,6 +58,8 @@ mako==1.1.0               # via alembic
 markupsafe==1.1.1           # via jinja2, mako
 oauthlib==2.1.0 # pyup: < 3.0.0  # pin until flask-oauthlib, flask-dance, requests-oauthlib upgraded
 onetimepass==1.0.1
+packaging==24.1
+    # via sqlakeyset
 passlib==1.7.1            # via flask-user
 polib==1.1.1
 prompt-toolkit==3.0.47
@@ -65,7 +67,7 @@ prompt-toolkit==3.0.47
 pycparser==2.20           # via cffi
 pycryptodome==3.9.9       # via flask-user
 python-dateutil==2.9.0.post0
-    # via celery
+    # via celery, sqlakeyset
 python-editor==1.0.4      # via alembic
 python-levenshtein==0.12.0
 python-memcached==1.59    # via flask-dogpile-cache
@@ -79,9 +81,10 @@ requests==2.25.1          # via flask-recaptcha, requests-cache, requests-oauthl
 six==1.14.0
     # via bcrypt, packaging, python-dateutil, python-memcached, sphinx, swagger-spec-validator, tox, validators, webtest
 sqlalchemy==1.3.11         # via alembic, flask-sqlalchemy
+sqlakeyset==2.0.1716332987
 swagger-spec-validator==2.7.3
 typing-extensions==4.12.2
-    # via kombu
+    # via kombu, sqlakeyset
 tzdata==2024.1
     # via celery
 urllib3==1.26.5             # via requests
