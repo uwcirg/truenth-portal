@@ -32,8 +32,9 @@ services:
     command: sh -c '
       flask generate-site-cfg &&
       nice
-        celery worker
+        celery
           --app portal.celery_worker.celery
+        worker
           --loglevel debug
       '
 
@@ -49,9 +50,10 @@ services:
     command: sh -c '
       flask generate-site-cfg &&
       nice -n 15
-        celery worker
+        celery
           --app portal.celery_worker.celery
-          --queue low_priority
+        worker
+          --queues low_priority
           --loglevel debug
       '
 

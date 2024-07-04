@@ -250,6 +250,12 @@ emproObj.prototype.initOptOutElementEvents = function () {
   if (!this.hasOptOutModal()) {
     return;
   }
+  // x, close button in OPT OUT modal, need to make sure thank you modal is initiated after closing out opt out modal
+  $("#emproOptOutModal .close").on("click", function(e) {
+    EmproObj.initOptOutModal(false);
+    EmproObj.initThankyouModal(true);
+  });
+
   // submit buttons
   $("#emproOptOutModal .btn-submit").on("click", function (e) {
     e.preventDefault();
