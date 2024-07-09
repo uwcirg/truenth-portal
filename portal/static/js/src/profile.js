@@ -1607,6 +1607,10 @@ export default (function() {
                 if (this.getPostTxActionStatus() === EMPRO_TRIGGER_WITHDRAWN_STATE) return true; // subject withdrawn
                 return this.getPostTxActionStatus() === "completed" || this.subStudyTriggers.data.resolution;
             },
+            getDataRequiredAttribute:function(element) {
+                if (!element) return null;
+                return element.hasOwnProperty("required") ? String(element.required) : "true";
+            },
             onResponseChangeFieldEvent: function(event) {
                 let targetElement = $(event.target);
                 let containerIdentifier = "#postTxQuestionnaireContainer";
@@ -1635,7 +1639,8 @@ export default (function() {
                 }
                 let answeredNum = 0;
                 $(`${containerIdentifier} .question`).each(function() {
-                    if ($(this).find("[answered]").length) {
+                    // count not required towards total
+                    if ($(this).find("[answered]").length || $(this).find("[dataRequired='false']").length) {
                         answeredNum++;
                     }
                 });
@@ -1672,6 +1677,14 @@ export default (function() {
                             return;
                         }
                         this.postTxQuestionnaire.questions = data.item;
+                        this.postTxQuestionnaire.questions.forEach(question => {
+                            const numId = (question.linkId).split(".").slice(1).join(".");
+                            // id like 2.1, 3.1 as opposed to 2, 3,
+                            if (parseFloat(numId) % 1 !== 0) {
+                                question.partOf = true;
+                            }
+                            return question;
+                        });
                         Vue.nextTick(function() {
                             /*
                              *  if the triggers are considered proccessed. check to see if they have been resolved

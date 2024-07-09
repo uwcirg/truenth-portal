@@ -31,7 +31,7 @@ from .questionnaire_bank import (
     trigger_date,
     visit_name,
 )
-from .research_study import research_study_id_from_questionnaire
+from .research_study import EMPRO_RS_ID, research_study_id_from_questionnaire
 from .reference import Reference
 from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
@@ -110,6 +110,7 @@ class QuestionnaireResponse(db.Model):
             # special case for the EMPRO Staff QB
             from ..trigger_states.empro_states import empro_staff_qbd_accessor
             qbd_accessor = empro_staff_qbd_accessor(self)
+            research_study_id = EMPRO_RS_ID
         elif qbd_accessor is None:
             from .qb_status import QB_Status  # avoid cycle
             if self.questionnaire_bank is not None:

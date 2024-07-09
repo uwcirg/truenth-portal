@@ -139,6 +139,9 @@ def single_patient_adherence_data(patient_id, research_study_id):
             report_format(
                 ts_reporting.resolution_authored_from_visit(visit_month))
             or "")
+        row['delayed_by_holiday'] = (
+            ts_reporting.resolution_delayed_by_holiday(visit_month) or ""
+        )
         ht = ts_reporting.hard_triggers_for_visit(visit_month)
         row['hard_trigger_domains'] = ', '.join(ht) if ht else ""
         oo = ts_reporting.opted_out_domains_for_visit(visit_month)
@@ -454,6 +457,7 @@ def adherence_report(
                 'clinician',
                 'clinician_status',
                 'clinician_survey_completion_date',
+                'delayed_by_holiday',
                 ]
 
     return results
