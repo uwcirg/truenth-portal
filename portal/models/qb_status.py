@@ -593,7 +593,7 @@ def patient_research_study_status(
             rs_status['ready'] = True
 
         # Apply business rules specific to EMPRO
-        if rs == EMPRO_RS_ID:
+        if rs == EMPRO_RS_ID and 0 in results:
             if results[0]['ready']:
                 # Clear ready status when base has pending work
                 rs_status['ready'] = False
