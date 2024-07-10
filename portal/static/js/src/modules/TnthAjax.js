@@ -4,7 +4,7 @@ import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
-import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
+import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_UNPROCCESSED_STATES} from "../data/common/consts.js";
 const MAX_ATTEMPTS = 3
 export default { /*global $ */
     "beforeSend": function() {
@@ -32,6 +32,7 @@ export default { /*global $ */
         var fieldHelper = this.FieldLoaderHelper, targetField = params.targetField || null;
         callback = callback || function() {};
         params.attempts++;
+        params.checkAuth = ["post", "put", "delete"].indexOf(String(method).toLowerCase()) !== -1;
         fieldHelper.showLoader(targetField);
         if (params.useWorker && window.Worker && !Utility.isTouchDevice()) { /*global isTouchDevice()*/
             Utility.initWorker(url, params, function(result) { /*global initWorker*/
@@ -63,31 +64,46 @@ export default { /*global $ */
                 "pragma": "no-cache"
             };
         }
-        $.ajax(params).done(function(data) {
-            params.attempts = 0;
-            if (data) {
-                fieldHelper.showUpdate(targetField);
-                callback(data);
-            } else {
-                fieldHelper.showError(targetField);
-                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
-            }
-        }).fail(function(xhr) {
-            if (params.attempts < params.max_attempts) {
-                (function(self, url, method, userId, params, callback) {
-                    setTimeout(function () {
-                      self.sendRequest(url, method, userId, params, callback);
-                    }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
-                })(self, url, method, userId, params, callback);
-            } else {
-                fieldHelper.showError(targetField);
-                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": xhr});
-                self.sendError(xhr, url, userId, params);
-                //reset attempts after reporting error so we know how many attempts have been made
-                //multiple attempts can signify server not being responsive or busy network
-                params.attempts = 0;
-            }
-        });
+        var ajaxCall = () => $.ajax(params).done(function(data) {
+                            params.attempts = 0;
+                            if (data) {
+                                fieldHelper.showUpdate(targetField);
+                                callback(data);
+                            } else {
+                                fieldHelper.showError(targetField);
+                                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
+                            }
+                        }).fail(function(xhr) {
+                            if (params.attempts < params.max_attempts) {
+                                (function(self, url, method, userId, params, callback) {
+                                    setTimeout(function () {
+                                    self.sendRequest(url, method, userId, params, callback);
+                                    }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
+                                })(self, url, method, userId, params, callback);
+                            } else {
+                                fieldHelper.showError(targetField);
+                                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": xhr});
+                                self.sendError(xhr, url, userId, params);
+                                //reset attempts after reporting error so we know how many attempts have been made
+                                //multiple attempts can signify server not being responsive or busy network
+                                params.attempts = 0;
+                            }
+                        });
+        if (params.checkAuth && params.attempts <= 1) {
+            $.ajax("/api/me").done(
+                function() {
+                    console.log("user authorized");
+                    ajaxCall();
+                }
+            ).fail(function() {
+                if (callback) {
+                    callback({"error": DEFAULT_SERVER_DATA_ERROR});
+                    fieldHelper.showError(targetField);
+                }
+            });
+            return;
+        }
+        ajaxCall();
     },
     "sendError": function(xhr, url, userId, params) {
         if (!xhr) { return false; }
@@ -144,7 +160,7 @@ export default { /*global $ */
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         successField.animate({"opacity": 1}, __timeout, function() {
                             setTimeout(function() {
-                                successField.animate({"opacity": 0}, __timeout * 2);
+                                successField.animate({"opacity": 0}, __timeout * 4);
                             }, __timeout * 2);
                         });
                     });
@@ -167,7 +183,7 @@ export default { /*global $ */
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         errorField.animate({"opacity": 1}, __timeout, function() {
                             setTimeout(function() {
-                                errorField.animate({"opacity": 0}, __timeout * 2);
+                                errorField.animate({"opacity": 0}, __timeout * 4);
                             }, __timeout * 2);
                         });
                     });
@@ -326,7 +342,7 @@ export default { /*global $ */
         callback = callback || function() {};
         params = params || {};
         params.retryAttempt = params.retryAttempt || 0;
-        params.maxTryAttempts = params.maxTryAttempts || MAX_ATTEMPTS;
+        params.maxTryAttempts = !isNaN(params.maxTryAttempts) ? params.maxTryAttempts : MAX_ATTEMPTS;
 
         if (!userId) {
             callback({error: i18next.t("User id is required.")});
@@ -347,13 +363,16 @@ export default { /*global $ */
                 return false;
             }
 
+            const dataState = String(data.state).toLowerCase();
+            params = params || {};
+
+            //if the trigger data has not been processed, try again until maximum number of attempts has been reached
             if (params.retryAttempt < params.maxTryAttempts &&
-                //if the trigger data has not been processed, try again until maximum number of attempts has been reached
-                EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(String(data.state).toLowerCase()) === -1) {
+                EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(dataState) !== -1) {
                 params.retryAttempt++;
                 setTimeout(function() {
                     this.getSubStudyTriggers(userId, params, callback);
-                }.bind(this), 1000*params.retryAttempt);
+                }.bind(this), 1500*params.retryAttempt);
                 return false;
             }
             params.retryAttempt = 0;
@@ -370,6 +389,22 @@ export default { /*global $ */
             return false;
         }
         this.sendRequest(`/api/patient/${userId}/trigger_history`, "GET", userId, params, (data) => {
+            if (!data || data.error) {
+                callback({"error": true});
+                return false;
+            }
+            callback(data);
+            return true;
+        });
+    },
+    "setOptoutTriggers": function(userId, params, callback) {
+        callback = callback || function() {};
+        params = params || {};
+        if (!userId) {
+            callback({error: true});
+            return false;
+        }
+        this.sendRequest(`/api/patient/${userId}/triggers/opt_out`, "PUT", userId, params, (data) => {
             if (!data || data.error) {
                 callback({"error": true});
                 return false;
@@ -1087,6 +1122,10 @@ export default { /*global $ */
         params = params || {};
         params.data = JSON.stringify(data);
         this.sendRequest("/api/patient/" + userId + "/assessment", "POST", userId, params, function(data) {
+            if (data && data.error) {
+                callback({"error": true});
+                return;
+            }
             callback({data: data});
         });
     },

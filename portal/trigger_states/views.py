@@ -1,11 +1,13 @@
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, abort, jsonify, make_response, request
 from flask_user import roles_required
 
-from .empro_states import extract_observations, users_trigger_state
+from .empro_states import extract_observations, fire_trigger_events, users_trigger_state
 from .models import TriggerState
+from ..database import db
 from ..extensions import oauth
 from ..models.role import ROLE
 from ..models.user import get_user
+from ..timeout_lock import LockTimeout
 from ..views.crossdomain import crossdomain
 
 trigger_states = Blueprint('trigger_states', __name__)
@@ -53,8 +55,42 @@ def user_triggers(user_id):
 
     """
     # confirm view access
-    get_user(user_id, 'view', allow_on_url_authenticated_encounters=True)
+    get_user(user_id, permission='view', allow_on_url_authenticated_encounters=True)
     return jsonify(users_trigger_state(user_id).as_json())
+
+
+@trigger_states.route('/api/patient/<int:user_id>/triggers/opt_out', methods=['POST', 'PUT'])
+@crossdomain()
+@oauth.require_oauth()
+def opt_out(user_id):
+    """Takes a JSON object defining the domains for which to opt-out
+
+    The ad-hoc JSON expected resembles that returned from `user_triggers()`
+    simplified to only interpret the domains for which the user chooses to
+    opt-out.
+
+    :returns: TriggerState in JSON for the requested visit month
+    """
+    get_user(user_id, permission='edit', allow_on_url_authenticated_encounters=True)
+    ts = users_trigger_state(user_id)
+    try:
+        ts = ts.apply_opt_out(request.json)
+    except ValueError as e:
+        abort(400, str(e))
+
+    # persist the change
+    db.session.commit()
+
+    if ts.opted_out_domains():
+        # if user opted out of at least one, process immediately
+        try:
+            fire_trigger_events()
+        except LockTimeout:
+            # deadlock of sorts - skip out expecting the scheduled
+            # job to pick up the state next run
+            pass
+
+    return jsonify(ts.as_json())
 
 
 @trigger_states.route('/api/patient/<int:user_id>/trigger_history')
@@ -78,7 +114,7 @@ def user_trigger_history(user_id):
 
     """
     # confirm view access
-    get_user(user_id, 'view')
+    get_user(user_id, permission='view', allow_on_url_authenticated_encounters=True)
 
     history = TriggerState.query.filter(
         TriggerState.user_id == user_id).order_by(TriggerState.id)

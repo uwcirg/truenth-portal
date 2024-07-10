@@ -268,7 +268,7 @@ def calc_and_adjust_start(user, research_study_id, qbd, initial_trigger):
 
     delta = users_trigger - initial_trigger
     # this case should no longer be possible; raise the alarm
-    raise RuntimeError("found initial trigger to differ by: %s", str(delta))
+    raise RuntimeError("found user(%d) initial trigger to differ by: %s", user.id, str(delta))
     current_app.logger.debug("calc_and_adjust_start delta: %s", str(delta))
     return qbd.relative_start + delta
 
@@ -374,7 +374,8 @@ def cur_next_rp_gen(user, research_study_id, classification, trigger_date):
             )
             if curRPD.retired == nextRPD.retired:
                 raise ValueError(
-                    "Invalid state: multiple RPs w/ same retire date")
+                    "Invalid state: multiple RPs w/ same retire date: "
+                    f"{next_rp} : {curRPD.retired}")
         else:
             nextRPD = None
         yield curRPD, nextRPD
@@ -812,7 +813,11 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
     for row in qbt_rows:
         # Confirm expected order
         if last_at:
-            assert row.at >= last_at
+            if last_at > row.at:
+                raise ValueError(
+                    f"patient {row.user_id} has overlapping qb_timeline rows"
+                    f" {last_at} and {row.at}"
+                )
 
         key = f"{row.qb_id}:{row.qb_iteration}"
         if previous_key and previous_key != key:
@@ -975,11 +980,9 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                                 if (
                                         pending_qbts[j].qb_id != remove_qb_id or
                                         pending_qbts[j].qb_iteration != remove_iteration):
-                                    # To qualify for this special case,
-                                    # having worked back to previous QB, if
-                                    # at > start, take action
-                                    if pending_qbts[j].at > start:
-                                        unwanted_count = len(pending_qbts)-j-1
+                                    # unwanted_count represents all rows from
+                                    # overlapped, unwanted visit
+                                    unwanted_count = len(pending_qbts)-j-1
                                     break
 
                                 # keep a lookout for work done in old RP

@@ -8328,9 +8328,15 @@
           ]
         },
         {
-          "type": "date",
+          "type": "date", 
           "linkId": "ironman_ss_post_tx.2",
           "text": "Date action taken"
+        },
+        {
+          "type": "boolean",
+          "linkId": "ironman_ss_post_tx.2.1",
+          "text": "Delayed due to local public holiday",
+          "required": false
         },
         {
           "type": "choice",

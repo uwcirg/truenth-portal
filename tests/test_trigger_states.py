@@ -1,6 +1,7 @@
 """Test module for trigger_states blueprint """
 from flask_webtest import SessionScope
 from datetime import datetime
+from mock import Mock, patch
 import pytest
 from statemachine.exceptions import TransitionNotAllowed
 
@@ -17,7 +18,10 @@ from portal.trigger_states.empro_states import (
     initiate_trigger,
     users_trigger_state,
 )
-from portal.trigger_states.models import TriggerState
+from portal.trigger_states.models import (
+    TriggerState,
+    TriggerStatesReporting,
+)
 from portal.views.clinician import clinician_query
 
 
@@ -48,6 +52,18 @@ def test_qnr_identifier(initialized_with_ss_qnr):
     assert ref.as_fhir()['reference'] == (
         'https://stg-ae.us.truenth.org/eproms-demo/QuestionnaireResponse/538.0'
     )
+
+
+def test_qnr_holiday_delay(test_user, clinician_response_holiday_delay):
+    from portal.models.questionnaire_response import QuestionnaireResponse
+    tsr = TriggerStatesReporting(patient_id=test_user.id)
+    mock_ts = TriggerState()
+    mock_ts.triggers = {'resolution': {'qnr_id': "mocked"}}
+    tsr.latest_by_visit[0] = mock_ts
+    with patch('portal.models.questionnaire_response.QuestionnaireResponse') as mockQNR:
+        getbyid = mockQNR.query.get
+        getbyid.return_value = clinician_response_holiday_delay
+        assert tsr.resolution_delayed_by_holiday(0) == True
 
 
 def test_initiate_trigger(test_user):
@@ -127,6 +143,15 @@ def test_2nd_eval(
 
 def test_cur_hard_trigger():
     # Single result with a severe should generate a hard (and soft) trigger
+
+    # include a previous triggered state to test sequential count
+    previous_triggers = {
+        "ironman_ss.11": "hard",
+        "ironman_ss.12": "hard",
+        "ironman_ss.13": "hard",
+        "_sequential_hard_trigger_count": 3,
+    }
+
     dt = DomainTriggers(
         domain='anxious',
         current_answers={
@@ -134,10 +159,11 @@ def test_cur_hard_trigger():
             'ironman_ss.11': ('2', None),
             'ironman_ss.13': ('4', 'penultimate')},
         previous_answers=None,
-        initial_answers=None)
+        initial_answers=None,
+        previous_triggers=previous_triggers)
     assert len([k for k in dt.triggers.keys() if not k.startswith('_')]) == 1
     assert 'ironman_ss.13' in dt.triggers
-    assert dt.triggers[sequential_hard_trigger_count_key] == 1
+    assert dt.triggers[sequential_hard_trigger_count_key] == 4
 
 
 def test_worsening_soft_trigger():
@@ -147,7 +173,8 @@ def test_worsening_soft_trigger():
         previous_answers={'ss.21': (2, None), 'ss.15': (2, None)},
         current_answers={
             'ss.15': (3, None), 'ss.12': (3, None), 'ss.21': (1, None)},
-        initial_answers=None)
+        initial_answers=None,
+        previous_triggers=None)
     assert len([k for k in dt.triggers.keys() if not k.startswith('_')]) == 1
     assert dt.triggers['ss.15'] == 'soft'
     assert dt.triggers[sequential_hard_trigger_count_key] == 0
@@ -162,11 +189,34 @@ def test_worsening_baseline():
         domain='anxious',
         initial_answers=initial_answers,
         previous_answers=previous_answers,
-        current_answers=current_answers)
+        current_answers=current_answers,
+        previous_triggers=None)
 
     assert len([k for k in dt.triggers.keys() if not k.startswith('_')]) == 2
     assert dt.triggers['12'] == dt.triggers['21'] == 'hard'
     assert dt.triggers[sequential_hard_trigger_count_key] == 1
+
+
+def test_apply_opt_out(initialized_patient, processed_ts, opt_out_submission):
+    from portal.trigger_states.models import opt_out_this_visit_key
+    # apply opt out request
+    user = db.session.merge(initialized_patient)
+    ts = users_trigger_state(user.id)
+    result = ts.apply_opt_out(opt_out_submission)
+    found = [k for k, v in result.triggers['domain'].items() if opt_out_this_visit_key in v]
+    assert len(found) == 2
+
+    # confirm running counts for `_total_opted_out` match input
+    for domain, data in result.triggers['domain'].items():
+        if domain in ('fatigue', 'general_pain'):
+            assert data['_total_opted_out'] == 1
+        else:
+            assert '_total_opted_out' not in data.keys()
+
+
+def test_opted_out(mock_triggers):
+    ts = TriggerState(state='processed', triggers=mock_triggers, user_id=1)
+    assert ts.opted_out_domains() == ['insomnia']
 
 
 def test_ts_trigger_lists(mock_triggers):
@@ -175,6 +225,7 @@ def test_ts_trigger_lists(mock_triggers):
         ts.hard_trigger_list())
     assert set(['general_pain', 'joint_pain', 'anxious', 'fatigue']) == set(
         ts.soft_trigger_list())
+    assert ts.sequential_threshold_reached()
 
 
 def test_fire_trigger_events(
@@ -284,3 +335,13 @@ def test_subsequent_reminder_skips_weekends(initialized_patient):
     # until Monday
     assert ts.reminder_due(as_of_date=datetime.strptime(
         "2021-02-15T12:00:00Z", "%Y-%m-%dT%H:%M:%SZ"))
+
+
+def test_counts_from_db_triggers(initialized_patient, mock_opted_out_triggers):
+    user_id = db.session.merge(initialized_patient).id
+    ts = TriggerState(user_id=user_id, triggers=mock_opted_out_triggers)
+    opted_out_domains = ts.opted_out_domains()
+    hard_triggers = ts.hard_trigger_list()
+    assert set(["sad", "social_isolation"]) == set(opted_out_domains)
+    assert 7 == len(hard_triggers)
+    assert (set(hard_triggers) - set(opted_out_domains))

@@ -559,7 +559,7 @@
                 <div class="help-block with-errors"></div>
             </div>
         </div>
-        {{saveLoaderDiv("clinics")}}
+        {{saveLoaderDiv("clinics")}}  
     {% endcall %}
     <div class="get-orgs-error error-message"></div>
     <div class="get-demo-error error-message"></div>
@@ -871,7 +871,25 @@
         </div>
     {% endcall %}
 {%- endmacro -%}
-{%- macro postInterventionQuestionnaire(person) -%}
+{% macro postInterventionOptoutDomains() %}
+    <div class="item text-warning" v-if="hasSubStudyOptOutDomains()">
+        <p v-if="hasSubStudyTriggers()">{{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted about some issues.")}}</p>
+        <p v-else>{{_("<b>NOTE</b>: The participant has chosen <em>not</em> to be contacted.")}}</p>
+        <p>{{_("High distress areas ( <em>do not contact</em> ): ")}} <span v-text="getSubStudyOptoutDomainsDisplay()"></span></p>
+    </div>
+{% endmacro %}
+{%- macro adminTriggerLinks(person, current_user) %}
+    {% if (current_user.has_role(ROLE.ADMIN.value)) %}
+        <hr/>
+        <p class="text-muted">ADMIN USE ONLY</p>
+        <!-- triggers links, ease of access, for debugging -->
+        <p>
+            <a href="/api/patient/{{person.id}}/triggers" target="_blank">Current Triggers</a> |
+            <a href="/api/patient/{{person.id}}/trigger_history" target="_blank">Trigger History</a>
+        </p>
+    {% endif %}
+{% endmacro %}
+{%- macro postInterventionQuestionnaire(person, current_user) -%}
 <!-- require a static bookmark link for post intervention questionnaire section for the dynamically generated content. Othewise the hash location won't go to the section correctly -->
 <a href="#postInterventionQuestionnaireLoc"></a>
 <div id="postInterventionQuestionnaireLoc">&nbsp;</div>
@@ -883,13 +901,16 @@
                 <div class="loader" v-show="postTxQuestionnaire.loading"><i class="fa fa-spinner fa-spin fa-2x icon"></i></div>
                 <!-- display trigger areas if indicated -->
                 <div id="triggersSection" v-if="hasSubStudyTriggers()">
-                    <h5 class="muted" v-show="!isSubStudyTriggersResolved()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
+                    <h5 class="muted" v-show="isPostTxActionRequired()">{{_("Actions Required (for Clinicians/Site Staff)")}}</h5>
                     <div class="item">{{_("EMPRO questionnaire completed on:")}} <span class="text" v-html="subStudyTriggers.displaydate"></span></div>
-                    <div class="item">{{_("ACTION REQUIRED for high distress areas:")}}
+                    <div class="item">
+                        <p v-if="isPostTxActionRequired()">{{_("ACTION REQUIRED for high distress areas:")}}</p>
+                        <p v-else>{{_("High distress areas")}}</p>
                         <ul class="list">
                             <li v-for="item in subStudyTriggers.domains" v-text="item.replace(/_/g, ' ')" class="text"></li>
                         </ul>
                     </div>
+                    {{postInterventionOptoutDomains()}}
                 </div>
                 <!-- no triggers indicated -->
                 <!-- show the last completed EMPRO date && indicate no triggers -->
@@ -899,8 +920,9 @@
                             <span class="text" v-text="getSubStudyAssessmentStatusDisplay()"></span>
                             <span class="text" v-text="getLastSubStudyAssessmentDate()"></span>
                         </div>
+                        {{postInterventionOptoutDomains()}}
                         <!-- IF no triggers are indicated, ONLY display as such for assessment that has been COMPLETED, as triggers aren't calculated yet for assessment still in progress -->
-                        <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No high distress areas indicated")}}</div>
+                        <div class="item text-muted" v-show="isSubStudyAssessmentCompleted()">{{_("No action required")}}</div>
                     </div>
                 </div>
                 <div id="reportNoteSection">{{_("View subject EMPRO report for more information")}}</div>
@@ -911,24 +933,32 @@
                     will be in a disabled state if the action state is "completed" or intervention_qnr_eligible flag is set to false
                 -->
                 <div id="questionsSection" class="content" :class="{disabled: shouldDisableSubstudyPostTx(), active: shouldShowSubstudyPostTx()}" v-show="shouldShowSubstudyPostTx()">
-                    <div class="question" v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
+                    <div class="question" :class="{partOf: !!item.partOf}"  v-for="item in postTxQuestionnaire.questions" :linkId="item.linkId" :dataType="item.type" :text="item.text" >
                         <!-- question text -->
-                        <span class="title" :class="item.type" v-text="item.text"></span>
+                        <span class="title" :class="item.type" v-text="item.text" v-if="item.type !== 'boolean'"></span>
+                        <span class="title placeholder" v-if="item.partOf"></span><!-- placeholder space for formatting -->
                         <!-- date type answer-->
-                        <input type="text" class="data-datepicker form-control answer" readonly placeholder="DD MMM YYYY"
-                                :class="{disabled: isSubStudyTriggersResolved()}"
-                                :dataType="item.type"
+                         <div class="flex flex-column">
+                            <input type="text" class="data-datepicker form-control answer" readonly placeholder="DD MMM YYYY"
+                                    :class="{disabled: isSubStudyTriggersResolved()}"
+                                    :dataType="item.type"
+                                    :linkId="item.linkId"
+                                    :dataRequired="getDataRequiredAttribute(item)"
+                                    @change="onResponseChangeFieldEvent"
+                                    v-if="item.type == 'date'"
+                            />
+                        </div>
+                        <!-- boolean type answer-->
+                        <div class="flex flex-column-gap-1x" v-if="item.type == 'boolean'">
+                            <span v-text="item.text" class="text"></span>
+                            <input type="checkbox"
+                                class="bool answer"
+                                :dataType = "item.type"
                                 :linkId="item.linkId"
                                 @change="onResponseChangeFieldEvent"
-                                v-if="item.type == 'date'"
-                        >
-                        <!-- boolean type answer-->
-                        <input type="checkbox"
-                            class="bool answer"
-                            :dataType = "item.type"
-                            :linkId="item.linkId"
-                            @change="onResponseChangeFieldEvent"
-                            v-if="item.type == 'boolean'">
+                                :dataRequired="getDataRequiredAttribute(item)"
+                                v-if="item.type == 'boolean'" />
+                        </div>
                         <!-- open-choice (checkboxes) type answer -->
                         <div class="choices answer" v-if="item.type == 'open-choice'">
                             <div v-for="option in item.option">
@@ -940,6 +970,7 @@
                                         :dataType="item.type"
                                         :linkId="item.linkId"
                                         :value="option.valueCoding.display"
+                                        :dataRequired="getDataRequiredAttribute(item)"
                                         @change="onResponseChangeFieldEvent"
                                     >
                                     <span class="text" v-text="option.valueCoding.display"></span>
@@ -949,6 +980,7 @@
                                     dataType="string"
                                     :code="option.valueCoding.code"
                                     :linkId="item.linkId"
+                                    :dataRequired="getDataRequiredAttribute(item)"
                                     @change="onResponseChangeFieldEvent"
                                     v-if="/other/gi.test(option.valueCoding.display)"
                                 ></textarea>
@@ -958,6 +990,7 @@
                         <select class="form-control answer" v-if="item.type == 'choice'"
                             :linkId="item.linkId"
                             :dataType="item.type"
+                            :dataRequired="getDataRequiredAttribute(item)"
                             @change="onResponseChangeFieldEvent"
                         >
                             <option value="">{{_("Select")}}</option>
@@ -982,11 +1015,16 @@
                     <span>{{_("Action status:")}}</span>
                     <span class="text error-message" v-text="getPostTxActionStatus()"></span>
                 </div>
-                <div class="study-error error-message" v-show="shouldDisableSubstudyPostTx() && hasPostTxQuestionnaireErrors()">
-                    <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
-                    <span v-html="getSubStudyStatusErrors()" ></span>
+                <div class="study-error error-message" v-show="shouldShowPostTxError()">
+                    <div>
+                        <span class="glyphicon glyphicon-alert warning icon" aria-hidden="true"></span>
+                        <span v-html="getSubStudyStatusErrors()"></span>
+                    </div>
+                    <br/>
+                    <div><button class="btn btn-default sm-btn" onclick="refresh()">{{_("Refresh")}}</button></div>
                 </div>
                 <div class="post-intervention-questionnaire-error error-message"></div>
+                {{adminTriggerLinks(person, current_user)}}
             </div>
         {% endcall %}
     </div>

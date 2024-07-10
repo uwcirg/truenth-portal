@@ -6,14 +6,16 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
-import {sortArrayByField} from "./modules/Utility.js";
+import {sortArrayByField, getUrlParameter} from "./modules/Utility.js";
 import {
   EPROMS_SUBSTUDY_ID,
   EPROMS_SUBSTUDY_TITLE,
   EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
   EPROMS_SUBSTUDY_SHORT_TITLE,
   EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
+  EMPRO_TRIGGER_STATE_OPTOUT_KEY,
   EMPRO_TRIGGER_UNPROCCESSED_STATES,
+  EMPRO_TRIGGER_WITHDRAWN_STATE,
   REQUIRED_PI_ROLES,
   REQUIRED_PI_ROLES_WARNING_MESSAGE,
 } from "./data/common/consts.js";
@@ -201,6 +203,7 @@ export default (function() {
              */
             subStudyTriggers: {
                 domains: [],
+                optout_domains: [],
                 date: "",
                 state: "",
                 data: {}
@@ -263,6 +266,9 @@ export default (function() {
             },
             computedSubStudyTriggers: function() {
                 return this.subStudyTriggers.domains;
+            },
+            computedSubStudyOptOutDomains: function() {
+                return this.subStudyTriggers.optout_domains;
             },
             computedSubStudyAssessmentData: function() {
                 return this.subStudyAssessment.data;
@@ -1410,6 +1416,7 @@ export default (function() {
                                 return;
                             }
                             let domains = new Array();
+                            let arrOptOut = new Array();
                             let lastTriggerItem = null;
                             for (var index = data.length-1; index >= 0; index--) {
                                if (EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(String(data[index].state).toLowerCase()) === -1) {
@@ -1425,6 +1432,10 @@ export default (function() {
                                 if (!Object.keys(lastTriggerItem.triggers.domain[topic]).length) {
                                     continue;
                                 }
+                                if (lastTriggerItem.triggers.domain[topic][EMPRO_TRIGGER_STATE_OPTOUT_KEY]) {
+                                    arrOptOut.push(topic);
+                                    continue;
+                                }
                                 for (let q in lastTriggerItem.triggers.domain[topic]) {
                                     /*
                                      * HARD triggers ONLY
@@ -1437,14 +1448,17 @@ export default (function() {
                             }
                             let completedDate = lastTriggerItem.triggers.source && lastTriggerItem.triggers.source.authored ? lastTriggerItem.triggers.source.authored : lastTriggerItem.timestamp;
                             completedDate = new Date(completedDate); //convert to local date/time
+                            console.log("Last trigger item ", lastTriggerItem);
                             [
                                 this.subStudyTriggers.domains,
+                                this.subStudyTriggers.optout_domains,
                                 this.subStudyTriggers.date,
                                 this.subStudyTriggers.displaydate,
                                 this.subStudyTriggers.state,
                                 this.subStudyTriggers.data
                             ] = [
                                 domains,
+                                arrOptOut,
                                 completedDate,
                                 i18next.t(
                                     this.modules.tnthDates.formatDateString(completedDate, "d M y hh:mm")+" <span class='small muted'>({timezone})</span>"
@@ -1458,8 +1472,19 @@ export default (function() {
             hasSubStudyTriggers: function() {
                 return this.computedSubStudyTriggers.length;
             },
+            hasSubStudyOptOutDomains: function() {
+                return this.computedSubStudyOptOutDomains.length > 0;
+            },
             hasPrevSubStudyPostTx: function() {
                 return this.computedSubStudyPostTxResponses.length;
+            },
+            getSubStudyOptoutDomainsDisplay: function() {
+                if (!this.hasSubStudyOptOutDomains()) return "";
+                const arrOptoutDomains = this.subStudyTriggers.optout_domains;
+                if (!arrOptoutDomains || !arrOptoutDomains.length) return "";
+                return arrOptoutDomains.map(
+                    (item) => item.replace(/_/g, " ")
+                ).join(", ");
             },
             setPrevPostTxResponses: function(qnrId) {
                 if (!qnrId) {
@@ -1528,6 +1553,7 @@ export default (function() {
             shouldDisableSubstudyPostTx: function() {
                 return (
                   !this.isPostTxQuestionnaireEligible() ||
+                  this.isPostTxActionNotApplicable() ||
                   this.isSubStudyTriggersResolved()
                 );
             },
@@ -1542,25 +1568,48 @@ export default (function() {
                 this.hasSubStudyStatusErrors()
               );
             },
+            shouldShowPostTxError: function() {
+                return this.shouldDisableSubstudyPostTx() && this.hasPostTxQuestionnaireErrors();
+            },
             getPostTxActionStatus: function() {
                 if (!this.subStudyTriggers.data || !this.subStudyTriggers.data.action_state) {
                     return "";
                 }
-                return String(this.subStudyTriggers.data.action_state).toLowerCase();
+                const paramActionState = getUrlParameter("trigger_action_state");
+                // for debugging
+                if (paramActionState) return paramActionState.toLowerCase();
+                const actionState = this.subStudyTriggers.data.action_state;
+                if (!actionState &&
+                    !this.shouldDisableSubstudyPostTx() &&
+                    this.hasSubStudyTriggers()
+                ) return "required";
+                return String(actionState).toLowerCase();
             },
             hasMissedPostTxAction: function() {
                 return this.hasSubStudyTriggers() && this.getPostTxActionStatus() === "missed";
             },
             isPostTxActionRequired: function() {
+                const actionStatus = this.getPostTxActionStatus();
                 return this.subStudyTriggers.data &&
-                (["due", "overdue", "required"].indexOf(this.getPostTxActionStatus()) !== -1
+                (["due", "overdue", "required"].indexOf(actionStatus) !== -1
                 );
+            },
+            isPostTxActionNotApplicable: function() {
+                if (!this.subStudyTriggers.data) {
+                    return true;
+                }
+                return this.getPostTxActionStatus() === "not applicable";
             },
             isSubStudyTriggersResolved: function() {
                 if (!this.subStudyTriggers.data) {
                     return true;
                 }
+                if (this.getPostTxActionStatus() === EMPRO_TRIGGER_WITHDRAWN_STATE) return true; // subject withdrawn
                 return this.getPostTxActionStatus() === "completed" || this.subStudyTriggers.data.resolution;
+            },
+            getDataRequiredAttribute:function(element) {
+                if (!element) return null;
+                return element.hasOwnProperty("required") ? String(element.required) : "true";
             },
             onResponseChangeFieldEvent: function(event) {
                 let targetElement = $(event.target);
@@ -1590,7 +1639,8 @@ export default (function() {
                 }
                 let answeredNum = 0;
                 $(`${containerIdentifier} .question`).each(function() {
-                    if ($(this).find("[answered]").length) {
+                    // count not required towards total
+                    if ($(this).find("[answered]").length || $(this).find("[dataRequired='false']").length) {
                         answeredNum++;
                     }
                 });
@@ -1627,11 +1677,20 @@ export default (function() {
                             return;
                         }
                         this.postTxQuestionnaire.questions = data.item;
+                        this.postTxQuestionnaire.questions.forEach(question => {
+                            const numId = (question.linkId).split(".").slice(1).join(".");
+                            // id like 2.1, 3.1 as opposed to 2, 3,
+                            if (parseFloat(numId) % 1 !== 0) {
+                                question.partOf = true;
+                            }
+                            return question;
+                        });
                         Vue.nextTick(function() {
                             /*
                              *  if the triggers are considered proccessed. check to see if they have been resolved
                              */
                             if (
+                                self.subStudyTriggers.data &&
                                 self.subStudyTriggers.data.resolution &&
                                 self.subStudyTriggers.data.resolution.qnr_id
                             ){
@@ -3560,6 +3619,9 @@ export default (function() {
                     }[a];
                 });
             }
+        },
+        refresh: function() {
+            window.location.reload();
         }
     });
     return ProfileObj;

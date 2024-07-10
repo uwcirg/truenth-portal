@@ -117,6 +117,8 @@ class BaseConfig(object):
     TOKEN_LIFE_IN_DAYS = 30  # Used for emailed URL tokens
     MULTIPROCESS_LOCK_TIMEOUT = 30  # Lock on QB timeline generation
 
+    OPT_OUT_DISABLED_ORG_IDS = os.environ.get('OPT_OUT_DISABLED_ORG_IDS', [])
+
     # Medidata integration configuration
     # disable creation and editing of patients when active
     PROTECTED_ORG = os.environ.get('PROTECTED_ORG')  # use organization name
