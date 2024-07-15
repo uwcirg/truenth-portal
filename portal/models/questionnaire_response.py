@@ -8,7 +8,6 @@ import json
 from flask import current_app, has_request_context, url_for
 from flask_swagger import swagger
 import jsonschema
-from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm.exc import MultipleResultsFound
 
@@ -33,7 +32,6 @@ from .questionnaire_bank import (
 )
 from .research_data import ResearchData
 from .research_study import EMPRO_RS_ID, research_study_id_from_questionnaire
-from .reference import Reference
 from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
 
