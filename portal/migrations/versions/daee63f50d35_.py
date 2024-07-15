@@ -29,8 +29,6 @@ def upgrade():
         sa.ForeignKeyConstraint(
             ['questionnaire_response_id'], ['questionnaire_responses.id'], ),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint(
-            'patient_id', 'questionnaire_response_id', name='_research data_unique_patient_qnr')
         )
 
     op.create_index(

@@ -39,9 +39,6 @@ class ResearchData(db.Model):
         doc="document.authored used for sorting")
     data = db.Column(JSONB)
 
-    __table_args__ = (UniqueConstraint(
-        'patient_id', 'questionnaire_response_id', name='_research data_unique_patient_qnr'),)
-
     @staticmethod
     def persist(patient_id, qnr_id, data):
         """shortcut to persist a row, returns new instance"""
