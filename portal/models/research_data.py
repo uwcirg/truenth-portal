@@ -23,7 +23,7 @@ class ResearchData(db.Model):
     """
     __tablename__ = 'research_data'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
+    subject_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
     questionnaire_response_id = db.Column(
         db.ForeignKey('questionnaire_responses.id'), index=True, unique=True, nullable=False,
         doc="source questionnaire response")
@@ -69,19 +69,19 @@ def invalidate_qnr_research_data(questionnaire_response):
     db.session.commit()
 
 
-def invalidate_users_research_data(user_id, research_study_id):
+def invalidate_patient_research_data(subject_id, research_study_id):
     """invalidate applicable rows via removal"""
-    ResearchData.query.filter(ResearchData.user_id == user_id).filter(
+    ResearchData.query.filter(ResearchData.subject_id == subject_id).filter(
         ResearchData.research_study_id == research_study_id).delete()
     db.session.commit()
 
 
-def update_single_patient_research_data(user_id):
+def update_single_patient_research_data(subject_id):
     """back door to build research data for single patient"""
     from .questionnaire_response import QuestionnaireResponse
     qnrs = QuestionnaireResponse.query.filter(
         QuestionnaireResponse.questionnaire_bank_id > 0).filter(
-        QuestionnaireResponse.subject_id == user_id)
+        QuestionnaireResponse.subject_id == subject_id)
     for qnr in qnrs:
         # research_study_id of None triggers a lookup
         add_questionnaire_response(qnr, research_study_id=None)
@@ -129,7 +129,7 @@ def add_questionnaire_response(questionnaire_response, research_study_id):
     document["timepoint"] = qb_status['visit_name']
 
     research_data = ResearchData(
-        user_id=subject.id,
+        subject_id=subject.id,
         questionnaire_response_id=questionnaire_response.id,
         instrument=instrument,
         research_study_id=research_study_id,

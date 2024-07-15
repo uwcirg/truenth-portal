@@ -878,8 +878,8 @@ def aggregate_responses(
             meta={'current': 10, 'total': 100})
 
     query = ResearchData.query.filter(
-        ResearchData.user_id.in_(user_ids)).order_by(
-        ResearchData.authored.desc(), ResearchData.user_id).with_entities(
+        ResearchData.subject_id.in_(user_ids)).order_by(
+        ResearchData.authored.desc(), ResearchData.subject_id).with_entities(
         ResearchData.data)
 
     if instrument_ids:
