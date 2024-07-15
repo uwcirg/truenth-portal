@@ -756,8 +756,8 @@ def find_overlaps(correct_overlaps, reprocess_qnrs):
                     acting_user_id=admin.id,
                 )
 
-            update_users_QBT(
-                patient.id, research_study_id=0, invalidate_existing=True)
+            invalidate_users_QBT(user_id=patient.id, research_study_id=0)
+            update_users_QBT(user_id=patient.id, research_study_id=0)
             present_before_after_state(
                 patient.id, patient.external_study_id, b4)
 
@@ -838,8 +838,8 @@ def preview_site_update(org_id, retired):
             research_study_id=0,
             acting_user_id=admin.id,
         )
-        update_users_QBT(
-            patient.id, research_study_id=0, invalidate_existing=True)
+        invalidate_users_QBT(user_id=patient.id, research_study_id=0)
+        update_users_QBT(user_id=patient.id, research_study_id=0)
         after_qnrs, after_timeline, qnrs_lost_reference, _ = present_before_after_state(
             patient.id, patient.external_study_id, patient_state[patient.id])
         total_qnrs += len(patient_state[patient.id]['qnrs'])

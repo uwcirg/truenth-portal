@@ -27,7 +27,7 @@ from ..models.identifier import (
 )
 from ..models.message import EmailMessage
 from ..models.overall_status import OverallStatus
-from ..models.qb_timeline import QBT, update_users_QBT
+from ..models.qb_timeline import QBT, invalidate_users_QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
@@ -361,10 +361,9 @@ def patient_timeline(patient_id):
                 acting_user_id=current_user().id)
 
         cache.delete_memoized(trigger_date)
-        update_users_QBT(
-            patient_id,
-            research_study_id=research_study_id,
-            invalidate_existing=purge)
+        if purge:
+            invalidate_users_QBT(user_id=patient_id, research_study_id=research_study_id)
+        update_users_QBT(user_id=patient_id, research_study_id=research_study_id)
     except ValueError as ve:
         abort(500, str(ve))
 
@@ -658,10 +657,8 @@ def patient_timewarp(patient_id, days):
             research_study_id=research_study_id,
             acting_user_id=current_user().id)
 
-        update_users_QBT(
-            patient_id,
-            research_study_id=research_study_id,
-            invalidate_existing=True)
+        invalidate_users_QBT(user_id=patient_id, research_study_id=research_study_id)
+        update_users_QBT(user_id=patient_id, research_study_id=research_study_id)
 
     auditable_event(
         message=f"TIME WARPED existing data back {days} days.",
