@@ -1203,10 +1203,7 @@ def update_users_QBT(user_id, research_study_id):
     success = False
     for attempt in range(1, 6):
         try:
-            attempt_update(
-                user_id=user_id,
-                research_study_id=research_study_id,
-                invalidate_existing=invalidate_existing)
+            attempt_update(user_id=user_id, research_study_id=research_study_id)
             success = True
             break
         except ConnectionError as ce:
