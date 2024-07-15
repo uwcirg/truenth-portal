@@ -748,6 +748,8 @@ def invalidate_users_QBT(user_id, research_study_id):
       use string 'all' to invalidate all QBT rows for a user
 
     """
+    if research_study_id is None:
+        raise ValueError('research_study_id must be defined or use "all"')
     if research_study_id == 'all':
         QBT.query.filter(QBT.user_id == user_id).delete()
         AdherenceData.query.filter(
@@ -863,18 +865,17 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
         return True
 
 
-def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
+def update_users_QBT(user_id, research_study_id):
     """Populate the QBT rows for given user, research_study
 
     :param user: the user to add QBT rows for
     :param research_study_id: the research study being processed
-    :param invalidate_existing: set true to wipe any current rows first
 
     A user may be eligible for any number of research studies.  QBT treats
     each (user, research_study) independently, as should clients.
 
     """
-    def attempt_update(user_id, research_study_id, invalidate_existing):
+    def attempt_update(user_id, research_study_id):
         """Updates user's QBT or raises if lock is unattainable"""
         from .qb_status import patient_research_study_status
         from ..tasks import LOW_PRIORITY, cache_single_patient_adherence_data
@@ -886,18 +887,6 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
             user_id, research_study_id)
 
         with TimeoutLock(key=key, timeout=timeout):
-            if invalidate_existing:
-                QBT.query.filter(QBT.user_id == user_id).filter(
-                    QBT.research_study_id == research_study_id).delete()
-                adh_data = AdherenceData.query.filter(
-                    AdherenceData.patient_id == user_id).filter(
-                    AdherenceData.rs_id_visit.like(f"{research_study_id}:%")
-                )
-                # SQL alchemy can't combine `like` expression with delete op.
-                for ad in adh_data:
-                    db.session.delete(ad)
-                db.session.commit()
-
             # if any rows are found, assume this user/study is current
             if QBT.query.filter(QBT.user_id == user_id).filter(
                     QBT.research_study_id == research_study_id).count():
