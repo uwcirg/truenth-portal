@@ -26,6 +26,7 @@ from .questionnaire_bank import (
     visit_name,
 )
 from .questionnaire_response import QNR_results, QuestionnaireResponse
+from .research_data import ResearchData
 from .research_protocol import ResearchProtocol
 from .role import ROLE
 from .user import User
@@ -741,7 +742,10 @@ def ordered_qbs(user, research_study_id, classification=None):
 
 
 def invalidate_users_QBT(user_id, research_study_id):
-    """Mark the given user's QBT rows and adherence_data invalid (by deletion)
+    """invalidate the given user's QBT rows and related cached data, by deletion
+
+    This also clears a users cached adherence and research data rows from their
+    respective caches.
 
     :param user_id: user for whom to purge all QBT rows
     :param research_study_id: set to limit invalidation to research study or
@@ -754,6 +758,7 @@ def invalidate_users_QBT(user_id, research_study_id):
         QBT.query.filter(QBT.user_id == user_id).delete()
         AdherenceData.query.filter(
             AdherenceData.patient_id == user_id).delete()
+        ResearchData.query.filter(ResearchData.subject_id == user_id).delete()
     else:
         QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.research_study_id == research_study_id).delete()
@@ -763,6 +768,8 @@ def invalidate_users_QBT(user_id, research_study_id):
         # SQL alchemy can't combine `like` expression with delete op.
         for ad in adh_data:
             db.session.delete(ad)
+        ResearchData.query.filter(ResearchData.subject_id == user_id).filter(
+            ResearchData.research_study_id == research_study_id).delete()
 
         if not current_app.config.get("TESTING", False):
             # clear the timeout lock as well, since we need a refresh
@@ -775,6 +782,7 @@ def invalidate_users_QBT(user_id, research_study_id):
             cache_moderation.reset()
 
 
+    # clear cached qb_status_visit_name() using current as_of value
     # args have to match order and values - no wild carding avail
     as_of = QB_StatusCacheKey().current()
     if research_study_id != 'all':
