@@ -878,14 +878,14 @@ def aggregate_responses(
             meta={'current': 10, 'total': 100})
 
     query = ResearchData.query.filter(
-        ResearchData.patient_id.in_(user_ids)).order_by(
-        ResearchData.authored.desc(), ResearchData.patient_id).with_entities(
+        ResearchData.user_id.in_(user_ids)).order_by(
+        ResearchData.authored.desc(), ResearchData.user_id).with_entities(
         ResearchData.data)
 
     if instrument_ids:
         query = query.filter(ResearchData.instrument.in_(tuple(instrument_ids)))
     if celery_task:
-        # the delay is now a single big query, and then bundling - call it "half" done
+        # the delay is now a single big query, and then bundling - mark near done
         celery_task.update_state(
             state='PROGRESS',
             meta={'current': 70, 'total': 100})
