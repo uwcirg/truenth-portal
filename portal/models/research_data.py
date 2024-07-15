@@ -15,20 +15,15 @@ from .user import User
 class ResearchData(db.Model):
     """ Cached adherence report data
 
-    Full history research data is expensive to generate, retain between reports.
-    Cache reportable data in simple JSON structure, maintaining keys for lookup
-    and invalidation.
+    Full history research data is expensive to generate and rarely changes,
+    except on receipt of new questionnaire response inserts and updates.
 
-    rs_id_visit: the numeric rs_id and visit month string joined with a colon
-    valid_till: old history data never changes, unless an external event such
-        as a user's consent date or organization research protocol undergoes
-        change.  active visits require more frequent updates but are considered
-        fresh enough for days.  client code sets valid_till as appropriate.
-
+    Cache reportable data in simple JSON structure, maintaining indexed columns
+    for lookup and invalidation.
     """
     __tablename__ = 'research_data'
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
+    user_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
     questionnaire_response_id = db.Column(
         db.ForeignKey('questionnaire_responses.id'), index=True, unique=True, nullable=False,
         doc="source questionnaire response")
@@ -38,24 +33,6 @@ class ResearchData(db.Model):
         db.DateTime, nullable=False, index=True,
         doc="document.authored used for sorting")
     data = db.Column(JSONB)
-
-    @staticmethod
-    def persist(patient_id, qnr_id, data):
-        """shortcut to persist a row, returns new instance"""
-        import json
-        for k, v in data.items():
-            try:
-                json.dumps(k)
-                json.dumps(v)
-            except TypeError:
-                raise ValueError(f"couldn't encode {k}:{v}, {type(v)}")
-
-        record = ResearchData(
-            patient_id=patient_id,
-            data=data)
-        db.session.add(record)
-        db.session.commit()
-        return db.session.merge(record)
 
 
 def cache_research_data(job_id=None, manual_run=None):
@@ -94,7 +71,7 @@ def invalidate_qnr_research_data(questionnaire_response):
 
 def invalidate_users_research_data(user_id, research_study_id):
     """invalidate applicable rows via removal"""
-    ResearchData.query.filter(ResearchData.patient_id == user_id).filter(
+    ResearchData.query.filter(ResearchData.user_id == user_id).filter(
         ResearchData.research_study_id == research_study_id).delete()
     db.session.commit()
 
@@ -152,7 +129,7 @@ def add_questionnaire_response(questionnaire_response, research_study_id):
     document["timepoint"] = qb_status['visit_name']
 
     research_data = ResearchData(
-        patient_id=subject.id,
+        user_id=subject.id,
         questionnaire_response_id=questionnaire_response.id,
         instrument=instrument,
         research_study_id=research_study_id,
