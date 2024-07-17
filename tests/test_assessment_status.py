@@ -32,7 +32,8 @@ from portal.models.questionnaire_response import (
 from portal.models.recur import Recur
 from portal.models.research_data import (
     add_questionnaire_response,
-    invalidate_qnr_research_data,
+    invalidate_patient_research_data,
+    update_single_patient_research_data,
 )
 from portal.models.research_protocol import ResearchProtocol
 from portal.models.role import ROLE
@@ -96,7 +97,6 @@ def mock_qr(
         db.session.commit()
     invalidate_users_QBT(user_id=user_id, research_study_id='all')
     qr = db.session.merge(qr)
-    invalidate_qnr_research_data(qr)
     add_questionnaire_response(questionnaire_response=qr, research_study_id=0)
 
 
@@ -323,6 +323,11 @@ class TestAggregateResponses(TestQuestionnaireSetup):
                 Organization.name == 'metastatic').one())
         self.promote_user(staff, role_name=ROLE.STAFF.value)
         staff = db.session.merge(staff)
+
+        # testing situation, each mock_qr() call invalidates cached and adds
+        # only the latest to the research data cache.  flush and add all
+        invalidate_patient_research_data(TEST_USER_ID, research_study_id=0)
+        update_single_patient_research_data(TEST_USER_ID)
         bundle = aggregate_responses(
             instrument_ids=[instrument_id],
             research_study_id=0,
