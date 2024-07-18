@@ -1,3 +1,4 @@
+from flask import current_app
 from datetime import datetime
 
 from ..database import db
@@ -61,20 +62,24 @@ class Observation(db.Model):
         return fhir
 
     def update_from_fhir(self, data):
+        current_app.logger.debug("update_from_fhir: enter")
         if 'issued' in data:
             issued = FHIR_datetime.parse(data['issued']) if data[
                 'issued'] else None
             setattr(self, 'issued', issued)
         if 'code' in data:
+            current_app.logger.debug("update_from_fhir: code")
             self.codeable_concept = CodeableConcept.from_fhir(
                 data['code'])
         if 'status' in data:
             setattr(self, 'status', data['status'])
         if 'performer' in data:
+            current_app.logger.debug("update_from_fhir: performer")
             for p in data['performer']:
                 performer = Performer.from_fhir(p)
                 self.performers.append(performer)
         if 'valueQuantity' in data:
+            current_app.logger.debug("update_from_fhir: valueQuantity")
             v = data['valueQuantity']
             current_v = self.value_quantity
             vq = ValueQuantity(
@@ -85,10 +90,12 @@ class Observation(db.Model):
             setattr(self, 'value_quantity_id', vq.id)
             setattr(self, 'value_quantity', vq)
         if 'valueCoding' in data:
+            current_app.logger.debug("update_from_fhir: valueCoding")
             self.value_coding = Coding.from_fhir(
                 data['valueCoding']).add_if_not_found(True)
             self.value_coding_id = self.value_coding.id
         if 'derivedFrom' in data:
+            current_app.logger.debug("update_from_fhir: derivedFrom")
             # The only reference supported at this time is a single
             # QuestionnaireResponse.  If given, must refer to
             # a value QNR in the system - store PK if found.
@@ -98,6 +105,7 @@ class Observation(db.Model):
                     "Observation.derivedFrom")
             qnr = Reference.parse(data['derivedFrom'][0])
             self.derived_from = qnr.id
+        current_app.logger.debug("update_from_fhir: exit")
         return self.as_fhir()
 
     def add_if_not_found(self, commit_immediately=False):
@@ -128,8 +136,11 @@ class Observation(db.Model):
     @classmethod
     def parse_obs_bundle(cls, obs_bundle):
         for obs in obs_bundle['entry']:
+            current_app.logger.debug("parse_obs_bundle: next observation")
             observation = cls()
+            current_app.logger.debug("parse_obs_bundle: update_from_fhir()")
             observation.update_from_fhir(obs)
+            current_app.logger.debug("parse_obs_bundle: add()")
             db.session.add(observation)
 
 
