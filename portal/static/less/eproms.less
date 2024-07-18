@@ -6885,14 +6885,14 @@ div.or {
   position: relative;
   margin: auto;
   display: flex;
-  margin-top: calc(~"25% - 48px");
+  margin-top: calc(~"25% - 24px");
   margin-bottom: 8%;
   width: 120px;
-  height:300px;
+  height: 280px;
   .loading-text-container {
     position: relative;
     width: 120px;
-    top: 16px;
+    //top: 16px;
     margin: auto;
     color: #FFF;
     font-weight: 600;
@@ -6902,17 +6902,18 @@ div.or {
   .frame {
     position: absolute;
     width: 100px;
-    height: 140px;
+    height: 100px;
     border-top: 10px solid @hourGlassFrameColor;
     border-bottom: 10px solid @hourGlassColor;
-    animation: rotateFrame 320s infinite;
+    border-radius: 4px;
+    animation: rotateFrame 460s infinite;
   }
   .top {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     width: 68px;
-    height: 62px;
+    height: 40px;
     clip-path: polygon(45% 100%, 55% 100%, 100% 0, 0 0);
   }
   /* Sand - top */
@@ -6920,10 +6921,10 @@ div.or {
     content: '';
     position: absolute;
     width: 68px;
-    height: 64px;
+    height: 44px;
     bottom: 0;
     background: @hourGlassSandColor;
-    animation: 380s lowerTopSand infinite;
+    animation: 520s lowerTopSand infinite;
   }
   
   .top::after {
@@ -6945,9 +6946,9 @@ div.or {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: 60px;
+    top: 40px;
     width: 68px;
-    height: 60px;
+    height: 40px;
     clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
   }
   
@@ -6961,7 +6962,7 @@ div.or {
     height: 80px;
     bottom: 0;
     background: @hourGlassSandColor;
-    animation: 380s raiseBottomSand infinite;
+    animation: 520s raiseBottomSand infinite;
   }
   
   .blob {
@@ -6974,7 +6975,7 @@ div.or {
     height: 50px;
     border-radius: 50%;
     background: @hourGlassSandColor;
-    animation: raiseMound 320s infinite;
+    animation: raiseMound 460s infinite;
   }
   /* Drip through to bottom */
   .drip {
