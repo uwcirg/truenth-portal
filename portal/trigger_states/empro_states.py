@@ -552,10 +552,12 @@ def extract_observations(questionnaire_response_id, override_state=False):
     :return: None
     """
     qnr = QuestionnaireResponse.query.get(questionnaire_response_id)
+    current_app.logger.debug("extract_observations: enter")
 
     # given asynchronous possibility, require user's EMPRO lock
     with TimeoutLock(
             key=EMPRO_LOCK_KEY.format(user_id=qnr.subject_id), timeout=60):
+        current_app.logger.debug("extract_observations: timeout lock obtained")
         ts = users_trigger_state(qnr.subject_id)
         sm = EMPRO_state(ts)
         if not override_state:
@@ -580,16 +582,21 @@ def extract_observations(questionnaire_response_id, override_state=False):
         qnr_json = qnr.as_sdc_fhir()
 
         SDC_BASE_URL = current_app.config['SDC_BASE_URL']
+        current_app.logger.debug("extract_observations: POST to SDC")
         response = post(f"{SDC_BASE_URL}/$extract", json=qnr_json)
         response.raise_for_status()
 
         # Add SDC generated observations to db
+        current_app.logger.debug("extract_observations: parse_obs_bundle()")
         Observation.parse_obs_bundle(response.json())
         db.session.commit()
 
         # With completed scoring, evaluate for triggers
+        current_app.logger.debug("extract_observations: evaluate_triggers()")
         evaluate_triggers(qnr)
 
     # Finally, fire any outstanding actions
     # NB async locks obtained w/i
+    current_app.logger.debug("extract_observations: fire_trigger_events()")
     fire_trigger_events()
+    current_app.logger.debug("extract_observations: exit")
