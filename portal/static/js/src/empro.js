@@ -205,20 +205,21 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
   }, 1000);
   return true;
 };
-emproObj.prototype.handleNoOptOutSelection = function() {
-    EmproObj.initOptOutModal(false);
-    EmproObj.initThankyouModal(true);
+emproObj.prototype.handleNoOptOutSelection = function () {
+  EmproObj.initOptOutModal(false);
+  EmproObj.initThankyouModal(true);
 };
-emproObj.prototype.isFullOptout = function() {
-  return this.submittedOptOutDomains.length > 0 && (
-      this.submittedOptOutDomains.length === this.hardTriggerDomains.length
+emproObj.prototype.isFullOptout = function () {
+  return (
+    this.submittedOptOutDomains.length > 0 &&
+    this.submittedOptOutDomains.length === this.hardTriggerDomains.length
   );
-}
-emproObj.prototype.handleFullOptout = function() {
+};
+emproObj.prototype.handleFullOptout = function () {
   if (this.isFullOptout()) {
     $(".full-optout-hide").addClass("hide");
   }
-}
+};
 emproObj.prototype.handleSubmitOptoutData = function () {
   // if (!EmproObj.hasErrorText() && !EmproObj.hasSelectedOptOutDomains()) {
   //   EmproObj.setOptoutError(
@@ -251,9 +252,10 @@ emproObj.prototype.initOptOutElementEvents = function () {
     return;
   }
   // x, close button in OPT OUT modal, need to make sure thank you modal is initiated after closing out opt out modal
-  $("#emproOptOutModal .close").on("click", function(e) {
+  $("#emproOptOutModal .close").on("click", function (e) {
     EmproObj.initOptOutModal(false);
     EmproObj.initThankyouModal(true);
+    EmproObj.postToAudit("Opt out modal dismissed");
   });
 
   // submit buttons
@@ -326,7 +328,7 @@ emproObj.prototype.initOptOutModal = function (autoShow) {
   }
   $("#emproOptOutModal").modal({
     backdrop: "static",
-    keyboard: false
+    keyboard: false,
   });
   $("#emproOptOutModal").modal(autoShow ? "show" : "hide");
 };
@@ -335,6 +337,7 @@ emproObj.prototype.onDetectOptOutDomains = function () {
   this.initOptOutElementEvents();
   this.initOptOutModal(true);
   this.initThankyouModal(false);
+  this.postToAudit("Opt out modal presented");
 };
 emproObj.prototype.initReportLink = function () {
   if (!this.hasThankyouModal()) return;
@@ -385,6 +388,13 @@ emproObj.prototype.checkUserOrgAllowOptOut = function (
     callback(
       !!userOrgs.find((orgId) => orgsToCompare.indexOf(parseInt(orgId)) !== -1)
     );
+  });
+};
+emproObj.prototype.postToAudit = function (message) {
+  if (!message) return;
+  tnthAjax.postAuditLog(this.userId, {
+    message: message,
+    context: "access"
   });
 };
 emproObj.prototype.init = function () {
@@ -500,7 +510,10 @@ emproObj.prototype.init = function () {
 
           this.initTriggerDomains(
             {
-              maxTryAttempts: !autoShowModal ? 0 : isDebugging ? 0 : 5, //no need to retry if thank you modal isn't supposed to show
+              // retry up to at least a minute, the call times out a 5 seconds, retry after 1.5 ~ 2.5 second each time (including browser connection time)
+              // so 5 * 14 * 2.5 seconds (175 seconds, approximately 2 minute and 35 seconds)
+              // hopefully gives the server plenty of time to process triggers
+              maxTryAttempts: !autoShowModal ? 0 : isDebugging ? 14 : 14, //no need to retry if thank you modal isn't supposed to show
               clearCache: autoShowModal,
             },
             (result) => {
@@ -511,7 +524,6 @@ emproObj.prototype.init = function () {
                   console.log("Error retrieving trigger data: ", result.reason);
                 }
               }
-
               /*
                * set thank you modal accessed flag here
                */
@@ -533,7 +545,7 @@ emproObj.prototype.init = function () {
   });
 };
 emproObj.prototype.setLoadingVis = function (loading) {
-  var LOADING_INDICATOR_ID = ".portal-body .loading-container";
+  var LOADING_INDICATOR_ID = ".portal-body .wait-indicator-wrapper";
   if (!loading) {
     $(LOADING_INDICATOR_ID).addClass("hide");
     return;

@@ -107,6 +107,9 @@
 @toolbarBorderColor: #f5f4f4;
 @emproBtnPrimaryColor: #60676E;
 @alertColor: #cc0a0a;
+@hourGlassColor: #919EB3;
+@hourGlassFrameColor: #3D4750;
+@hourGlassSandColor: #EDD0AA;
 
 
 
@@ -6866,6 +6869,233 @@ div.or {
   .loader,
   .error {
     margin-top: 16px;
+  }
+}
+.wait-indicator-wrapper {
+    position: fixed;
+    background: hsla(0, 7%, 12%, 0.35);
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 888;
+}
+// from https://codepen.io/aitchiss/pen/rNxqEMP
+.wait-indicator-container {
+  position: relative;
+  margin: auto;
+  display: flex;
+  margin-top: calc(~"25% - 48px");
+  margin-bottom: 8%;
+  width: 120px;
+  height:300px;
+  .loading-text-container {
+    position: relative;
+    width: 120px;
+    top: 16px;
+    margin: auto;
+    color: #FFF;
+    font-weight: 600;
+    font-size: 1.1em;
+    letter-spacing: .1rem;
+  }
+  .frame {
+    position: absolute;
+    width: 100px;
+    height: 140px;
+    border-top: 10px solid @hourGlassFrameColor;
+    border-bottom: 10px solid @hourGlassColor;
+    animation: rotateFrame 320s infinite;
+  }
+  .top {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 68px;
+    height: 62px;
+    clip-path: polygon(45% 100%, 55% 100%, 100% 0, 0 0);
+  }
+  /* Sand - top */
+  .top::before {
+    content: '';
+    position: absolute;
+    width: 68px;
+    height: 64px;
+    bottom: 0;
+    background: @hourGlassSandColor;
+    animation: 380s lowerTopSand infinite;
+  }
+  
+  .top::after {
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: -15px;
+    width: 190px;
+    height: 190px;
+    transform: rotate(-90deg);
+    background: conic-gradient(
+      from 0deg, 
+      white 0deg, 
+      transparent 90deg,
+      white 180deg
+    );
+  }
+  .bottom {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 60px;
+    width: 68px;
+    height: 60px;
+    clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+  }
+  
+  /* Bottom sand */
+  .bottom::before {
+    content: '';
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+    width: 160px;
+    height: 80px;
+    bottom: 0;
+    background: @hourGlassSandColor;
+    animation: 380s raiseBottomSand infinite;
+  }
+  
+  .blob {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 10px;
+    left: 50%;
+    content: '';
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: @hourGlassSandColor;
+    animation: raiseMound 320s infinite;
+  }
+  /* Drip through to bottom */
+  .drip {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid @hourGlassSandColor;
+    animation: fadeDrip 2s infinite;
+  }
+
+  .drip::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    width: 3px;
+    height: 200px;
+    background: repeating-linear-gradient(to bottom,
+      @hourGlassSandColor,
+      @hourGlassSandColor 5px,
+      transparent 5px,
+      transparent 10px
+    );
+    animation: drip 2s infinite;
+  }
+  
+  .glass {
+    position: absolute;
+    top: -90px;
+    left: -15px;
+    width: 190px;
+    height: 190px;
+    transform: rotate(-270deg);
+    background: conic-gradient(
+      from 0deg, 
+      white 0deg, 
+      transparent 90deg,
+      white 180deg
+    );
+  }  
+  
+}
+
+@keyframes rotateFrame {
+  0% {
+    transform: none;
+  }
+  
+  90% {
+    transform: none;
+  }
+  
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes lowerTopSand {
+  0% {
+    transform: none;
+  }
+  
+  100% {
+    transform: translateY(80px);
+  }
+}
+
+
+@keyframes raiseMound {
+  0% {
+    transform: translate(-50%, 80px);
+    width: 180px;
+  }
+  
+  100% {
+    transform: translateX(-50%);
+    width: 50px;
+  }
+}
+
+@keyframes raiseBottomSand {
+  0% {
+    transform: translate(-50%, 80px);
+    boder-radius: 0;
+  }
+  
+  100% {
+    transform: translateX(-50%);
+    border-radius: 50% 50% 0 0;
+  }
+}
+
+@keyframes fadeDrip {
+  0% {
+    opacity: 1;
+  }
+  
+  70% {
+    opacity: 1;
+  }
+  
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes drip {
+  0% {
+    transform: translateY(-150px);
+    opacity: 1;
+  }
+  
+  99% {
+    opacity: 1;
+  }
+  
+  100% {
+    transform: translateY(30px);
   }
 }
 

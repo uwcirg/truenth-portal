@@ -373,6 +373,12 @@ export default { /*global $ */
                 setTimeout(function() {
                     this.getSubStudyTriggers(userId, params, callback);
                 }.bind(this), 1500*params.retryAttempt);
+                if (params.retryAttempt === params.maxTryAttempts) {
+                    this.postAuditLog(userId, {
+                        context: "access",
+                        message: `maximum retry attempts reached for retrieving triggers, state: ${dataState ? dataState : "unknown"}`
+                    });
+                }
                 return false;
             }
             params.retryAttempt = 0;
@@ -1266,6 +1272,21 @@ export default { /*global $ */
                     callback(data);
                 } else {
                     callback({"error": i18next.t("Error occurred retrieving email audit entries.")});
+                }
+            } else {
+                callback({"error": i18next.t("no data returned")});
+            }
+        });
+    },
+    "postAuditLog": function(userId, payload, callback) {
+        callback = callback || function() {};
+        //url, method, userId, params, callback
+        this.sendRequest("/api/auditlog", "POST", userId, {"data": payload, "contentType": "application/x-www-form-urlencoded; charset=UTF-8"}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    callback(data);
+                } else {
+                    callback({"error": i18next.t("Error occurred posting to audit log.")});
                 }
             } else {
                 callback({"error": i18next.t("no data returned")});
