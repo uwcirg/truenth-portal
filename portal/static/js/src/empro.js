@@ -513,7 +513,7 @@ emproObj.prototype.init = function () {
               // retry up to at least a minute, the call times out a 5 seconds, retry after 1.5 ~ 2.5 second each time (including browser connection time)
               // so 5 * 14 * 2.5 seconds (175 seconds, approximately 2 minute and 35 seconds)
               // hopefully gives the server plenty of time to process triggers
-              maxTryAttempts: !autoShowModal ? 0 : isDebugging ? 14 : 14, //no need to retry if thank you modal isn't supposed to show
+              maxTryAttempts: !autoShowModal ? 0 : isDebugging ? 0 : 14, //no need to retry if thank you modal isn't supposed to show
               clearCache: autoShowModal,
             },
             (result) => {
