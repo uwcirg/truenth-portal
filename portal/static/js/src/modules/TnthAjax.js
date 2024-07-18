@@ -375,7 +375,7 @@ export default { /*global $ */
                 }.bind(this), 1500*params.retryAttempt);
                 if (params.retryAttempt === params.maxTryAttempts) {
                     this.postAuditLog(userId, {
-                        context: "access",
+                        context: "assessment",
                         message: `maximum retry attempts reached for retrieving triggers, state: ${dataState ? dataState : "unknown"}`
                     });
                 }

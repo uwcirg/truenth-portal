@@ -394,7 +394,7 @@ emproObj.prototype.postToAudit = function (message) {
   if (!message) return;
   tnthAjax.postAuditLog(this.userId, {
     message: message,
-    context: "access"
+    context: "assessment"
   });
 };
 emproObj.prototype.init = function () {
