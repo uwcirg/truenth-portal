@@ -270,7 +270,9 @@ class QuestionnaireResponse(db.Model):
                 == json.dumps(identifier.system)).filter(
                 QuestionnaireResponse.document['identifier']['value']
                 == json.dumps(identifier.value))
-        return found.order_by(QuestionnaireResponse.id.desc())
+        query = found.order_by(QuestionnaireResponse.id.desc())
+        current_app.logger.debug(query)
+        return query
 
     @staticmethod
     def qnr_state(user_id):
