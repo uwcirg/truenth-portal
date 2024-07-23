@@ -365,10 +365,11 @@ export default { /*global $ */
 
             const dataState = String(data.state).toLowerCase();
             params = params || {};
+            const isUnprocessed = EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(dataState) !== -1;
 
             //if the trigger data has not been processed, try again until maximum number of attempts has been reached
             if (params.retryAttempt < params.maxTryAttempts &&
-                EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(dataState) !== -1) {
+                isUnprocessed) {
                 params.retryAttempt++;
                 setTimeout(function() {
                     this.getSubStudyTriggers(userId, params, callback);
@@ -382,7 +383,9 @@ export default { /*global $ */
                 return false;
             }
             params.retryAttempt = 0;
-            sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
+            if (!isUnprocessed) {
+                sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
+            }
             callback(data);
             return true;
         });
