@@ -2,14 +2,13 @@
 from builtins import str
 import json
 
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum, UniqueConstraint
 from werkzeug.exceptions import BadRequest, Conflict
 
 from ..database import db
 from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 
-identifier_use = ENUM('usual', 'official', 'temp', 'secondary',
+identifier_use = Enum('usual', 'official', 'temp', 'secondary',
                       name='id_use', create_type=False)
 UNIQUE_IDENTIFIER_SYSTEMS = {TRUENTH_EXTERNAL_STUDY_SYSTEM}
 

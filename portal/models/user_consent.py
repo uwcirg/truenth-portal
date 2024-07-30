@@ -1,7 +1,7 @@
 """User Consent module"""
 from datetime import datetime, timedelta
 
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum
 from sqlalchemy.ext.hybrid import hybrid_property
 from validators import ValidationFailure, url as url_validation
 
@@ -22,7 +22,7 @@ INCLUDE_IN_REPORTS_MASK = 0b010
 SEND_REMINDERS_MASK = 0b100
 
 status_types = ('consented', 'suspended', 'deleted')
-status_types_enum = ENUM(
+status_types_enum = Enum(
     *status_types, name='status_enum', create_type=False)
 
 

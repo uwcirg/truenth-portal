@@ -8,8 +8,8 @@ import json
 from flask import current_app, has_request_context, url_for
 from flask_swagger import swagger
 import jsonschema
-from sqlalchemy import or_
-from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy import Enum, or_
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from ..database import db
@@ -64,7 +64,7 @@ class QuestionnaireResponse(db.Model):
 
     # Fields derived from document content
     status = db.Column(
-        ENUM(
+        Enum(
             'in-progress',
             'completed',
             name='questionnaire_response_statuses'

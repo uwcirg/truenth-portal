@@ -8,8 +8,7 @@ from string import Formatter
 
 from flask import current_app, url_for
 from flask_babel import force_locale, gettext as _
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
@@ -26,7 +25,7 @@ from .url_token import url_token
 from .user import User
 
 # https://www.hl7.org/fhir/valueset-event-status.html
-event_status_types = ENUM(
+event_status_types = Enum(
     'preparation', 'in-progress', 'suspended', 'aborted', 'completed',
     'entered-in-error', 'unknown', name='event_statuses',
     create_type=False)
