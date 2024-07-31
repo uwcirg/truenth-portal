@@ -88,7 +88,7 @@ services:
     image: redis
 
   db:
-    image: postgres:${POSTGRES_VERSION:-16}
+    image: postgres:${POSTGRES_VERSION:-13}
     environment:
       # use generic postgres env vars to configure env vars specific to dockerized postgres
       POSTGRES_DB: ${PGDATABASE:-portaldb}
