@@ -1,7 +1,7 @@
 """Questionnaire module"""
 from flask import url_for
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy import Enum, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 
 from ..database import db
 from ..date_tools import FHIR_datetime
@@ -10,7 +10,7 @@ from .fhir import bundle_results
 from .identifier import Identifier
 
 status_types = ('draft', 'published', 'retired')
-status_types_enum = ENUM(
+status_types_enum = Enum(
     *status_types, name='questionnaire_status_enum', create_type=False)
 
 
