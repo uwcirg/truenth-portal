@@ -1,0 +1,40 @@
+# continuous integration
+# run tests for repo
+---
+name: Test
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: python:3.9
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      redis:
+        # DockerHub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      postgres:
+        # DockerHub image
+        image: postgres:13
+        env:
+          POSTGRES_DB: portaldb
+          POSTGRES_PASSWORD: wplatrop
+    env:
+      SESSION_REDIS: redis://redis:6379/0
+      SECRET_KEY: static secret key
+      SQLALCHEMY_DATABASE_TEST_URI: postgresql://postgres:wplatrop@postgres/portaldb
+      REDIS_URL: redis://redis:6379/0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install test runner
+        run: python3 -m pip install tox
+
+      - name: Run tests
+        run: tox
