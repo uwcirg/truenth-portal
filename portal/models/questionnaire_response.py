@@ -49,11 +49,12 @@ class QuestionnaireResponse(db.Model):
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
-    subject_id = db.Column(db.ForeignKey('users.id'), nullable=False)
+    subject_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
     subject = db.relationship("User", back_populates="questionnaire_responses")
     document = db.Column(JSONB)
     encounter_id = db.Column(
         db.ForeignKey('encounters.id', name='qr_encounter_id_fk'),
+        index=True,
         nullable=False)
     questionnaire_bank_id = db.Column(
         db.ForeignKey('questionnaire_banks.id'), nullable=True)
