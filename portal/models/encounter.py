@@ -21,7 +21,7 @@ class EncounterCodings(db.Model):
 
     __tablename__ = 'encounter_codings'
     id = db.Column(db.Integer, primary_key=True)
-    encounter_id = db.Column(db.ForeignKey('encounters.id'), nullable=False)
+    encounter_id = db.Column(db.ForeignKey('encounters.id'), index=True, nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
 
