@@ -137,13 +137,13 @@ class UserObservation(db.Model):
     __tablename__ = 'user_observations'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey(
-        'users.id', ondelete='CASCADE'), nullable=False)
+        'users.id', ondelete='CASCADE'), index=True, nullable=False)
     observation_id = db.Column(
-        db.ForeignKey('observations.id'), nullable=False)
+        db.ForeignKey('observations.id'), index=True, nullable=False)
     encounter_id = db.Column(db.ForeignKey(
         'encounters.id', name='user_observation_encounter_id_fk'),
         nullable=False)
-    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
+    audit_id = db.Column(db.ForeignKey('audit.id'), index=True, nullable=False)
     audit = db.relationship('Audit', cascade="save-update, delete")
     encounter = db.relationship('Encounter', cascade='delete')
     # There was a time when UserObservations were constrained to
