@@ -5,3 +5,18 @@
     {%- block body -%}{%- endblock -%}
 </section>
 <div class="loading-container hide"><div class="content"><i class="fa fa-spinner fa-spin fa-2x"></i>{{_("Loading")}} ...</div></div>
+
+<div class="wait-indicator-wrapper hide">
+    <div class="wait-indicator-container">
+        <div class="frame">
+        <div class="top"></div>
+        <div class="bottom">
+            <div class="drip"></div>
+            <div class="blob"></div>
+            <div class="glass"></div>
+        </div>
+        </div>
+        <!-- loading text is pre-existing -->
+        <div class="loading-text-container">{{_("Loading")}} ...</div>
+    </div>
+</div>
