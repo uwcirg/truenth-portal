@@ -98,7 +98,7 @@ class EmailMessage(db.Model):
     __tablename__ = 'email_messages'
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(255), nullable=False)
-    _recipients = db.Column("recipients", db.Text, nullable=False)
+    _recipients = db.Column("recipients", db.Text, index=True, nullable=False)
     sender = db.Column(db.String(255), nullable=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     body = db.Column(db.Text, nullable=False)

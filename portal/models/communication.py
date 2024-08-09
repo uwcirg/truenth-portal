@@ -268,16 +268,16 @@ class Communication(db.Model):
     """
     __tablename__ = 'communications'
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column('status', event_status_types, nullable=False)
+    status = db.Column('status', event_status_types, index=True, nullable=False)
 
     # FHIR Communication spec says `basedOn` can return to any
     # object.  For current needs, this is always a CommunicationRequest
     communication_request_id = db.Column(
-        db.ForeignKey('communication_requests.id'), nullable=False)
+        db.ForeignKey('communication_requests.id'), index=True, nullable=False)
     communication_request = db.relationship('CommunicationRequest')
 
     user_id = db.Column(db.ForeignKey(
-        'users.id', ondelete='cascade'), nullable=False)
+        'users.id', ondelete='cascade'), index=True, nullable=False)
 
     # message_id is null until sent
     message_id = db.Column(db.ForeignKey(

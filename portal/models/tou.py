@@ -19,7 +19,7 @@ class ToU(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     agreement_url = db.Column(
         db.Text, server_default='predates agreement_url', nullable=False)
-    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
+    audit_id = db.Column(db.ForeignKey('audit.id'), index=True, nullable=False)
     organization_id = db.Column(db.ForeignKey('organizations.id'))
     type = db.Column('type', tou_types, nullable=False)
     active = db.Column(db.Boolean(), nullable=False, server_default='1')
