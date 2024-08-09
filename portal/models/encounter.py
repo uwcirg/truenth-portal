@@ -21,7 +21,7 @@ class EncounterCodings(db.Model):
 
     __tablename__ = 'encounter_codings'
     id = db.Column(db.Integer, primary_key=True)
-    encounter_id = db.Column(db.ForeignKey('encounters.id'), nullable=False)
+    encounter_id = db.Column(db.ForeignKey('encounters.id'), index=True, nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
 
@@ -48,11 +48,12 @@ class Encounter(db.Model):
     """
     __tablename__ = 'encounters'
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column('status', status_types, nullable=False)
+    status = db.Column('status', status_types, index=True, nullable=False)
     user_id = db.Column(
         db.ForeignKey(
             'users.id',
             name='encounters_user_id_fk'),
+        index=True,
         nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
     """required whereas end_time is optional

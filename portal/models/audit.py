@@ -29,9 +29,9 @@ class Audit(db.Model):
 
     """
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    subject_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    _context = db.Column('context', db.Text, default='other', nullable=False)
+    user_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
+    subject_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
+    _context = db.Column('context', db.Text, default='other', index=True, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     version = db.Column(db.Text, default=lookup_version, nullable=False)
     comment = db.Column(db.Text)
