@@ -8,7 +8,6 @@ import json
 from flask import current_app, has_request_context, url_for
 from flask_swagger import swagger
 import jsonschema
-from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm.exc import MultipleResultsFound
 
@@ -31,8 +30,8 @@ from .questionnaire_bank import (
     trigger_date,
     visit_name,
 )
+from .research_data import ResearchData
 from .research_study import EMPRO_RS_ID, research_study_id_from_questionnaire
-from .reference import Reference
 from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
 
@@ -356,8 +355,7 @@ class QuestionnaireResponse(db.Model):
         questionnaire_map = questionnaire.questionnaire_code_map()
 
         for question in document.get('group', {}).get('question', ()):
-
-            combined_answers = consolidate_answer_pairs(question['answer'])
+            combined_answers = consolidate_answer_pairs(question.get('answer', ()))
 
             # Separate out text and coded answer, then override text
             text_and_coded_answers = []
@@ -372,7 +370,8 @@ class QuestionnaireResponse(db.Model):
                         answer['valueCoding'].get('text')
                     )
 
-                    text_and_coded_answers.append({'valueString': text_answer})
+                    if text_answer is not None:
+                        text_and_coded_answers.append({'valueString': text_answer})
                 elif 'valueString' in answer and '"' in answer['valueString']:
                     answer['valueString'] = quote_double_quote(answer['valueString'])
 
@@ -844,7 +843,7 @@ class QNR_indef_results(QNR_results):
 
 def aggregate_responses(
         instrument_ids, current_user, research_study_id, patch_dstu2=False,
-        ignore_qb_requirement=False, celery_task=None, patient_ids=None):
+        celery_task=None, patient_ids=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
@@ -852,7 +851,6 @@ def aggregate_responses(
         to list of patients the current_user has permission to see
     :param research_study_id: study being processed
     :param patch_dstu2: set to make bundle DSTU2 compliant
-    :param ignore_qb_requirement: set to include all questionnaire responses
     :param celery_task: if defined, send occasional progress updates
     :param patient_ids: if defined, limit result set to given patient list
 
@@ -861,6 +859,11 @@ def aggregate_responses(
     """
     from .qb_timeline import qb_status_visit_name  # avoid cycle
 
+    if celery_task:
+        celery_task.update_state(
+            state='PROGRESS',
+            meta={'current': 1, 'total': 100})
+
     # Gather up the patient IDs for whom current user has 'view' permission
     user_ids = patients_query(
         current_user,
@@ -868,82 +871,26 @@ def aggregate_responses(
         filter_by_ids=patient_ids,
     ).with_entities(User.id)
 
-    annotated_questionnaire_responses = []
-    questionnaire_responses = QuestionnaireResponse.query.filter(
-        QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
-        QuestionnaireResponse.document['authored'].desc())
 
-    # TN-3250, don't include QNRs without assigned visits, i.e. qb_id > 0
-    if not ignore_qb_requirement:
-        questionnaire_responses = questionnaire_responses.filter(
-            QuestionnaireResponse.questionnaire_bank_id > 0)
+    if celery_task:
+        celery_task.update_state(
+            state='PROGRESS',
+            meta={'current': 10, 'total': 100})
+
+    query = ResearchData.query.filter(
+        ResearchData.subject_id.in_(user_ids)).order_by(
+        ResearchData.authored.desc(), ResearchData.subject_id).with_entities(
+        ResearchData.data)
 
     if instrument_ids:
-        instrument_filters = (
-            QuestionnaireResponse.document[
-                ("questionnaire", "reference")
-            ].astext.endswith(instrument_id)
-            for instrument_id in instrument_ids
-        )
-        questionnaire_responses = questionnaire_responses.filter(
-            or_(*instrument_filters))
-
-    patient_fields = ("careProvider", "identifier")
-    system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
+        query = query.filter(ResearchData.instrument.in_(tuple(instrument_ids)))
     if celery_task:
-        current, total = 0, questionnaire_responses.count()
-
-    for questionnaire_response in questionnaire_responses:
-        document = questionnaire_response.document_answered.copy()
-        subject = questionnaire_response.subject
-        encounter = questionnaire_response.encounter
-        encounter_fhir = encounter.as_fhir()
-        document["encounter"] = encounter_fhir
-
-        document["subject"] = {
-            k: v for k, v in subject.as_fhir().items() if k in patient_fields
-        }
-
-        if subject.organizations:
-            providers = []
-            for org in subject.organizations:
-                org_ref = Reference.organization(org.id).as_fhir()
-                identifiers = [i.as_fhir() for i in org.identifiers if
-                               i.system in system_filter]
-                if identifiers:
-                    org_ref['identifier'] = identifiers
-                providers.append(org_ref)
-            document["subject"]["careProvider"] = providers
-
-        qb_status = qb_status_visit_name(
-            subject.id,
-            research_study_id,
-            FHIR_datetime.parse(questionnaire_response.document['authored']))
-        document["timepoint"] = qb_status['visit_name']
-
-        # Hack: add missing "resource" wrapper for DTSU2 compliance
-        # Remove when all interventions compliant
-        if patch_dstu2:
-            document = {
-                'resource': document,
-                # Todo: return URL to individual QuestionnaireResponse resource
-                'fullUrl': url_for(
-                    'assessment_engine_api.assessment',
-                    patient_id=subject.id,
-                    _external=True,
-                ),
-            }
-
-        annotated_questionnaire_responses.append(document)
-
-        if celery_task:
-            current += 1
-            if current % 25 == 0:
-                celery_task.update_state(
-                    state='PROGRESS',
-                    meta={'current': current, 'total': total})
-
-    return bundle_results(elements=annotated_questionnaire_responses)
+        # the delay is now a single big query, and then bundling - mark near done
+        celery_task.update_state(
+            state='PROGRESS',
+            meta={'current': 70, 'total': 100})
+    elements = [i.data for i in query.all()]
+    return bundle_results(elements=elements)
 
 
 def qnr_document_id(

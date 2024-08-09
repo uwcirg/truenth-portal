@@ -26,6 +26,7 @@ from .questionnaire_bank import (
     visit_name,
 )
 from .questionnaire_response import QNR_results, QuestionnaireResponse
+from .research_data import ResearchData
 from .research_protocol import ResearchProtocol
 from .role import ROLE
 from .user import User
@@ -741,17 +742,23 @@ def ordered_qbs(user, research_study_id, classification=None):
 
 
 def invalidate_users_QBT(user_id, research_study_id):
-    """Mark the given user's QBT rows and adherence_data invalid (by deletion)
+    """invalidate the given user's QBT rows and related cached data, by deletion
+
+    This also clears a users cached adherence and research data rows from their
+    respective caches.
 
     :param user_id: user for whom to purge all QBT rows
     :param research_study_id: set to limit invalidation to research study or
       use string 'all' to invalidate all QBT rows for a user
 
     """
+    if research_study_id is None:
+        raise ValueError('research_study_id must be defined or use "all"')
     if research_study_id == 'all':
         QBT.query.filter(QBT.user_id == user_id).delete()
         AdherenceData.query.filter(
             AdherenceData.patient_id == user_id).delete()
+        ResearchData.query.filter(ResearchData.subject_id == user_id).delete()
     else:
         QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.research_study_id == research_study_id).delete()
@@ -761,6 +768,8 @@ def invalidate_users_QBT(user_id, research_study_id):
         # SQL alchemy can't combine `like` expression with delete op.
         for ad in adh_data:
             db.session.delete(ad)
+        ResearchData.query.filter(ResearchData.subject_id == user_id).filter(
+            ResearchData.research_study_id == research_study_id).delete()
 
         if not current_app.config.get("TESTING", False):
             # clear the timeout lock as well, since we need a refresh
@@ -773,6 +782,7 @@ def invalidate_users_QBT(user_id, research_study_id):
             cache_moderation.reset()
 
 
+    # clear cached qb_status_visit_name() using current as_of value
     # args have to match order and values - no wild carding avail
     as_of = QB_StatusCacheKey().current()
     if research_study_id != 'all':
@@ -863,18 +873,17 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
         return True
 
 
-def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
+def update_users_QBT(user_id, research_study_id):
     """Populate the QBT rows for given user, research_study
 
     :param user: the user to add QBT rows for
     :param research_study_id: the research study being processed
-    :param invalidate_existing: set true to wipe any current rows first
 
     A user may be eligible for any number of research studies.  QBT treats
     each (user, research_study) independently, as should clients.
 
     """
-    def attempt_update(user_id, research_study_id, invalidate_existing):
+    def attempt_update(user_id, research_study_id):
         """Updates user's QBT or raises if lock is unattainable"""
         from .qb_status import patient_research_study_status
         from ..tasks import LOW_PRIORITY, cache_single_patient_adherence_data
@@ -886,18 +895,6 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
             user_id, research_study_id)
 
         with TimeoutLock(key=key, timeout=timeout):
-            if invalidate_existing:
-                QBT.query.filter(QBT.user_id == user_id).filter(
-                    QBT.research_study_id == research_study_id).delete()
-                adh_data = AdherenceData.query.filter(
-                    AdherenceData.patient_id == user_id).filter(
-                    AdherenceData.rs_id_visit.like(f"{research_study_id}:%")
-                )
-                # SQL alchemy can't combine `like` expression with delete op.
-                for ad in adh_data:
-                    db.session.delete(ad)
-                db.session.commit()
-
             # if any rows are found, assume this user/study is current
             if QBT.query.filter(QBT.user_id == user_id).filter(
                     QBT.research_study_id == research_study_id).count():
@@ -1206,10 +1203,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
     success = False
     for attempt in range(1, 6):
         try:
-            attempt_update(
-                user_id=user_id,
-                research_study_id=research_study_id,
-                invalidate_existing=invalidate_existing)
+            attempt_update(user_id=user_id, research_study_id=research_study_id)
             success = True
             break
         except ConnectionError as ce:
