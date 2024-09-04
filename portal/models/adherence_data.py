@@ -77,12 +77,20 @@ class AdherenceData(db.Model):
             except TypeError:
                 raise ValueError(f"couldn't encode {k}:{v}, {type(v)}")
 
-        record = AdherenceData(
-            patient_id=patient_id,
-            rs_id_visit=rs_id_visit,
-            valid_till=valid_till,
-            data=data)
-        db.session.add(record)
+        # only a single row for a given patient, rs_id_visit allowed.  replace or add
+        record = AdherenceData.query.filter(
+            AdherenceData.patient_id == patient_id).filter(
+            AdherenceData.rs_id_visit == rs_id_visit).first()
+        if record:
+            record.valid_till = valid_till
+            record.data = data
+        else:
+            record = AdherenceData(
+                patient_id=patient_id,
+                rs_id_visit=rs_id_visit,
+                valid_till=valid_till,
+                data=data)
+            db.session.add(record)
         db.session.commit()
         return db.session.merge(record)
 
