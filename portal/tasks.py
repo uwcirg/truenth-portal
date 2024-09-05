@@ -34,6 +34,7 @@ from .models.reporting import (
     research_report,
     single_patient_adherence_data,
 )
+from .models.research_data import cache_research_data
 from .models.research_study import ResearchStudy
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
@@ -129,6 +130,13 @@ def adherence_report_task(self, **kwargs):
     current_app.logger.debug("launch adherence report task: %s", self.request.id)
     kwargs['celery_task'] = self
     return adherence_report(**kwargs)
+
+
+@celery.task(queue=LOW_PRIORITY)
+@scheduled_task
+def cache_research_data_task(**kwargs):
+    """Queues up all patients needing a cache refresh"""
+    return cache_research_data(**kwargs)
 
 
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)

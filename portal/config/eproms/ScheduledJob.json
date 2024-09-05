@@ -300,6 +300,15 @@
       "resourceType": "ScheduledJob",
       "schedule": "30 14 * * *",
       "task": "cache_adherence_data_task"
+    },
+    {
+      "active": true,
+      "args": null,
+      "kwargs": null,
+      "name": "Cache Research Report Data",
+      "resourceType": "ScheduledJob",
+      "schedule": "30 23 * * *",
+      "task": "cache_research_data_task"
     }
   ],
   "id": "SitePersistence v0.2",

@@ -27,7 +27,7 @@ from ..models.identifier import (
 )
 from ..models.message import EmailMessage
 from ..models.overall_status import OverallStatus
-from ..models.qb_timeline import QBT, update_users_QBT
+from ..models.qb_timeline import QBT, invalidate_users_QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
@@ -361,10 +361,9 @@ def patient_timeline(patient_id):
                 acting_user_id=current_user().id)
 
         cache.delete_memoized(trigger_date)
-        update_users_QBT(
-            patient_id,
-            research_study_id=research_study_id,
-            invalidate_existing=purge)
+        if purge:
+            invalidate_users_QBT(user_id=patient_id, research_study_id=research_study_id)
+        update_users_QBT(user_id=patient_id, research_study_id=research_study_id)
     except ValueError as ve:
         abort(500, str(ve))
 
@@ -478,37 +477,44 @@ def patient_timeline(patient_id):
         cache_single_patient_adherence_data(**kwargs)
         adherence_data = sorted_adherence_data(patient_id, research_study_id)
 
-    qnr_responses = aggregate_responses(
-        instrument_ids=None,
-        current_user=current_user(),
-        research_study_id=research_study_id,
-        patch_dstu2=True,
-        ignore_qb_requirement=True,
-        patient_ids=[patient_id]
-    )
+    agg_args = {
+        'instrument_ids': None,
+        'current_user': current_user(),
+        'research_study_id': research_study_id,
+        'patch_dstu2': True,
+        'patient_ids': [patient_id],
+    }
+    qnr_responses = aggregate_responses(**agg_args)
+
+    if qnr_responses['total'] == 0:
+        from ..models.research_data import update_single_patient_research_data
+        update_single_patient_research_data(patient_id)
+        qnr_responses = aggregate_responses(**agg_args)
+
     # filter qnr data to a manageable result data set
     qnr_data = []
     for row in qnr_responses['entry']:
         i = {}
-        d = row['resource']
-        i['questionnaire'] = d['questionnaire']['reference'].split('/')[-1]
+        i['questionnaire'] = row['questionnaire']['reference'].split('/')[-1]
 
         # qnr_responses return all.  filter to requested research_study
         study_id = research_study_id_from_questionnaire(i['questionnaire'])
         if study_id != research_study_id:
             continue
 
-        i['auth_method'] = d['encounter']['auth_method']
-        i['encounter_period'] = d['encounter']['period']
-        i['document_authored'] = d['authored']
+        i['auth_method'] = row['encounter']['auth_method']
+        i['encounter_period'] = row['encounter']['period']
+        i['document_authored'] = row['authored']
         try:
-            i['ae_session'] = d['identifier']['value']
+            i['ae_session'] = row['identifier']['value']
         except KeyError:
             # happens with sub-study follow up, skip ae_session
             pass
-        i['status'] = d['status']
-        i['org'] = d['subject']['careProvider'][0]['display']
-        i['visit'] = d['timepoint']
+        i['status'] = row['status']
+        i['org'] = ': '.join((
+            row['subject']['careProvider'][0]['identifier'][0]['value'],
+            row['subject']['careProvider'][0]['display']))
+        i['visit'] = row['timepoint']
         qnr_data.append(i)
 
     consent_date, withdrawal_date = consent_withdrawal_dates(user, research_study_id)
@@ -651,10 +657,8 @@ def patient_timewarp(patient_id, days):
             research_study_id=research_study_id,
             acting_user_id=current_user().id)
 
-        update_users_QBT(
-            patient_id,
-            research_study_id=research_study_id,
-            invalidate_existing=True)
+        invalidate_users_QBT(user_id=patient_id, research_study_id=research_study_id)
+        update_users_QBT(user_id=patient_id, research_study_id=research_study_id)
 
     auditable_event(
         message=f"TIME WARPED existing data back {days} days.",
