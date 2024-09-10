@@ -34,7 +34,7 @@ tox==3.23.0
 typing==3.7.4.3             # via sphinx
 virtualenv==20.4.2        # via tox
 waitress==1.4.3           # via webtest
-webob==1.8.5              # via webtest
+webob==1.8.8              # via webtest
 webtest==2.0.33           # via flask-webtest
 xvfbwrapper==0.2.9
 --editable .
