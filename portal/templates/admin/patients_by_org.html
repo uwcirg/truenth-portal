@@ -50,6 +50,8 @@
              data-unique-id="id"
              data-id-field="id"
              data-filter-control="true"
+             data-side-pagination="server"
+             data-ajax="ajaxRequest"
              {%- if not isResearcher -%} data-show-export="true" {%- endif -%}
              data-export-data-type="all"
              >
@@ -164,6 +166,18 @@
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
   {{ExportPopover()}}
+  <script>
+    // custom ajax request here
+    function ajaxRequest(params) {
+      console.log("data ? ", $.param(params.data));
+      //search=&sort=userid&order=desc&offset=0&limit=10
+      var url = "/patients";
+      $.get(url + '?' + $.param(params.data)).then(function (res) {
+        params.success(res)
+      });
+    }
+
+  </script>
 </div>
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}
