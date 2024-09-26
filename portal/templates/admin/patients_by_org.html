@@ -32,6 +32,8 @@
           {{deletedUsersFilter()}}
         {% endif %}
       </div>
+      {# variable for checking if user is a researcher #}
+      {% set isResearcher = user.has_role(ROLE.RESEARCHER.value) and not(user.has_role(ROLE.ADMIN.value)) %}
       <table id="adminTable"
              data-table-id="adminTable"
              class="tnth-admin-table"
@@ -48,7 +50,7 @@
              data-unique-id="id"
              data-id-field="id"
              data-filter-control="true"
-             data-show-export="true"
+             {%- if not isResearcher -%} data-show-export="true" {%- endif -%}
              data-export-data-type="all"
              >
             {{testUsersCheckbox(postUrl=url_for('patients.patients_root'))}}
