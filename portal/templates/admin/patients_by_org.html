@@ -61,7 +61,7 @@
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
                   <!-- need to hide the ID column specifically for EPROMs -->
                   <th data-field="userid" data-sortable="true" data-class="id-field" data-width="1%" {%if config.HIDE_TRUENTH_ID_FIELD%}data-visible="false"{%endif%}>{{_("TrueNTH ID")}}</th>
-                  <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
+                  <!-- <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th> -->
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
                   <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-filter-control="input">{{ _("Date of Birth") }}</th>
@@ -75,7 +75,7 @@
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
                   {%- if user.has_role(ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) -%}
-                    <th data-field="interventions" data-sortable="true" data-class="interventions-field" data-filter-control="input">{{ _("Interventions") }}</th>
+                    <!-- <th data-field="interventions" data-sortable="true" data-class="interventions-field" data-filter-control="input">{{ _("Interventions") }}</th> -->
                   {%- endif -%}
                   {% if account_deactivation_enabled %}
                     <th class="text-center" data-field="deactivate" data-sortable="true" data-sorter="tnthTables.alphanumericSorter" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate") }}</th>
@@ -88,7 +88,7 @@
                   <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
                       <td>{{patient.id}}</td>
                       <td>{{ patient.id }}</td>
-                      <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
+                      <!-- <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td> -->
                       <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.birthdate.strftime('%-d %b %Y') if patient.birthdate }}</td>
@@ -118,7 +118,7 @@
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
                       {%- if user.has_role(ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) -%}
-                        <td>{% for intervention in patient.interventions | sort(attribute='description') %}{{intervention.description}}<br/>{% endfor %}</td>
+                        <!-- <td>{% for intervention in patient.interventions | sort(attribute='description') %}{{intervention.description}}<br/>{% endfor %}</td> -->
                       {%- endif -%}
                       {% if account_deactivation_enabled %}{{deletedUserCell(patient, allowReactivate=True)}}{% endif %}
                       <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
@@ -169,9 +169,9 @@
   <script>
     // custom ajax request here
     function ajaxRequest(params) {
-      console.log("data ? ", $.param(params.data));
+      console.log("param data ? ", $.param(params.data));
       //search=&sort=userid&order=desc&offset=0&limit=10
-      var url = "/patients";
+      var url = "/patients/page";
       $.get(url + '?' + $.param(params.data)).then(function (res) {
         params.success(res)
       });
