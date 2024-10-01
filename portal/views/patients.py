@@ -16,7 +16,8 @@ from .clinician import clinician_query
 from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention
-from ..models.organization import Organization
+from ..models.organization import Organization, OrgTree
+from ..models.patient_list import PatientList
 from ..models.qb_status import patient_research_study_status
 from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
@@ -90,6 +91,48 @@ def render_patients_list(
         template_name, patients_list=patients_list, user=user,
         qb_status_cache_age=qb_status_cache_age, wide_container="true",
         include_test_role=include_test_role)
+
+
+@patients.route("/page", methods=["GET"])
+@roles_required([
+    ROLE.INTERVENTION_STAFF.value,
+    ROLE.STAFF.value,
+    ROLE.STAFF_ADMIN.value])
+@oauth.require_oauth()
+def page_of_patients():
+    """called via ajax from the patient list, deliver next page worth of patients
+
+    Following query string parameters are expected:
+    :param search: search string,
+    :param sort: column to sort by,
+    :param order: direction to apply to sorted column,
+    :param offset: offset from first page of the given search params
+    :param limit: count in a page
+
+    """
+    user = current_user()
+    # build set of org ids the user has permission to view
+    viewable_orgs = set()
+    for org in user.organizations:
+        ids = OrgTree.here_and_below_id(org.id)
+        viewable_orgs.update(ids)
+
+    # TODO apply filter to viewable orgs
+
+    query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
+    if not request.args.get('include_test_role'):
+        query = query.filter(PatientList.test_role==False)
+    total = query.count()
+    query = query.offset(request.args.get('offset', 0))
+    query = query.limit(request.args.get('limit', 10))
+
+    # Returns JSON structured as:
+    # { "total": int, "totalNotFiltered": int, "rows": [
+    #   { "id": int, "column": value},
+    #   { "id": int, "column": value},
+    # ]}
+    data = {"total": total, "totalNotFiltered": total, "rows": [dict(row) for row in query]}
+    return jsonify(data)
 
 
 @patients.route('/', methods=('GET', 'POST'))
