@@ -476,15 +476,25 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 if (this.isAdminUser()) { /* turn on test account toggle checkbox if admin user */
                     $("#frmTestUsersContainer").removeClass("tnth-hide");
                     $("#include_test_role").on("click", function() {
-                        self.showLoader();
-                        $("#frmTestUsers").submit();
+                        // self.showLoader();
+                        // $("#frmTestUsers").submit();
+                        $("#adminTable").bootstrapTable('refresh');
                     });
                 }
+            },
+            initRowEvent: function() {
+                $("#adminTable tbody tr").each(function() {
+                    $(this).off("click").on("click", (e) => {
+                        e.stopPropagation();
+                        window.location = "/patients/patient_profile/" + $(this).attr("data-uniqueid");
+                    })
+                })
             },
             initTableEvents: function () {
                 var self = this;
                 $("#adminTable").on("post-body.bs.table", function() {
                     self.setContainerVis();
+                    self.initRowEvent();
                 });
                 $("#adminTable").on("reset-view.bs.table", function () {
                     self.addFilterPlaceHolders();

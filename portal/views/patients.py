@@ -45,52 +45,56 @@ def org_preference_filter(user, table_name):
 
 def render_patients_list(
         request, research_study_id, table_name, template_name):
-    include_test_role = request.args.get('include_test_role')
+    #include_test_role = request.args.get('include_test_role')
 
-    if request.form.get('reset_cache'):
-        QB_StatusCacheKey().update(datetime.utcnow())
-    if research_study_id == EMPRO_RS_ID:
-        clinician_name_map = {None: None}
-        for clinician in clinician_query(current_user()):
-            clinician_name_map[clinician.id] = f"{clinician.last_name}, {clinician.first_name}"
+    # if request.form.get('reset_cache'):
+    #     QB_StatusCacheKey().update(datetime.utcnow())
+    # if research_study_id == EMPRO_RS_ID:
+    #     clinician_name_map = {None: None}
+    #     for clinician in clinician_query(current_user()):
+    #         clinician_name_map[clinician.id] = f"{clinician.last_name}, {clinician.first_name}"
 
     user = current_user()
-    query = patients_query(
-        acting_user=user,
-        include_test_role=include_test_role,
-        include_deleted=True,
-        research_study_id=research_study_id,
-        requested_orgs=org_preference_filter(user, table_name=table_name))
+    # query = patients_query(
+    #     acting_user=user,
+    #     include_test_role=include_test_role,
+    #     include_deleted=True,
+    #     research_study_id=research_study_id,
+    #     requested_orgs=org_preference_filter(user, table_name=table_name))
 
     # get assessment status only if it is needed as specified by config
-    qb_status_cache_age = 0
-    if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
-        status_cache_key = QB_StatusCacheKey()
-        cached_as_of_key = status_cache_key.current()
-        qb_status_cache_age = status_cache_key.minutes_old()
-        patients_list = []
-        for patient in query:
-            if patient.deleted:
-                patients_list.append(patient)
-                continue
-            qb_status = qb_status_visit_name(
-                patient.id, research_study_id, cached_as_of_key)
-            patient.assessment_status = _(qb_status['status'])
-            patient.current_qb = qb_status['visit_name']
-            if research_study_id == EMPRO_RS_ID:
-                patient.clinician = '; '.join(
-                    (clinician_name_map.get(c.id, "not in map") for c in
-                     patient.clinicians)) or ""
-                patient.action_state = qb_status['action_state'].title() \
-                    if qb_status['action_state'] else ""
-            patients_list.append(patient)
-    else:
-        patients_list = query
+    # qb_status_cache_age = 0
+    # if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
+    #     status_cache_key = QB_StatusCacheKey()
+    #     cached_as_of_key = status_cache_key.current()
+    #     qb_status_cache_age = status_cache_key.minutes_old()
+    #     patients_list = []
+    #     for patient in query:
+    #         if patient.deleted:
+    #             patients_list.append(patient)
+    #             continue
+    #         qb_status = qb_status_visit_name(
+    #             patient.id, research_study_id, cached_as_of_key)
+    #         patient.assessment_status = _(qb_status['status'])
+    #         patient.current_qb = qb_status['visit_name']
+    #         if research_study_id == EMPRO_RS_ID:
+    #             patient.clinician = '; '.join(
+    #                 (clinician_name_map.get(c.id, "not in map") for c in
+    #                  patient.clinicians)) or ""
+    #             patient.action_state = qb_status['action_state'].title() \
+    #                 if qb_status['action_state'] else ""
+    #         patients_list.append(patient)
+    # else:
+    #     patients_list = query
 
+    # return render_template(
+    #     template_name, patients_list=patients_list, user=user,
+    #     qb_status_cache_age=qb_status_cache_age, wide_container="true",
+    #     include_test_role=include_test_role)
     return render_template(
-        template_name, patients_list=patients_list, user=user,
-        qb_status_cache_age=qb_status_cache_age, wide_container="true",
-        include_test_role=include_test_role)
+            template_name, user=user,
+            wide_container="true",
+        )
 
 
 @patients.route("/page", methods=["GET"])
