@@ -114,8 +114,11 @@ def page_of_patients():
     # build set of org ids the user has permission to view
     viewable_orgs = set()
     for org in user.organizations:
+        #ids = OrgTree.here_and_below_id(org.id)
         ids = OrgTree().here_and_below_id(org.id)
         viewable_orgs.update(ids)
+
+    print(viewable_orgs)
 
     # TODO apply filter to viewable orgs
 
