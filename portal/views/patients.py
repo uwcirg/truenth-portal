@@ -114,7 +114,7 @@ def page_of_patients():
     # build set of org ids the user has permission to view
     viewable_orgs = set()
     for org in user.organizations:
-        ids = OrgTree.here_and_below_id(org.id)
+        ids = OrgTree().here_and_below_id(org.id)
         viewable_orgs.update(ids)
 
     # TODO apply filter to viewable orgs
@@ -131,7 +131,22 @@ def page_of_patients():
     #   { "id": int, "column": value},
     #   { "id": int, "column": value},
     # ]}
-    data = {"total": total, "totalNotFiltered": total, "rows": [dict(row) for row in query]}
+    data = {"total": total, "totalNotFiltered": total, "rows": []}
+    for row in query:
+        data['rows'].append({
+            "id": row.id,
+            "first_name": row.first_name,
+            "last_name": row.last_name,
+            "birthdate": row.birthdate,
+            "email": row.email,
+            "questionnaire_status": row.questionnaire_status,
+            "visit": row.visit,
+            "study_id": row.study_id,
+            "consent_date": row.consent_date,
+            "sites": row.sites,
+            "deleted": row.deleted,
+            "test_role": row.test_role,
+        })
     return jsonify(data)
 
 
