@@ -19,14 +19,13 @@
       <div id="adminTableToolbar" class="admin-toolbar">
         {{orgsSelector()}}
         {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-          <div id="cacheResetContainer">
+          <!-- <div id="cacheResetContainer">
             <form id="cacheResetForm" method="POST" action="{{url_for('patients.patients_root')}}">
               <input type="hidden" name="reset_cache" id="reset_cache" value="True"/>
               <input id="csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">
               <button type="submit" class="button btn btn-default">{{_("Refresh Patient List")}} <span class="glyphicon glyphicon-refresh text-muted" arial-hidden="true"></span></button>
-              <span class="smaller-text byline-text text-muted">{{_("Last updated %(minutes)d minutes ago", minutes=qb_status_cache_age)}}</span> <!-- qb_status_cache_age should be calculated via view-->
             </form>
-          </div>
+          </div> -->
         {% endif %}
         {% if account_deactivation_enabled %}
           {{deletedUsersFilter()}}
@@ -167,20 +166,7 @@
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
   {{ExportPopover()}}
-  <script>
-    // custom ajax request here
-    function ajaxRequest(params) {
-      console.log("param data ? ", $.param(params.data));
-      //var includeTestUsers = $("#include_test_role").is(":checked");
-      var includeTestUsers = true;
-      //search=&sort=userid&order=desc&offset=0&limit=10
-      var url = "/patients/page";
-      $.get(url + '?' + $.param(params.data) + (includeTestUsers?"&include_test_role=true":"")).then(function (res) {
-        params.success(res)
-      });
-    }
-
-  </script>
 </div>
+{{ajaxDataScript()}}
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}

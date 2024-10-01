@@ -44,7 +44,7 @@
 	<caption id="frmTestUsersContainer" class="tnth-hide">
 		<form id="frmTestUsers" method="GET" action="{{postUrl}}">
 			<label class="text-normal text-warning">
-				<input type="checkbox" name="include_test_role" id="include_test_role" value="True" {%if include_test_role %}checked{% endif %}/>
+				<input type="checkbox" name="include_test_role" id="include_test_role" value="True" checked/>
 				{{_("include test accounts")}}
 			</label>
 		</form>
@@ -88,4 +88,19 @@
 			</div>
 		</div>
   	</div>
+{%- endmacro -%}
+{%- macro ajaxDataScript() -%}
+	<script>
+    // custom ajax request here
+    function ajaxRequest(params) {
+      console.log("param data ? ", $.param(params.data));
+      var includeTestUsers = $("#include_test_role").is(":checked");
+      //search=&sort=userid&order=desc&offset=0&limit=10
+      var url = "/patients/page";
+      $.get(url + '?' + $.param(params.data) + (includeTestUsers?"&include_test_role=true":"")).then(function (res) {
+        params.success(res);
+      });
+    }
+	
+  </script>
 {%- endmacro -%}
