@@ -83,12 +83,12 @@
                   <th data-field="activationstatus" data-visible="false">{{_("activation status")}}</th>
               </tr>
           </thead>
+          <!--
           <tbody id="admin-table-body" class="data-link">
                {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
+                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}>
                       <td>{{patient.id}}</td>
                       <td>{{ patient.id }}</td>
-                      <!-- <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td> -->
                       <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.birthdate.strftime('%-d %b %Y') if patient.birthdate }}</td>
@@ -118,13 +118,14 @@
                       </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
                       {%- if user.has_role(ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) -%}
-                        <!-- <td>{% for intervention in patient.interventions | sort(attribute='description') %}{{intervention.description}}<br/>{% endfor %}</td> -->
+                        <td>{% for intervention in patient.interventions | sort(attribute='description') %}{{intervention.description}}<br/>{% endfor %}</td>
                       {%- endif -%}
                       {% if account_deactivation_enabled %}{{deletedUserCell(patient, allowReactivate=True)}}{% endif %}
-                      <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
+                      <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td>
                   </tr>
                {% endfor %}
           </tbody>
+          -->
       </table>
       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
         <div class="modal fade" id="patientReportModal" tabindex="-1" role="dialog" aria-labelledby="patientReportModal">
@@ -170,9 +171,11 @@
     // custom ajax request here
     function ajaxRequest(params) {
       console.log("param data ? ", $.param(params.data));
+      //var includeTestUsers = $("#include_test_role").is(":checked");
+      var includeTestUsers = true;
       //search=&sort=userid&order=desc&offset=0&limit=10
       var url = "/patients/page";
-      $.get(url + '?' + $.param(params.data)).then(function (res) {
+      $.get(url + '?' + $.param(params.data) + (includeTestUsers?"&include_test_role=true":"")).then(function (res) {
         params.success(res)
       });
     }
