@@ -21,7 +21,7 @@ def upgrade():
     sa.Column('first_name', sa.String(length=64), nullable=True),
     sa.Column('last_name', sa.String(length=64), nullable=True),
     sa.Column('birthdate', sa.Date(), nullable=True),
-    sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=True),
     sa.Column('questionnaire_status', sa.Text(), nullable=True),
     sa.Column('visit', sa.Text(), nullable=True),
     sa.Column('study_id', sa.Text(), nullable=True),
@@ -35,7 +35,7 @@ def upgrade():
     )
     op.create_index(op.f('ix_patient_list_birthdate'), 'patient_list', ['birthdate'], unique=False)
     op.create_index(op.f('ix_patient_list_consent_date'), 'patient_list', ['consent_date'], unique=False)
-    op.create_index(op.f('ix_patient_list_email'), 'patient_list', ['email'], unique=True)
+    op.create_index(op.f('ix_patient_list_email'), 'patient_list', ['email'], unique=False)
     op.create_index(op.f('ix_patient_list_first_name'), 'patient_list', ['first_name'], unique=False)
     op.create_index(op.f('ix_patient_list_last_name'), 'patient_list', ['last_name'], unique=False)
     op.create_index(op.f('ix_patient_list_questionnaire_status'), 'patient_list', ['questionnaire_status'], unique=False)
