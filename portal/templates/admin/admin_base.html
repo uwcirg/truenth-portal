@@ -42,12 +42,10 @@
 {%- endmacro %}
 {%- macro testUsersCheckbox(postUrl) -%}
 	<caption id="frmTestUsersContainer" class="tnth-hide">
-		<form id="frmTestUsers" method="GET" action="{{postUrl}}">
-			<label class="text-normal text-warning">
-				<input type="checkbox" name="include_test_role" id="include_test_role" value="True" />
-				{{_("include test accounts")}}
-			</label>
-		</form>
+		<label class="text-normal text-warning">
+			<input type="checkbox" name="include_test_role" id="include_test_role" value="True" />
+			{{_("include test accounts")}}
+		</label>
 	</caption>
 {%- endmacro -%}
 <!-- this widget is only applicable for sub-study users -->
@@ -89,17 +87,28 @@
 		</div>
   	</div>
 {%- endmacro -%}
-{%- macro ajaxDataScript() -%}
+{%- macro ajaxDataScript(research_study_id) -%}
 	<script>
     // custom ajax request here
     function patientDataAjaxRequest(params) {
-      console.log("param data ? ", $.param(params.data));
       var includeTestUsers = $("#include_test_role").is(":checked");
-      //search=&sort=userid&order=desc&offset=0&limit=10
+	  if (includeTestUsers) {
+		params.data["include_test_role"] = true;
+	  }
+	  params.data["research_study_id"] = parseInt("{{research_study_id}}");
+	  console.log("param data ? ", params.data);
       var url = "/patients/page";
-	  $("#loadingIndicator").fadeOut().css("visibility", "visible");
-      $.get(url + '?' + $.param(params.data) + (includeTestUsers?"&include_test_role=true":"")).then(function (res) {
-        params.success(res);
+	  $("#loadingIndicator").fadeIn().css("visibility", "visible");
+      $.get(url + "?" + $.param(params.data)).then(function (results) {
+		if (results.rows) {
+			results.rows.map(row => {
+				if (!row.id)
+				row.id = row.userid;
+				return row;
+			});
+		}
+		console.log("row results ", results);
+        params.success(results);
 		$("#loadingIndicator").fadeOut().css("visibility", "hidden");
       });
     }
