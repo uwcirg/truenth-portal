@@ -1,6 +1,4 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from datetime import datetime
-
 from flask import (
     Blueprint,
     abort,
@@ -12,29 +10,34 @@ from flask import (
 from flask_babel import gettext as _
 from flask_user import roles_required
 
-from .clinician import clinician_query
 from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention
 from ..models.organization import Organization, OrgTree
 from ..models.patient_list import PatientList
 from ..models.qb_status import patient_research_study_status
-from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.table_preference import TablePreference
-from ..models.user import current_user, get_user, patients_query
+from ..models.user import current_user, get_user
 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
-def org_preference_filter(user, table_name):
+def org_preference_filter(user, research_study_id):
     """Obtain user's preference for filtering organizations
 
     :returns: list of org IDs to use as filter, or None
 
     """
+    if research_study_id == 0:
+        table_name = 'patientList'
+    elif research_study_id == 1:
+        table_name = 'substudyPatientList'
+    else:
+        raise ValueError('Invalid research_study_id')
+
     # check user table preference for organization filters
     pref = TablePreference.query.filter_by(
         table_name=table_name, user_id=user.id).first()
@@ -44,7 +47,7 @@ def org_preference_filter(user, table_name):
 
 
 def render_patients_list(
-        request, research_study_id, table_name, template_name):
+        request, research_study_id, template_name):
     user = current_user()
     return render_template(
             template_name, user=user,
@@ -67,6 +70,7 @@ def page_of_patients():
     :param order: direction to apply to sorted column,
     :param offset: offset from first page of the given search params
     :param limit: count in a page
+    :param research_study_id: default 0, set to 1 for EMPRO
 
     """
     user = current_user()
@@ -76,7 +80,11 @@ def page_of_patients():
         ids = OrgTree().here_and_below_id(org.id)
         viewable_orgs.update(ids)
 
-    # TODO apply filter to viewable orgs
+    research_study_id = request.args.get("research_study_id", 0)
+    # Reduce viewable orgs by filter preferences
+    filtered_orgs = org_preference_filter(user=user, research_study_id=research_study_id)
+    if filtered_orgs:
+        viewable_orgs = viewable_orgs.intersection(filtered_orgs)
 
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
     if not request.args.get('include_test_role', "false").lower() == "true":
@@ -136,7 +144,6 @@ def patients_root():
     return render_patients_list(
         request,
         research_study_id=0,
-        table_name='patientList',
         template_name='admin/patients_by_org.html')
 
 
@@ -161,7 +168,6 @@ def patients_substudy():
     return render_patients_list(
         request,
         research_study_id=EMPRO_RS_ID,
-        table_name='substudyPatientList',
         template_name='admin/patients_substudy.html')
 
 
