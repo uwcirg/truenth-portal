@@ -80,7 +80,7 @@ def page_of_patients():
 
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
     if not request.args.get('include_test_role', "false").lower() == "true":
-        query = query.filter(PatientList.test_role==False)
+        query = query.filter(PatientList.test_role.is_(False))
     total = query.count()
     query = query.offset(request.args.get('offset', 0))
     query = query.limit(request.args.get('limit', 10))
@@ -93,16 +93,17 @@ def page_of_patients():
     data = {"total": total, "totalNotFiltered": total, "rows": []}
     for row in query:
         data['rows'].append({
-            "id": row.id,
-            "first_name": row.first_name,
-            "last_name": row.last_name,
+            "userid": row.id,
+            "firstname": row.first_name,
+            "lastname": row.last_name,
             "birthdate": row.birthdate,
             "email": row.email,
-            "questionnaire_status": row.questionnaire_status,
+            "questionnaire_status": _(row.questionnaire_status),
             "visit": row.visit,
             "study_id": row.study_id,
-            "consent_date": row.consent_date,
-            "sites": row.sites,
+            "consentdate": row.consent_date,
+            "org_id": row.org_id,
+            "org_name": row.sites,
             "deleted": row.deleted,
             "test_role": row.test_role,
         })
