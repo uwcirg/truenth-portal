@@ -81,6 +81,7 @@ import {
         close: false,
       },
       ROW_ID_PREFIX: "data_row_",
+      ROW_ID: "id",
       tableIdentifier: "adminList",
       popoverEventInitiated: false,
       dependencies: {},
@@ -575,10 +576,11 @@ import {
       },
       handleDeletedAccountRows: function (tableData) {
         const rows = tableData && tableData.rows ? tableData.rows : [];
+        const self = this;
         $("#adminTable tbody tr").each(function () {
           const rowId = $(this).attr("data-uniqueid");
           const isDeleted = rows.find(
-            (o) => parseInt(o.id) === parseInt(rowId) && o.deleted
+            (o) => parseInt(o[self.ROW_ID]) === parseInt(rowId) && o.deleted
           );
           if (!!isDeleted) {
             $(this).addClass("deleted-user-row");
@@ -587,16 +589,23 @@ import {
       },
       handleDateFields: function (tableData) {
         const rows = tableData && tableData.rows ? tableData.rows : [];
+        const self = this;
         $("#adminTable tbody tr").each(function () {
           const rowId = $(this).attr("data-uniqueid");
+          console.log("row id ? ", self.ROW_ID)
           const matchedRow = rows.find(
-            (o) => parseInt(o.id) === parseInt(rowId)
+            (o) => parseInt(o[self.ROW_ID]) === parseInt(rowId)
           );
           if (matchedRow) {
             $(this)
-              .find(".birthdate-field .consentdate-field")
+              .find(".birthdate-field")
               .text(
                 tnthDates.getDateWithTimeZone(matchedRow.birthdate, "d M y")
+              );
+            $(this)
+              .find(".consentdate-field")
+              .text(
+                tnthDates.getDateWithTimeZone(matchedRow.consentdate, "d M y")
               );
           }
         });
