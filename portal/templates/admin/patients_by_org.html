@@ -48,7 +48,7 @@
             {{testUsersCheckbox(postUrl=url_for('patients.patients_root'))}}
           <thead>
               <tr>
-                  <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
+                  <th data-field="userid" data-sortable="true" data-class="id-field" data-width="1%">{{_("TrueNTH ID")}}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
                   <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-filter-control="input">{{ _("Date of Birth") }}</th>
