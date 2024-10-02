@@ -71,7 +71,7 @@
                   <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input">{{ _("Visit") }}</th>
                   {% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
-                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
+                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
                   {%- if user.has_role(ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) -%}
                     <!-- <th data-field="interventions" data-sortable="true" data-class="interventions-field" data-filter-control="input">{{ _("Interventions") }}</th> -->

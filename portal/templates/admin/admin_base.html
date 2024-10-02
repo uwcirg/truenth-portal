@@ -97,8 +97,10 @@
       var includeTestUsers = $("#include_test_role").is(":checked");
       //search=&sort=userid&order=desc&offset=0&limit=10
       var url = "/patients/page";
+	  $("#loadingIndicator").fadeOut().css("visibility", "visible");
       $.get(url + '?' + $.param(params.data) + (includeTestUsers?"&include_test_role=true":"")).then(function (res) {
         params.success(res);
+		$("#loadingIndicator").fadeOut().css("visibility", "hidden");
       });
     }
 	
