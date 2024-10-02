@@ -80,7 +80,7 @@ def page_of_patients():
         ids = OrgTree().here_and_below_id(org.id)
         viewable_orgs.update(ids)
 
-    research_study_id = request.args.get("research_study_id", 0)
+    research_study_id = int(request.args.get("research_study_id", 0))
     # Reduce viewable orgs by filter preferences
     filtered_orgs = org_preference_filter(user=user, research_study_id=research_study_id)
     if filtered_orgs:
