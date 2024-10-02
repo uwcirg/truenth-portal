@@ -24,14 +24,14 @@ class PatientList(db.Model):
     first_name = db.Column(db.String(64), index=True)
     last_name = db.Column(db.String(64), index=True)
     birthdate = db.Column(db.Date, index=True)
-    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    email = db.Column(db.String(120), index=True)
     questionnaire_status = db.Column(db.Text, index=True)
     visit = db.Column(db.Text, index=True)
     study_id = db.Column(db.Text, index=True)
     consent_date = db.Column(db.DateTime, index=True)
     sites = db.Column(db.Text, index=True)
     deleted = db.Column(db.Boolean, default=False)
-    test_role = db.Column(db.Boolean, default=False)
+    test_role = db.Column(db.Boolean)
     org_id = db.Column(db.ForeignKey('organizations.id'))  # used for access control
 
 
@@ -50,7 +50,7 @@ def patient_list_update_patient(patient_id):
     patient.email = user.email
     patient.birthdate = user.birthdate
     patient.deleted = user.deleted_id is not None
-    patient.test_role = user.has_role(ROLE.TEST.value)
+    patient.test_role = True if user.has_role(ROLE.TEST.value) else False
     patient.org_id = user.organizations[0].id if user.organizations else None
 
     # TODO
