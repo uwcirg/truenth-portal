@@ -44,7 +44,7 @@
 	<caption id="frmTestUsersContainer" class="tnth-hide">
 		<form id="frmTestUsers" method="GET" action="{{postUrl}}">
 			<label class="text-normal text-warning">
-				<input type="checkbox" name="include_test_role" id="include_test_role" value="True" checked/>
+				<input type="checkbox" name="include_test_role" id="include_test_role" value="True" />
 				{{_("include test accounts")}}
 			</label>
 		</form>
@@ -92,7 +92,7 @@
 {%- macro ajaxDataScript() -%}
 	<script>
     // custom ajax request here
-    function ajaxRequest(params) {
+    function patientDataAjaxRequest(params) {
       console.log("param data ? ", $.param(params.data));
       var includeTestUsers = $("#include_test_role").is(":checked");
       //search=&sort=userid&order=desc&offset=0&limit=10

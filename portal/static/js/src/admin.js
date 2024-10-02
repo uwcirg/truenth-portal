@@ -478,23 +478,27 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                     $("#include_test_role").on("click", function() {
                         // self.showLoader();
                         // $("#frmTestUsers").submit();
-                        $("#adminTable").bootstrapTable('refresh');
+                        $("#adminTable").bootstrapTable("refresh");
                     });
                 }
             },
-            initRowEvent: function() {
+            handleDeletedAccountRows: function(tableData) {
+                const rows = tableData && tableData.rows ? tableData.rows : [];
                 $("#adminTable tbody tr").each(function() {
-                    $(this).off("click").on("click", (e) => {
-                        e.stopPropagation();
-                        window.location = "/patients/patient_profile/" + $(this).attr("data-uniqueid");
-                    })
+                    const rowId = $(this).attr("data-uniqueid");
+                    const isDeleted = rows.find(o => parseInt(o.id) === parseInt(rowId) && o.deleted);
+                    if (!!isDeleted) {
+                        $(this).addClass("deleted-user-row");
+                    }
                 })
             },
             initTableEvents: function () {
                 var self = this;
                 $("#adminTable").on("post-body.bs.table", function() {
                     self.setContainerVis();
-                    self.initRowEvent();
+                });
+                $("#adminTable").on("load-success.bs.table", function(e, data) {
+                    self.handleDeletedAccountRows(data);
                 });
                 $("#adminTable").on("reset-view.bs.table", function () {
                     self.addFilterPlaceHolders();
@@ -504,6 +508,11 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 $("#adminTable").on("search.bs.table", function () {
                     self.resetRowVisByActivationStatus();
                     self.setRowItemEvent();
+                });
+                $("#adminTable").on("click-row.bs.table", function(e, row, $element, field) {
+                    e.stopPropagation();
+                    if (row.deleted) return;
+                    window.location = "/patients/patient_profile/" + $element.attr("data-uniqueid");
                 });
                 $(window).bind("scroll mousedown mousewheel keyup", function () {
                     if ($("html, body").is(":animated")) {
@@ -758,8 +767,6 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                 var orgFields = $("#userOrgs input[name='organization']");
                 var fi = this.currentTablePreference ? this.currentTablePreference.filters : {};
                 var fa = this.siteFilterApplied() ? fi.orgs_filter_control : [];
-                let ot = this.getOrgTool();
-                let isSubStudyPatientView = this.isSubStudyPatientView();
                 orgFields.each(function () {
                     $(this).prop("checked", false);
                     var oself = $(this),
@@ -907,8 +914,9 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                   // this ensures that the table filter preference is saved before reloading the page
                   // so the backend can present patient list based on that saved preference
                   setTimeout(function () {
-                    this.showLoader();
-                    location.reload();
+                    // this.showLoader();
+                    // location.reload();
+                    $("#adminTable").bootstrapTable("refresh");
                   }.bind(this), 350);
                 }.bind(this));
             },
