@@ -277,6 +277,14 @@
       "task": "raise_background_exception_task"
     },
     {
+      "active": false,
+      "args": null,
+      "name": "Populate Patient List",
+      "resourceType": "ScheduledJob",
+      "schedule": "0 0 0 0 0",
+      "task": "cache_patient_list"
+    },
+    {
       "active": true,
       "args": null,
       "kwargs": {
