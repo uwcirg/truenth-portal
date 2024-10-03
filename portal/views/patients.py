@@ -10,6 +10,7 @@ from flask import (
 )
 from flask_babel import gettext as _
 from flask_user import roles_required
+from sqlalchemy import asc, desc
 
 from ..extensions import oauth
 from ..models.coding import Coding
@@ -76,6 +77,33 @@ def filter_query(query, filter_field, filter_value):
     return query
 
 
+def sort_query(query, sort_column, direction):
+    """Extend patient list query with requested sorting criteria"""
+    sort_method = asc if direction == 'asc' else desc
+
+    if sort_column == 'firstname':
+        query = query.order_by(sort_method(PatientList.first_name))
+    if sort_column == 'lastname':
+        query = query.order_by(sort_method(PatientList.last_name))
+    if sort_column == 'email':
+        query = query.order_by(sort_method(PatientList.email))
+    if sort_column == 'study_id':
+        query = query.order_by(sort_method(PatientList.study_id))
+    if sort_column == 'visit':
+        query = query.order_by(sort_method(PatientList.visit))
+    if sort_column == 'questionnaire_status':
+        query = query.order_by(sort_method(PatientList.questionnaire_status))
+    if sort_column == 'userid':
+        query = query.order_by(sort_method(PatientList.id))
+    if sort_column == 'org_name':
+        query = query.order_by(sort_method(PatientList.sites))
+    if sort_column == 'birthdate':
+        query = query.order_by(sort_method(PatientList.birthdate))
+    if sort_column == 'consentdate':
+        query = query.order_by(sort_method(PatientList.consent_date))
+    return query
+
+
 @patients.route("/page", methods=["GET"])
 @roles_required([
     ROLE.INTERVENTION_STAFF.value,
@@ -114,6 +142,10 @@ def page_of_patients():
         filters = json.loads(request.args.get("filter"))
         for key, value in filters.items():
             query = filter_query(query, key, value)
+
+    sort_column = request.args.get("sort", "userid")
+    sort_order = request.args.get("order", "asc")
+    query = sort_query(query, sort_column, sort_order)
 
     total = query.count()
     query = query.offset(request.args.get('offset', 0))
