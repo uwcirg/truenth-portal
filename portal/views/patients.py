@@ -27,12 +27,8 @@ from ..models.user import current_user, get_user
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
-def org_preference_filter(user, research_study_id):
-    """Obtain user's preference for filtering organizations
-
-    :returns: list of org IDs to use as filter, or None
-
-    """
+def users_table_pref_from_research_study_id(user, research_study_id):
+    """Returns user's table preferences for given research_study id"""
     if research_study_id == 0:
         table_name = 'patientList'
     elif research_study_id == 1:
@@ -40,21 +36,70 @@ def org_preference_filter(user, research_study_id):
     else:
         raise ValueError('Invalid research_study_id')
 
-    # check user table preference for organization filters
-    pref = TablePreference.query.filter_by(
+    return TablePreference.query.filter_by(
         table_name=table_name, user_id=user.id).first()
+
+
+def org_preference_filter(user, research_study_id):
+    """Obtain user's preference for filtering organizations
+
+    :returns: list of org IDs to use as filter, or None
+    """
+    pref = users_table_pref_from_research_study_id(
+        user=user, research_study_id=research_study_id)
     if pref and pref.filters:
         return pref.filters.get('orgs_filter_control')
-    return None
 
 
-def render_patients_list(
-        request, research_study_id, template_name):
-    user = current_user()
-    return render_template(
-            template_name, user=user,
-            wide_container="true",
-        )
+def preference_filter(user, research_study_id, arg_filter):
+    """Obtain user's preference for filtering
+
+    Looks first in request args, defaults to table preferences if not found
+
+    :param user: current user
+    :param research_study_id: 0 or 1, i.e. EMPRO_STUDY_ID
+    :param arg_filter: value of request.args.get("filter")
+
+    returns: dictionary of key/value pairs for filtering
+    """
+    # if arg_filter is defined, use as return value
+    if arg_filter:
+        # Convert from query string to dict
+        filters = json.loads(arg_filter)
+        return filters
+
+    # otherwise, check db for filters from previous requests
+    pref = users_table_pref_from_research_study_id(
+        user=user, research_study_id=research_study_id)
+    if pref and pref.filters:
+        # return all but orgs and column selections
+        return {
+            k:v for k,v in pref.filters.items()
+            if k not in ['orgs_filter_control', 'column_selections']}
+
+
+def preference_sort(user, research_study_id, arg_sort, arg_order):
+    """Obtain user's preference for sorting
+
+    Looks first in request args, defaults to table preferences if not found
+
+    :param user: current user
+    :param research_study_id: 0 or 1, i.e. EMPRO_STUDY_ID
+    :param arg_sort: value of request.args.get("sort")
+    :param arg_sort: value of request.args.get("order")
+
+    returns: tuple: (sort_field, sort_order)
+    """
+    # if args are defined, use as return value
+    if arg_sort and arg_order:
+        return arg_sort, arg_order
+
+    # otherwise, check db for filters from previous requests
+    pref = users_table_pref_from_research_study_id(
+        user=user, research_study_id=research_study_id)
+    if not pref:
+        return  "userid", "asc"  # reasonable defaults
+    return pref.sort_field, pref.sort_order
 
 
 def filter_query(query, filter_field, filter_value):
@@ -122,40 +167,42 @@ def page_of_patients():
     :param research_study_id: default 0, set to 1 for EMPRO
 
     """
+    def requested_orgs(user, research_study_id):
+        """Return set of requested orgs limited to those the user is allowed to view"""
+        # start with set of org ids the user has permission to view
+        viewable_orgs = set()
+        for org in user.organizations:
+            ids = OrgTree().here_and_below_id(org.id)
+            viewable_orgs.update(ids)
+
+        # Reduce viewable orgs by filter preferences
+        filtered_orgs = org_preference_filter(user=user, research_study_id=research_study_id)
+        if filtered_orgs:
+            viewable_orgs = viewable_orgs.intersection(filtered_orgs)
+        return viewable_orgs
+
     user = current_user()
-    # build set of org ids the user has permission to view
-    viewable_orgs = set()
-    for org in user.organizations:
-        ids = OrgTree().here_and_below_id(org.id)
-        viewable_orgs.update(ids)
-
     research_study_id = int(request.args.get("research_study_id", 0))
-    # Reduce viewable orgs by filter preferences
-    filtered_orgs = org_preference_filter(user=user, research_study_id=research_study_id)
-    if filtered_orgs:
-        viewable_orgs = viewable_orgs.intersection(filtered_orgs)
-
+    viewable_orgs = requested_orgs(user, research_study_id)
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
     if not request.args.get('include_test_role', "false").lower() == "true":
         query = query.filter(PatientList.test_role.is_(False))
-    if "filter" in request.args:
-        filters = json.loads(request.args.get("filter"))
-        for key, value in filters.items():
-            query = filter_query(query, key, value)
 
-    sort_column = request.args.get("sort", "userid")
-    sort_order = request.args.get("order", "asc")
+    filters = preference_filter(
+        user=user, research_study_id=research_study_id, arg_filter=request.args.get("filter"))
+    for key, value in filters.items():
+        query = filter_query(query, key, value)
+
+    sort_column, sort_order = preference_sort(
+        user=user, research_study_id=research_study_id, arg_sort=request.args.get("sort"),
+        arg_order=request.args.get("order"))
     query = sort_query(query, sort_column, sort_order)
 
     total = query.count()
     query = query.offset(request.args.get('offset', 0))
     query = query.limit(request.args.get('limit', 10))
 
-    # Returns JSON structured as:
-    # { "total": int, "totalNotFiltered": int, "rows": [
-    #   { "id": int, "column": value},
-    #   { "id": int, "column": value},
-    # ]}
+    # Returns structured JSON with totals and rows
     data = {"total": total, "totalNotFiltered": total, "rows": []}
     for row in query:
         data['rows'].append({
@@ -199,10 +246,11 @@ def patients_root():
     expected and will raise a 400: Bad Request
 
     """
-    return render_patients_list(
-        request,
-        research_study_id=0,
-        template_name='admin/patients_by_org.html')
+    user = current_user()
+    return render_template(
+        'admin/patients_by_org.html', user=user,
+        wide_container="true",
+    )
 
 
 @patients.route('/substudy', methods=('GET', 'POST'))
@@ -223,10 +271,11 @@ def patients_substudy():
       staff, staff_admin: all patients with common consented organizations
 
     """
-    return render_patients_list(
-        request,
-        research_study_id=EMPRO_RS_ID,
-        template_name='admin/patients_substudy.html')
+    user = current_user()
+    return render_template(
+        'admin/patients_substudy.html', user=user,
+        wide_container="true",
+    )
 
 
 @patients.route('/patient-profile-create')
