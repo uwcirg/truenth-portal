@@ -48,17 +48,17 @@
             {{testUsersCheckbox(postUrl=url_for('patients.patients_root'))}}
           <thead>
               <tr>
-                  <th data-field="userid" data-sortable="true" data-class="id-field" data-width="1%">{{_("TrueNTH ID")}}</th>
+                  <th data-field="userid" data-sortable="true" data-class="id-field" data-width="1%" data-filter-control="input">{{_("TrueNTH ID")}}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
-                  <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-filter-control="input">{{ _("Date of Birth") }}</th>
+                  <th data-field="birthdate" data-sortable="true" data-class="birthdate-field">{{ _("Date of Birth") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input">{{ _("Email") }}</th>
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
                   <th data-field="questionnaire_status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>
                   <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input">{{ _("Visit") }}</th>
                   {% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
-                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }}</th>
+                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center">{{ app_text('consent date label') }}</th>
                   <th data-field="org_name" data-sortable="true" data-class="organization-field">{{ _("Site") }}</th>
                   {% if account_deactivation_enabled %}
                     <th class="text-center" data-field="deactivate" data-sortable="true" data-sorter="tnthTables.alphanumericSorter" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate") }}</th>
