@@ -1,4 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
+import json
 from flask import (
     Blueprint,
     abort,
@@ -55,6 +56,26 @@ def render_patients_list(
         )
 
 
+def filter_query(query, filter_field, filter_value):
+    """Extend patient list query with requested filter/search"""
+    pattern = f"%{filter_value.lower()}%"
+    if filter_field == 'firstname':
+        query = query.filter(PatientList.first_name.ilike(pattern))
+    if filter_field == 'lastname':
+        query = query.filter(PatientList.last_name.ilike(pattern))
+    if filter_field == 'email':
+        query = query.filter(PatientList.email.ilike(pattern))
+    if filter_field == 'study_id':
+        query = query.filter(PatientList.study_id.ilike(pattern))
+    if filter_field == 'visit':
+        query = query.filter(PatientList.visit.ilike(pattern))
+    if filter_field == 'questionnaire_status':
+        query = query.filter(PatientList.questionnaire_status == filter_value)
+    if filter_field == 'userid':
+        query = query.filter(PatientList.id == int(filter_value))
+    return query
+
+
 @patients.route("/page", methods=["GET"])
 @roles_required([
     ROLE.INTERVENTION_STAFF.value,
@@ -89,6 +110,11 @@ def page_of_patients():
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
     if not request.args.get('include_test_role', "false").lower() == "true":
         query = query.filter(PatientList.test_role.is_(False))
+    if "filter" in request.args:
+        filters = json.loads(request.args.get("filter"))
+        for key, value in filters.items():
+            query = filter_query(query, key, value)
+
     total = query.count()
     query = query.offset(request.args.get('offset', 0))
     query = query.limit(request.args.get('limit', 10))
