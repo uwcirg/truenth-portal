@@ -60,10 +60,6 @@
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center">{{ app_text('consent date label') }}</th>
                   <th data-field="org_name" data-sortable="true" data-class="organization-field">{{ _("Site") }}</th>
-                  {% if account_deactivation_enabled %}
-                    <th class="text-center" data-field="deactivate" data-sortable="true" data-sorter="tnthTables.alphanumericSorter" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate") }}</th>
-                  {% endif %}
-                  <th data-field="activationstatus" data-visible="false">{{_("activation status")}}</th>
               </tr>
           </thead>
       </table>
