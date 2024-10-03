@@ -57,8 +57,8 @@ import {
           self.addFilterPlaceHolders();
           if (self.userId) {
             self.handleCurrentUser();
-            self.setColumnSelections();
-            self.setTableFilters(self.userId); //set user's preference for filter(s)
+            // self.setColumnSelections();
+            // self.setTableFilters(self.userId); //set user's preference for filter(s)
           }
           setTimeout(function () {
             self.setContainerVis();
@@ -592,7 +592,6 @@ import {
         const self = this;
         $("#adminTable tbody tr").each(function () {
           const rowId = $(this).attr("data-uniqueid");
-          console.log("row id ? ", self.ROW_ID)
           const matchedRow = rows.find(
             (o) => parseInt(o[self.ROW_ID]) === parseInt(rowId)
           );
@@ -616,6 +615,9 @@ import {
           self.setContainerVis();
         });
         $("#adminTable").on("load-success.bs.table", function (e, data) {
+          self.setColumnSelections();
+          self.setTableFilters(self.userId); //set user's preference for filter(s)
+         // $("#adminTable").bootstrapTable("refresh");
           self.handleDeletedAccountRows(data);
           self.handleDateFields(data);
         });
@@ -1242,10 +1244,10 @@ import {
             if (prefData.filters[item]) {
               $(fname).addClass("active");
             }
-            if ($(fname).get(0))
-              $(fname).trigger(
-                $(fname).get(0).tagName === "INPUT" ? "keyup" : "change"
-              );
+            // if ($(fname).get(0))
+            //   $(fname).trigger(
+            //     $(fname).get(0).tagName === "INPUT" ? "keyup" : "change"
+            //   );
           }
         }
       },
