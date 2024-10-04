@@ -342,6 +342,8 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                                     "error": true,
                                     "message": i18next.t("More than 5 minutes spent in pending status.")
                                 });
+                                //log error
+                                tnthAjax.reportError(self.userId, window.location.pathname, "Request to export report data failed. More than 5 minutes spent in pending status.");
                                 return;
                             }
                         }
