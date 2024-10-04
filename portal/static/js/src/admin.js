@@ -81,7 +81,7 @@ import {
         close: false,
       },
       ROW_ID_PREFIX: "data_row_",
-      ROW_ID: "id",
+      ROW_ID: "userid",
       tableIdentifier: "adminList",
       popoverEventInitiated: false,
       dependencies: {},
@@ -406,8 +406,8 @@ import {
                 (new Date().getTime() -
                   self.exportReportProgressTime.getTime()) /
                 1000;
-              if (passedTime > 60) {
-                //more than a minute passed and the task is still in PENDING status
+              if (passedTime > 300) {
+                //more than 5 minutes passed and the task is still in PENDING status
                 //never advanced to PROGRESS to start the export process
                 //abort
                 self.onAfterExportReportData({
@@ -568,8 +568,6 @@ import {
           /* turn on test account toggle checkbox if admin user */
           $("#frmTestUsersContainer").removeClass("tnth-hide");
           $("#include_test_role").on("click", function () {
-            // self.showLoader();
-            // $("#frmTestUsers").submit();
             $("#adminTable").bootstrapTable("refresh");
           });
         }
@@ -617,7 +615,6 @@ import {
         $("#adminTable").on("load-success.bs.table", function (e, data) {
           self.setColumnSelections();
           self.setTableFilters(self.userId); //set user's preference for filter(s)
-         // $("#adminTable").bootstrapTable("refresh");
           self.handleDeletedAccountRows(data);
           self.handleDateFields(data);
         });
@@ -1137,7 +1134,7 @@ import {
       },
       getDefaultTablePreference: function () {
         return {
-          sort_field: "id",
+          sort_field: this.ROW_ID,
           sort_order: "desc",
         };
       },
