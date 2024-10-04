@@ -15,6 +15,20 @@ from .crossdomain import crossdomain
 clinician_api = Blueprint('clinician_api', __name__)
 
 
+def clinician_name_map():
+    roles = [ROLE.CLINICIAN.value, ROLE.PRIMARY_INVESTIGATOR.value]
+    query = User.query.join(UserRoles).filter(
+        User.deleted_id.is_(None)).filter(
+        UserRoles.user_id == User.id).join(Role).filter(
+        UserRoles.role_id == Role.id).filter(
+        Role.name.in_(roles))
+
+    _clinician_name_map = {None: None}
+    for clinician in query:
+        _clinician_name_map[clinician.id] = f"{clinician.last_name}, {clinician.first_name}"
+    return _clinician_name_map
+
+
 def clinician_query(acting_user, org_filter=None, include_staff=False):
     """Builds a live query for all clinicians the acting user can view"""
     roles = [ROLE.CLINICIAN.value, ROLE.PRIMARY_INVESTIGATOR.value]

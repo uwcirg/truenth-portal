@@ -104,21 +104,17 @@ def preference_sort(user, research_study_id, arg_sort, arg_order):
 
 def filter_query(query, filter_field, filter_value):
     """Extend patient list query with requested filter/search"""
-    pattern = f"%{filter_value.lower()}%"
-    if filter_field == 'firstname':
-        query = query.filter(PatientList.first_name.ilike(pattern))
-    if filter_field == 'lastname':
-        query = query.filter(PatientList.last_name.ilike(pattern))
-    if filter_field == 'email':
-        query = query.filter(PatientList.email.ilike(pattern))
-    if filter_field == 'study_id':
-        query = query.filter(PatientList.study_id.ilike(pattern))
-    if filter_field == 'visit':
-        query = query.filter(PatientList.visit.ilike(pattern))
-    if filter_field == 'questionnaire_status':
-        query = query.filter(PatientList.questionnaire_status == filter_value)
+    if not hasattr(PatientList, filter_field):
+        # these should never get passed, but it has happened in test.
+        # ignore requests to filter by unknown column
+        return query
+
     if filter_field == 'userid':
-        query = query.filter(PatientList.id == int(filter_value))
+        query = query.filter(PatientList.userid == int(filter_value))
+        return query
+
+    pattern = f"%{filter_value.lower()}%"
+    query = query.filter(getattr(PatientList, filter_field).ilike(pattern))
     return query
 
 
@@ -126,26 +122,11 @@ def sort_query(query, sort_column, direction):
     """Extend patient list query with requested sorting criteria"""
     sort_method = asc if direction == 'asc' else desc
 
-    if sort_column == 'firstname':
-        query = query.order_by(sort_method(PatientList.first_name))
-    if sort_column == 'lastname':
-        query = query.order_by(sort_method(PatientList.last_name))
-    if sort_column == 'email':
-        query = query.order_by(sort_method(PatientList.email))
-    if sort_column == 'study_id':
-        query = query.order_by(sort_method(PatientList.study_id))
-    if sort_column == 'visit':
-        query = query.order_by(sort_method(PatientList.visit))
-    if sort_column == 'questionnaire_status':
-        query = query.order_by(sort_method(PatientList.questionnaire_status))
-    if sort_column == 'userid':
-        query = query.order_by(sort_method(PatientList.id))
-    if sort_column == 'org_name':
-        query = query.order_by(sort_method(PatientList.sites))
-    if sort_column == 'birthdate':
-        query = query.order_by(sort_method(PatientList.birthdate))
-    if sort_column == 'consentdate':
-        query = query.order_by(sort_method(PatientList.consent_date))
+    if not hasattr(PatientList, sort_column):
+        # these should never get passed, but it has happened in test.
+        # ignore requests to sort by unknown column
+        return query
+    query = query.order_by(sort_method(getattr(PatientList, sort_column)))
     return query
 
 
@@ -185,13 +166,17 @@ def page_of_patients():
     research_study_id = int(request.args.get("research_study_id", 0))
     viewable_orgs = requested_orgs(user, research_study_id)
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
+    if research_study_id == EMPRO_RS_ID:
+        # only include those in the study.  use empro_consentdate as a quick check
+        query = query.filter(PatientList.empro_consentdate.isnot(None))
     if not request.args.get('include_test_role', "false").lower() == "true":
         query = query.filter(PatientList.test_role.is_(False))
 
     filters = preference_filter(
         user=user, research_study_id=research_study_id, arg_filter=request.args.get("filter"))
-    for key, value in filters.items():
-        query = filter_query(query, key, value)
+    if filters:
+        for key, value in filters.items():
+            query = filter_query(query, key, value)
 
     sort_column, sort_order = preference_sort(
         user=user, research_study_id=research_study_id, arg_sort=request.args.get("sort"),
@@ -206,17 +191,22 @@ def page_of_patients():
     data = {"total": total, "totalNotFiltered": total, "rows": []}
     for row in query:
         data['rows'].append({
-            "userid": row.id,
-            "firstname": row.first_name,
-            "lastname": row.last_name,
+            "userid": row.userid,
+            "firstname": row.firstname,
+            "lastname": row.lastname,
             "birthdate": row.birthdate,
             "email": row.email,
             "questionnaire_status": _(row.questionnaire_status),
+            "empro_status": _(row.empro_status),
+            "action_state": _(row.action_state),
             "visit": row.visit,
+            "empro_visit": row.empro_visit,
             "study_id": row.study_id,
-            "consentdate": row.consent_date,
+            "consentdate": row.consentdate,
+            "empro_consentdate": row.empro_consentdate,
+            "clinician": row.clinician,
             "org_id": row.org_id,
-            "org_name": row.sites,
+            "org_name": row.org_name,
             "deleted": row.deleted,
             "test_role": row.test_role,
         })
