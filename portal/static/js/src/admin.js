@@ -54,7 +54,6 @@ import {
           self.handleDeletedUsersVis();
           self.setRowItemEvent();
           self.handleAffiliatedUIVis();
-          self.addFilterPlaceHolders();
           if (self.userId) {
             self.handleCurrentUser();
             // self.setColumnSelections();
@@ -614,6 +613,7 @@ import {
         });
         $("#adminTable").on("load-success.bs.table", function (e, data) {
           self.setColumnSelections();
+          self.addFilterPlaceHolders();
           self.setTableFilters(self.userId); //set user's preference for filter(s)
           self.handleDeletedAccountRows(data);
           self.handleDateFields(data);

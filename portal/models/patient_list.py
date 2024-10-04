@@ -89,6 +89,7 @@ def patient_list_update_patient(patient_id, research_study_id=None):
         qb_status = qb_status_visit_name(
             patient.userid, research_study_id=rs_id, as_of_date=now)
         patient.empro_status = str(qb_status['status'])
+        patient.empro_visit = qb_status['visit_name']
         patient.action_state = qb_status['action_state'].title() \
             if qb_status['action_state'] else ""
         patient.empro_consentdate, _ = consent_withdrawal_dates(

@@ -113,6 +113,9 @@ def filter_query(query, filter_field, filter_value):
         query = query.filter(PatientList.userid == int(filter_value))
         return query
 
+    if filter_field in ('questionnaire_status', 'empro_status', 'action_state'):
+        query = query.filter(getattr(PatientList, filter_field) == filter_value)
+
     pattern = f"%{filter_value.lower()}%"
     query = query.filter(getattr(PatientList, filter_field).ilike(pattern))
     return query
