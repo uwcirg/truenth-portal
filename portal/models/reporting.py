@@ -56,7 +56,7 @@ def single_patient_adherence_data(patient_id, research_study_id):
 
     # keep patient list data in sync
     from .patient_list import patient_list_update_patient
-    patient_list_update_patient(patient_id)
+    patient_list_update_patient(patient_id=patient_id, research_study_id=research_study_id)
 
     as_of_date = datetime.utcnow()
     cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(

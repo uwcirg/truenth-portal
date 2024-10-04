@@ -220,7 +220,7 @@ def cache_patient_list(**kwargs):
         User.id == UserRoles.user_id,
         UserRoles.role_id == patient_role_id)).with_entities(User.id)
     for patient_id in all_patients:
-        patient_list_update_patient(patient_id)
+        patient_list_update_patient(patient_id[0])
 
 
 @celery.task(queue=LOW_PRIORITY)
