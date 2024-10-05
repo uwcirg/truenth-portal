@@ -48,6 +48,10 @@ def patient_list_update_patient(patient_id, research_study_id=None):
     from .user_consent import consent_withdrawal_dates
     from ..views.clinician import clinician_name_map
 
+    user = User.query.get(patient_id)
+    if not user.has_role(ROLE.PATIENT.value):
+        return
+
     patient = PatientList.query.get(patient_id)
     new_record = False
     if not patient:
@@ -61,7 +65,6 @@ def patient_list_update_patient(patient_id, research_study_id=None):
         return
     patient.last_updated = now
 
-    user = User.query.get(patient_id)
     if research_study_id is None or new_record:
         patient.study_id = user.external_study_id
         patient.firstname = user.first_name
