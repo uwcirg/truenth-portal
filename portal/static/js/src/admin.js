@@ -1374,6 +1374,7 @@ import {
             {
               data: JSON.stringify(data),
               sync: true,
+              max_attempts: 1
             },
             callback
           );

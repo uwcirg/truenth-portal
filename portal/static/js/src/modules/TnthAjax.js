@@ -23,7 +23,7 @@ export default { /*global $ */
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
         var REQUEST_TIMEOUT_INTERVAL = 5000; // default timed out at 5 seconds
-        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
+        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: params.max_attempts ? params.max_attempts : MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         params.timeout = params.timeout || REQUEST_TIMEOUT_INTERVAL;
@@ -1240,7 +1240,7 @@ export default { /*global $ */
             callback({error: "User Id and table name is required for setting preference."});
             return false;
         }
-        this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {"data": params.data,"sync": params.sync}, function(data) {
+        this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {...params, "data": params.data,"sync": params.sync}, function(data) {
             if (!data || data.error) {
                 callback({"error": i18next.t("Error occurred setting table preference.")});
                 return false;
