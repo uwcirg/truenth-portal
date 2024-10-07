@@ -167,6 +167,21 @@ def page_of_patients():
 
     user = current_user()
     research_study_id = int(request.args.get("research_study_id", 0))
+    # due to potentially translated content, need to capture all potential values to sort
+    # (not just the current page) for the front-end options list
+    options = []
+    if research_study_id == EMPRO_RS_ID:
+        distinct_status = PatientList.query.distinct(PatientList.empro_status).with_entities(
+            PatientList.empro_status)
+        options.append({"empro_status": [(status[0], _(status[0])) for status in distinct_status]})
+        distinct_action = PatientList.query.distinct(PatientList.action_state).with_entities(
+            PatientList.action_state)
+        options.append({"action_state": [(state[0], _(state[0])) for state in distinct_action]})
+    else:
+        distinct_status = PatientList.query.distinct(PatientList.questionnaire_status).with_entities(
+            PatientList.questionnaire_status)
+        options.append({"questionnaire_status": [(status[0], _(status[0])) for status in distinct_status]})
+
     viewable_orgs = requested_orgs(user, research_study_id)
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
     if research_study_id == EMPRO_RS_ID:
@@ -191,7 +206,7 @@ def page_of_patients():
     query = query.limit(request.args.get('limit', 10))
 
     # Returns structured JSON with totals and rows
-    data = {"total": total, "totalNotFiltered": total, "rows": []}
+    data = {"total": total, "totalNotFiltered": total, "rows": [], "options": options}
     for row in query:
         data['rows'].append({
             "userid": row.userid,
@@ -200,11 +215,8 @@ def page_of_patients():
             "birthdate": row.birthdate,
             "email": row.email,
             "questionnaire_status": _(row.questionnaire_status),
-            "questionnaire_status_untranslated": row.questionnaire_status,
             "empro_status": _(row.empro_status),
-            "empro_status_untranslated": row.empro_status,
             "action_state": _(row.action_state),
-            "action_state_untranslated": row.action_state,
             "visit": row.visit,
             "empro_visit": row.empro_visit,
             "study_id": row.study_id,
