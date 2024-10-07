@@ -1285,7 +1285,6 @@ import {
           }
         }
         var __filters = filters || {};
-        var shouldRefresh = true;
 
         //get fields
         if (Object.keys(__filters).length === 0) {
@@ -1300,7 +1299,6 @@ import {
                     ? $(this).find("option:selected").val()
                     : $(this).val();
               }
-              if (!!__filters[field]) shouldRefresh = false;
             }
           });
         }
@@ -1333,7 +1331,6 @@ import {
             callback
           );
           this.currentTablePreference = data;
-          if (shouldRefresh) $("#adminTable").bootstrapTable("refresh");
         }
       },
       getReportModal: function (patientId, options) {
