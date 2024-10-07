@@ -1285,6 +1285,7 @@ import {
           }
         }
         var __filters = filters || {};
+        var shouldRefresh = true;
 
         //get fields
         if (Object.keys(__filters).length === 0) {
@@ -1296,9 +1297,10 @@ import {
               if ($(this).get(0)) {
                 __filters[field] =
                   $(this).get(0).nodeName.toLowerCase() === "select"
-                    ? $(this).find("option:selected").text()
+                    ? $(this).find("option:selected").val()
                     : $(this).val();
               }
+              if (!!__filters[field]) shouldRefresh = false;
             }
           });
         }
@@ -1331,6 +1333,7 @@ import {
             callback
           );
           this.currentTablePreference = data;
+          if (shouldRefresh) $("#adminTable").bootstrapTable("refresh");
         }
       },
       getReportModal: function (patientId, options) {

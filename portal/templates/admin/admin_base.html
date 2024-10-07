@@ -27,7 +27,7 @@
 	    </div>
   	</div>
   	<div class="orgs-filter-warning" v-show="siteFilterApplied()" data-template='<div class="popover filter-popover alert-icon" role="tooltip" id="filterPopover" ><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-trigger="hover" data-container="body" data-toggle="popover" data-placement="top" data-content="{{_('Site filter applied')}}">
-		<img class="alert-icon" src="{{url_for('static', filename='img/filterIcon.png')}}">
+		<img class="alert-icon" src="{{url_for('static', filename='img/filterIcon.png')}}" alt="{{_("Site filter applied")}}"/>
 	</div>
 {%-endmacro %}
 {% macro deletedUsersFilter() -%}
@@ -112,6 +112,25 @@
 		$("#loadingIndicator").fadeOut().css("visibility", "hidden");
       });
     }
-	
   </script>
+{%- endmacro -%}
+{%- macro filterOptionsVar() -%}
+<script>
+	var qStatusFilterOptions = {
+		"Due": "{{_('Due')}}",
+		"Overdue": "{{_('Overdue')}}",
+		"In Progress": "{{_('In Progress')}}",
+		"Partially Completed": "{{_('Partially Completed')}}",
+		"Completed": "{{_('Completed')}}",
+		"Expired": "{{_('Expired')}}",
+		"Withdrawn": "{{_('Withdrawn')}}"
+	};
+	var clinicianActionStateFilterOptions = {
+		"Required": "{{_('Required')}}",
+		"Overdue": "{{_('Overdue')}}",
+		"Completed": "{{_('Completed')}}",
+		"Not Applicable": "{{_('Not Applicable')}}",
+		"Withdrawn": "{{_('Withdrawn')}}"
+	}
+</script>
 {%- endmacro -%}

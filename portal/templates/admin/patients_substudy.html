@@ -3,6 +3,9 @@
 {%- from "admin/admin_base.html" import patientListToggle -%}
 {%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
+<script>
+  var itemStatus = [{ id: "due", text: 'Due' }, { id: "overdue", text: 'Overdue' }];
+</script>
   <div id="patientList" class="substudy">
     {% set list_title = gettext('EMPRO Patient List') %}
     {% set list_subtitle = gettext('Select a patient below to view or update details') %}
@@ -56,9 +59,9 @@
                   <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input" data-width="150">{{ _("Username (email)") }}</th>
                   <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-visible="false">{{ _("Date of Birth") }}</th>
                   <th data-field="clinician" data-sortable="true" data-class="clinician-field" data-filter-control="input">{{ _("Treating Clinician") }}</th>
-                  <th data-field="empro_status" data-sortable="true" data-card-visible="true" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{_("EMPRO Questionnaire Status")}}</th>
+                  <th data-field="empro_status" data-sortable="true" data-card-visible="true" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true" data-filter-data="var:qStatusFilterOptions">{{_("EMPRO Questionnaire Status")}}</th>
                   <th data-field="empro_visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input" data-visible="false">{{ _("Visit") }}</th>
-                  <th data-field="action_state" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select">{{ _("Clinician Action Status") }}</th>
+                  <th data-field="action_state" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select" data-filter-data="var:clinicianActionStateFilterOptions">{{ _("Clinician Action Status") }}</th>
                   <th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-visible="false" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>
                   <th data-field="empro_consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-visible="false" data-class="consentdate-field text-center" data-visible="true">{{ _("Study Consent Date") }}</th>
                   <th data-field="org_name" data-sortable="true" data-class="organization-field"  data-visible="true">{{ _("Site") }}</th>
@@ -70,5 +73,6 @@
   {{ExportPopover(title=_("Export EMPRO adherence report"))}}
 </div>
 {{ajaxDataScript(research_study_id=1)}}
+{{filterOptionsVar()}}
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}

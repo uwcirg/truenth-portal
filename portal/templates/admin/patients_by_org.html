@@ -54,13 +54,13 @@
                   <th data-field="birthdate" data-sortable="true" data-class="birthdate-field">{{ _("Date of Birth") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input">{{ _("Email") }}</th>
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                  <th data-field="questionnaire_status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>
+                  <th data-field="questionnaire_status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true" data-filter-data="var:qStatusFilterOptions">{{ _("Questionnaire Status") }}</th>
                   <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input">{{ _("Visit") }}</th>
                   {% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center">{{ _("Study Consent Date") }}</th>
                   <th data-field="org_name" data-sortable="true" data-class="organization-field">{{ _("Site") }}</th>
-              </tr>
+                </tr>
           </thead>
       </table>
   </div>
@@ -68,5 +68,6 @@
   {{ExportPopover()}}
 </div>
 {{ajaxDataScript(research_study_id=0)}}
+{{filterOptionsVar()}}
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}
