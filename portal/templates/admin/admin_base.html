@@ -89,26 +89,14 @@
 {%- endmacro -%}
 {%- macro ajaxDataScript(research_study_id) -%}
 	<script>
+	var loadIntervalId = 0;
     // custom ajax request here
     function patientDataAjaxRequest(params) {
-      var includeTestUsers = $("#include_test_role").is(":checked");
-	  if (includeTestUsers) {
-		params.data["include_test_role"] = true;
-	  }
-	  params.data["research_study_id"] = parseInt("{{research_study_id}}");
-	  console.log("param data ? ", params.data);
-      var url = "/patients/page";
-      $.get(url + "?" + $.param(params.data)).then(function (results) {
-		if (results.rows) {
-			results.rows.map(row => {
-				if (!row.id)
-				row.id = row.userid;
-				return row;
-			});
-		}
-		console.log("row results ", results);
-        params.success(results);
-      });
+		loadIntervalId = setInterval(() => {
+			if (typeof window.AdminObj === "undefined") return;
+			window.AdminObj.getRemotePatientListData(params);
+			clearInterval(loadIntervalId);
+		}, 50);
     }
   </script>
 {%- endmacro -%}

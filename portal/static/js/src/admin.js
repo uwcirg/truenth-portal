@@ -13,7 +13,7 @@ import {
   $.ajaxSetup({
     contentType: "application/json; charset=utf-8",
   });
-  var AdminObj = (window.AdminObj = new Vue({
+  window.AdminObj = new Vue({
     el: "#adminTableContainer",
     errorCaptured: function (Error, Component, info) {
       console.error(
@@ -29,13 +29,9 @@ import {
     },
     errorHandler: function (err, vm) {
       this.dataError = true;
-      var errorElement = document.getElementById("admin-table-error-message");
-      if (errorElement) {
-        errorElement.innerHTML =
-          "Error occurred initializing Admin Vue instance.";
-      }
       console.warn("Admin Vue instance threw an error: ", vm, this);
       console.error("Error thrown: ", err);
+      this.setError("Error occurred initializing Admin Vue instance.");
       this.setContainerVis();
     },
     created: function () {
@@ -72,6 +68,7 @@ import {
       dataError: false,
       configured: false,
       initIntervalId: 0,
+      accessed: false,
       sortFilterEnabled: false,
       showDeletedUsers: false,
       orgsSelector: {
@@ -137,6 +134,13 @@ import {
       exportDataType: "",
     },
     methods: {
+      setError: function (errorMessage) {
+        if (!errorMessage) return;
+        var errorElement = document.getElementById("admin-table-error-message");
+        if (errorElement) {
+          errorElement.innerHTML = errorMessage;
+        }
+      },
       injectDependencies: function () {
         var self = this;
         window.portalModules =
@@ -172,6 +176,45 @@ import {
           "-moz-opacity": 1,
           "-khtml-opacity": 1,
           opacity: 1,
+        });
+      },
+      getRemotePatientListData: function (params) {
+        if (this.accessed) {
+          var self = this;
+          this.setTablePreference(
+            this.userId,
+            this.tableIdentifier,
+            null,
+            null,
+            null,
+            function () {
+              self.patientDataAjaxRequest(params);
+            }
+          );
+          return;
+        }
+        this.patientDataAjaxRequest(params);
+      },
+      patientDataAjaxRequest: function (params) {
+        var includeTestUsers = $("#include_test_role").is(":checked");
+        if (includeTestUsers) {
+          params.data["include_test_role"] = true;
+        }
+        params.data["research_study_id"] =
+          this.tableIdentifier === "patientList" ? 0 : 1;
+        console.log("param data ? ", params.data);
+        var url = "/patients/page";
+        var self = this;
+        $.get(url + "?" + $.param(params.data)).then(function (results) {
+          if (results.rows) {
+            results.rows.map((row) => {
+              if (!row.id) row.id = row.userid;
+              return row;
+            });
+          }
+          console.log("row results ", results);
+          self.accessed = true;
+          params.success(results);
         });
       },
       handleCurrentUser: function () {
@@ -611,6 +654,10 @@ import {
         $("#adminTable").on("post-body.bs.table", function () {
           self.setContainerVis();
         });
+        $("#adminTable").on("load-error.bs.table", function (status, jqXHR) {
+          self.setError(`Error occurred: status ${status}. See console for detail.`);
+          console.error(jqXHR.responseText);
+        });
         $("#adminTable").on("load-success.bs.table", function (e, data) {
           self.setColumnSelections();
           self.addFilterPlaceHolders();
@@ -646,17 +693,17 @@ import {
         });
         if (this.sortFilterEnabled) {
           $("#adminTable")
-            .on("sort.bs.table", function (e, name, order) {
-              self.setTablePreference(
-                self.userId,
-                self.tableIdentifier,
-                name,
-                order
-              );
-            })
-            .on("column-search.bs.table", function () {
-              self.setTablePreference(self.userId);
-            })
+            // .on("sort.bs.table", function (e, name, order) {
+            //   self.setTablePreference(
+            //     self.userId,
+            //     self.tableIdentifier,
+            //     name,
+            //     order
+            //   );
+            // })
+            // .on("column-search.bs.table", function () {
+            //   self.setTablePreference(self.userId);
+            // })
             .on("column-switch.bs.table", function () {
               self.setTablePreference(self.userId);
             });
@@ -1590,5 +1637,5 @@ import {
         }
       },
     },
-  }));
+  });
 })();
