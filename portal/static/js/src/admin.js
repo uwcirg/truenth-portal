@@ -132,6 +132,7 @@ import {
       exportReportProgressTime: 0,
       arrExportReportTimeoutID: [],
       exportDataType: "",
+      filterOptionsList: [],
     },
     methods: {
       setError: function (errorMessage) {
@@ -213,6 +214,39 @@ import {
             });
           }
           console.log("row results ", results);
+          if (!self.accessed && results && results.options) {
+            self.filterOptionsList = results.options;
+            // results.options.forEach((option) => {
+            //   if (option.questionnaire_status) {
+            //     self.qStatusList = option.questionnaire_status;
+            //     // qStatusList.forEach((o) => {
+            //     //   for (const [key, value] of Object.entries(o)) {
+            //     //     console.log(`${key}: ${value}`);
+            //     //     self.qStatusList[key] = value;
+            //     //   }
+            //     // });
+            //   }
+            //   if (option.empro_status) {
+            //     self.qStatusList = option.empro_status;
+            //     // qStatusList.forEach((o) => {
+            //     //   for (const [key, value] of Object.entries(o)) {
+            //     //     console.log(`${key}: ${value}`);
+            //     //     console.log( $("#adminTable .bootstrap-table-filter-control-empro_status"));
+            //     //     $("#adminTable .bootstrap-table-filter-control-empro_status").append(`<option value="${key}">${value}</option>`);
+            //     //   }
+            //     // });
+            //   }
+            //   if (option.action_state) {
+            //     self.actionStateList = option.action_state;
+            //     // actionStateList.forEach((o) => {
+            //     //   for (const [key, value] of Object.entries(o)) {
+            //     //     console.log(`${key}: ${value}`);
+            //     //     self.actionStateList[key] = value;
+            //     //   }
+            //     // });
+            //   }
+            // });
+          }
           self.accessed = true;
           params.success(results);
         });
@@ -580,6 +614,25 @@ import {
           this.tableIdentifier === "patientList" ||
           this.tableIdentifier === "substudyPatientList";
       },
+      setFilterOptionsList: function () {
+        this.filterOptionsList.forEach((o) => {
+          for (const [key, values] of Object.entries(o)) {
+            values.forEach((value) => {
+              if (
+                $(
+                  `#adminTable .bootstrap-table-filter-control-${key} option[value='${value[0]}']`
+                ).length > 0
+              ) {
+                // Option exists
+                return true;
+              }
+              $(`#adminTable .bootstrap-table-filter-control-${key}`).append(
+                `<option value="${value[0]}">${value[1]}</option>`
+              );
+            });
+          }
+        });
+      },
       configTable: function () {
         var options = {};
         var sortObj = this.getTablePreference(
@@ -653,9 +706,13 @@ import {
         var self = this;
         $("#adminTable").on("post-body.bs.table", function () {
           self.setContainerVis();
+          console.log("should get here");
+          self.setFilterOptionsList();
         });
         $("#adminTable").on("load-error.bs.table", function (status, jqXHR) {
-          self.setError(`Error occurred: status ${status}. See console for detail.`);
+          self.setError(
+            `Error occurred: status ${status}. See console for detail.`
+          );
           console.error(jqXHR.responseText);
         });
         $("#adminTable").on("load-success.bs.table", function (e, data) {
@@ -1374,7 +1431,7 @@ import {
             {
               data: JSON.stringify(data),
               sync: true,
-              max_attempts: 1
+              max_attempts: 1,
             },
             callback
           );
