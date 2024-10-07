@@ -98,7 +98,6 @@
 	  params.data["research_study_id"] = parseInt("{{research_study_id}}");
 	  console.log("param data ? ", params.data);
       var url = "/patients/page";
-	  $("#loadingIndicator").fadeIn().css("visibility", "visible");
       $.get(url + "?" + $.param(params.data)).then(function (results) {
 		if (results.rows) {
 			results.rows.map(row => {
@@ -109,7 +108,6 @@
 		}
 		console.log("row results ", results);
         params.success(results);
-		$("#loadingIndicator").fadeOut().css("visibility", "hidden");
       });
     }
   </script>
