@@ -189,7 +189,7 @@ let requestTimerId = 0;
             null,
             null,
             null,
-            function() {
+            function () {
               clearTimeout(requestTimerId);
               requestTimerId = setTimeout(() => {
                 self.patientDataAjaxRequest(params);
@@ -198,8 +198,7 @@ let requestTimerId = 0;
           );
           return;
         }
-        this.patientDataAjaxRequest(params)
-        
+        this.patientDataAjaxRequest(params);
       },
       patientDataAjaxRequest: function (params) {
         var includeTestUsers = $("#include_test_role").is(":checked");
@@ -464,9 +463,15 @@ let requestTimerId = 0;
                 self.onAfterExportReportData({
                   error: true,
                   message: i18next.t(
-                    "More than a minute spent in pending status."
+                    "More than 5 minutes spent in pending status."
                   ),
                 });
+                //log error
+                tnthAjax.reportError(
+                  self.userId,
+                  window.location.pathname,
+                  "Request to export report data failed. More than 5 minutes spent in pending status."
+                );
                 return;
               }
             }
