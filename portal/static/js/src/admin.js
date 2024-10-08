@@ -7,6 +7,7 @@ import {
   EPROMS_SUBSTUDY_ID,
 } from "./data/common/consts.js";
 
+let requestTimerId = 0;
 (function () {
   /*global Vue DELAY_LOADING i18next $ */
   var DELAY_LOADING = true; //a workaround for hiding of loading indicator upon completion of loading of portal wrapper - loading indicator needs to continue displaying until patients list has finished loading
@@ -188,13 +189,17 @@ import {
             null,
             null,
             null,
-            function () {
-              self.patientDataAjaxRequest(params);
+            function() {
+              clearTimeout(requestTimerId);
+              requestTimerId = setTimeout(() => {
+                self.patientDataAjaxRequest(params);
+              }, 200);
             }
           );
           return;
         }
-        this.patientDataAjaxRequest(params);
+        this.patientDataAjaxRequest(params)
+        
       },
       patientDataAjaxRequest: function (params) {
         var includeTestUsers = $("#include_test_role").is(":checked");
@@ -1399,7 +1404,7 @@ import {
             this.tableIdentifier,
             {
               data: JSON.stringify(data),
-              sync: true,
+              //sync: true,
               max_attempts: 1,
             },
             callback

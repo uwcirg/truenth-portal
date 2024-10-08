@@ -124,7 +124,7 @@
                 {
                     field: $(this).closest('[data-field]').data('field'),
                     value: $(this).val(),
-                   // position: getCursorPosition($(this).get(0))
+                    position: getCursorPosition($(this).get(0))
                 });
         });
     };
