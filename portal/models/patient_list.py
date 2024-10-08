@@ -14,7 +14,8 @@ class PatientList(db.Model):
     All columns in both patients and sub-study lists are defined.
     """
     __tablename__ = 'patient_list'
-    userid = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(
+        db.ForeignKey('users.id', ondelete='cascade'), primary_key=True, nullable=False)
     study_id = db.Column(db.Text, index=True)
     firstname = db.Column(db.String(64), index=True)
     lastname = db.Column(db.String(64), index=True)
