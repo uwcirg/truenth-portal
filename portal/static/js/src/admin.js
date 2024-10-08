@@ -216,36 +216,6 @@ import {
           console.log("row results ", results);
           if (!self.accessed && results && results.options) {
             self.filterOptionsList = results.options;
-            // results.options.forEach((option) => {
-            //   if (option.questionnaire_status) {
-            //     self.qStatusList = option.questionnaire_status;
-            //     // qStatusList.forEach((o) => {
-            //     //   for (const [key, value] of Object.entries(o)) {
-            //     //     console.log(`${key}: ${value}`);
-            //     //     self.qStatusList[key] = value;
-            //     //   }
-            //     // });
-            //   }
-            //   if (option.empro_status) {
-            //     self.qStatusList = option.empro_status;
-            //     // qStatusList.forEach((o) => {
-            //     //   for (const [key, value] of Object.entries(o)) {
-            //     //     console.log(`${key}: ${value}`);
-            //     //     console.log( $("#adminTable .bootstrap-table-filter-control-empro_status"));
-            //     //     $("#adminTable .bootstrap-table-filter-control-empro_status").append(`<option value="${key}">${value}</option>`);
-            //     //   }
-            //     // });
-            //   }
-            //   if (option.action_state) {
-            //     self.actionStateList = option.action_state;
-            //     // actionStateList.forEach((o) => {
-            //     //   for (const [key, value] of Object.entries(o)) {
-            //     //     console.log(`${key}: ${value}`);
-            //     //     self.actionStateList[key] = value;
-            //     //   }
-            //     // });
-            //   }
-            // });
           }
           self.accessed = true;
           params.success(results);
@@ -706,7 +676,6 @@ import {
         var self = this;
         $("#adminTable").on("post-body.bs.table", function () {
           self.setContainerVis();
-          console.log("should get here");
           self.setFilterOptionsList();
         });
         $("#adminTable").on("load-error.bs.table", function (status, jqXHR) {
