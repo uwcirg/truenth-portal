@@ -334,14 +334,16 @@ import {EPROMS_MAIN_STUDY_ID, EPROMS_SUBSTUDY_ID} from "./data/common/consts.js"
                         //check how long the status stays in pending
                         if (exportStatus === "PENDING") {
                             let passedTime = ((new Date()).getTime() - self.exportReportProgressTime.getTime()) / 1000;
-                            if (passedTime > 60) {
-                                //more than a minute passed and the task is still in PENDING status
+                            if (passedTime > 300) {
+                                //more than 5 minutes passed and the task is still in PENDING status
                                 //never advanced to PROGRESS to start the export process
                                 //abort
                                 self.onAfterExportReportData({
                                     "error": true,
-                                    "message": i18next.t("More than a minute spent in pending status.")
+                                    "message": i18next.t("More than 5 minutes spent in pending status.")
                                 });
+                                //log error
+                                tnthAjax.reportError(self.userId, window.location.pathname, "Request to export report data failed. More than 5 minutes spent in pending status.");
                                 return;
                             }
                         }
