@@ -53,12 +53,12 @@ let requestTimerId = 0;
           self.handleAffiliatedUIVis();
           if (self.userId) {
             self.handleCurrentUser();
-            // self.setColumnSelections();
-            // self.setTableFilters(self.userId); //set user's preference for filter(s)
           }
-          setTimeout(function () {
-            self.setContainerVis();
-          }, 350);
+          if (!self.isPatientsList()) {
+            setTimeout(function () {
+              self.setContainerVis();
+            }, 350);
+          }
         } else {
           self.handleCurrentUser();
         }
@@ -164,7 +164,9 @@ let requestTimerId = 0;
         }
       },
       setLoaderContent: function () {
-        $("#adminTableContainer .fixed-table-loading").html("");
+        $("#adminTableContainer .fixed-table-loading").html(
+          `<i class="fa fa-spinner fa-spin fa-fw fa-2x"></i>`
+        );
       },
       setContainerVis: function () {
         $("#adminTableContainer").addClass("active");
@@ -679,13 +681,16 @@ let requestTimerId = 0;
       initTableEvents: function () {
         var self = this;
         $("#adminTable").on("post-body.bs.table", function () {
-          self.setContainerVis();
+          if (!self.isPatientsList()) {
+            self.setContainerVis();
+          }
           self.setFilterOptionsList();
         });
         $("#adminTable").on("load-error.bs.table", function (status, jqXHR) {
           self.setError(
             `Error occurred: status ${status}. See console for detail.`
           );
+          self.setContainerVis();
           console.error(jqXHR.responseText);
         });
         $("#adminTable").on("load-success.bs.table", function (e, data) {
@@ -694,6 +699,7 @@ let requestTimerId = 0;
           self.setTableFilters(self.userId); //set user's preference for filter(s)
           self.handleDeletedAccountRows(data);
           self.handleDateFields(data);
+          self.setContainerVis();
         });
         $("#adminTable").on("reset-view.bs.table", function () {
           self.addFilterPlaceHolders();
@@ -722,10 +728,9 @@ let requestTimerId = 0;
           self.handleDeletedUsersVis();
         });
         if (this.sortFilterEnabled) {
-          $("#adminTable")
-            .on("column-switch.bs.table", function () {
-              self.setTablePreference(self.userId);
-            });
+          $("#adminTable").on("column-switch.bs.table", function () {
+            self.setTablePreference(self.userId);
+          });
         }
         $("#adminTableToolbar .orgs-filter-warning").popover();
         $("#adminTable .filterControl select").on("change", function () {
@@ -1389,13 +1394,11 @@ let requestTimerId = 0;
               //sync: true,
               max_attempts: 1,
             },
-            function(result) {
-              if (!result?.error)
-                self.currentTablePreference = data;
+            function (result) {
+              if (!result?.error) self.currentTablePreference = data;
               if (callback) callback();
             }
           );
-          
         }
       },
       getReportModal: function (patientId, options) {
