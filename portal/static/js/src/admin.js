@@ -211,12 +211,6 @@ let requestTimerId = 0;
         var url = "/patients/page";
         var self = this;
         $.get(url + "?" + $.param(params.data)).then(function (results) {
-          if (results.rows) {
-            results.rows.map((row) => {
-              if (!row.id) row.id = row.userid;
-              return row;
-            });
-          }
           console.log("row results ", results);
           if (!self.accessed && results && results.options) {
             self.filterOptionsList = results.options;
@@ -729,17 +723,6 @@ let requestTimerId = 0;
         });
         if (this.sortFilterEnabled) {
           $("#adminTable")
-            // .on("sort.bs.table", function (e, name, order) {
-            //   self.setTablePreference(
-            //     self.userId,
-            //     self.tableIdentifier,
-            //     name,
-            //     order
-            //   );
-            // })
-            // .on("column-search.bs.table", function () {
-            //   self.setTablePreference(self.userId);
-            // })
             .on("column-switch.bs.table", function () {
               self.setTablePreference(self.userId);
             });
@@ -1206,8 +1189,6 @@ let requestTimerId = 0;
             // so the backend can present patient list based on that saved preference
             setTimeout(
               function () {
-                // this.showLoader();
-                // location.reload();
                 $("#adminTable").bootstrapTable("refresh");
               }.bind(this),
               350
@@ -1324,10 +1305,6 @@ let requestTimerId = 0;
             if (prefData.filters[item]) {
               $(fname).addClass("active");
             }
-            // if ($(fname).get(0))
-            //   $(fname).trigger(
-            //     $(fname).get(0).tagName === "INPUT" ? "keyup" : "change"
-            //   );
           }
         }
       },
@@ -1403,7 +1380,7 @@ let requestTimerId = 0;
         data["filters"] = __filters;
 
         if (Object.keys(data).length > 0) {
-          // make this a synchronous call
+          var self = this;
           tnthAjax.setTablePreference(
             userId,
             this.tableIdentifier,
@@ -1412,9 +1389,13 @@ let requestTimerId = 0;
               //sync: true,
               max_attempts: 1,
             },
-            callback
+            function(result) {
+              if (!result?.error)
+                self.currentTablePreference = data;
+              if (callback) callback();
+            }
           );
-          this.currentTablePreference = data;
+          
         }
       },
       getReportModal: function (patientId, options) {
