@@ -20,7 +20,6 @@
         "CONSENT_EDIT_PERMISSIBLE_ROLES = ['staff', 'staff_admin', 'admin']\n",
         "CUSTOM_PATIENT_DETAIL = True\n",
         "LOCALIZED_AFFILIATE_ORG = 'TrueNTH Global Registry'\n",
-        "OPT_OUT_DISABLED_ORG_IDS = [14620]\n",
         "ORGS_W_CUSTOM_INVITES = ['TrueNTH Global Registry', 'IRONMAN']\n",
         "SHOW_WELCOME = False\n",
         "HIDE_TRUENTH_ID_FIELD = True\n",
