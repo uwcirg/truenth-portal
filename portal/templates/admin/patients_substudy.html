@@ -3,9 +3,6 @@
 {%- from "admin/admin_base.html" import patientListToggle -%}
 {%- block mainclass -%}class="vis-on-callback"{%- endblock -%}
 {% block main %}
-<script>
-  var itemStatus = [{ id: "due", text: 'Due' }, { id: "overdue", text: 'Overdue' }];
-</script>
   <div id="patientList" class="substudy">
     {% set list_title = gettext('EMPRO Patient List') %}
     {% set list_subtitle = gettext('Select a patient below to view or update details') %}
