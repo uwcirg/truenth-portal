@@ -74,6 +74,7 @@ def patient_list_update_patient(patient_id, research_study_id=None):
     # necessary to avoid recursive loop via some update paths
     now = datetime.utcnow()
     if patient.last_updated and patient.last_updated + timedelta(seconds=10) > now:
+        db.session.commit()
         return
 
     patient.last_updated = now
