@@ -60,12 +60,6 @@ def patient_list_update_patient(patient_id, research_study_id=None):
         patient = PatientList(userid=patient_id)
         db.session.add(patient)
 
-    # necessary to avoid recursive loop via some update paths
-    now = datetime.utcnow()
-    if patient.last_updated and patient.last_updated + timedelta(seconds=30) > now:
-        return
-    patient.last_updated = now
-
     if research_study_id is None or new_record:
         patient.study_id = user.external_study_id
         patient.firstname = user.first_name
@@ -77,6 +71,12 @@ def patient_list_update_patient(patient_id, research_study_id=None):
         patient.org_id = user.organizations[0].id if user.organizations else None
         patient.org_name = user.organizations[0].name if user.organizations else None
 
+    # necessary to avoid recursive loop via some update paths
+    now = datetime.utcnow()
+    if patient.last_updated and patient.last_updated + timedelta(seconds=10) > now:
+        return
+
+    patient.last_updated = now
     if research_study_id == BASE_RS_ID or research_study_id is None:
         rs_id = BASE_RS_ID
         qb_status = qb_status_visit_name(
