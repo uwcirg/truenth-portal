@@ -74,7 +74,7 @@ def preference_filter(user, research_study_id, arg_filter):
     if pref and pref.filters:
         # return all but orgs and column selections
         return {
-            k:v for k,v in pref.filters.items()
+            k: v for k, v in pref.filters.items()
             if k not in ['orgs_filter_control', 'column_selections']}
 
 
@@ -98,7 +98,7 @@ def preference_sort(user, research_study_id, arg_sort, arg_order):
     pref = users_table_pref_from_research_study_id(
         user=user, research_study_id=research_study_id)
     if not pref:
-        return  "userid", "asc"  # reasonable defaults
+        return "userid", "asc"  # reasonable defaults
     return pref.sort_field, pref.sort_order
 
 
@@ -178,9 +178,10 @@ def page_of_patients():
             PatientList.action_state)
         options.append({"action_state": [(state[0], _(state[0])) for state in distinct_action]})
     else:
-        distinct_status = PatientList.query.distinct(PatientList.questionnaire_status).with_entities(
-            PatientList.questionnaire_status)
-        options.append({"questionnaire_status": [(status[0], _(status[0])) for status in distinct_status]})
+        distinct_status = PatientList.query.distinct(
+            PatientList.questionnaire_status).with_entities(PatientList.questionnaire_status)
+        options.append(
+            {"questionnaire_status": [(status[0], _(status[0])) for status in distinct_status]})
 
     viewable_orgs = requested_orgs(user, research_study_id)
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))

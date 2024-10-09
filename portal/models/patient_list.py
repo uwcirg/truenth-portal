@@ -89,8 +89,7 @@ def patient_list_update_patient(patient_id, research_study_id=None):
     if (research_study_id == EMPRO_RS_ID or research_study_id is None) and user.clinicians:
         rs_id = EMPRO_RS_ID
         patient.clinician = '; '.join(
-            (clinician_name_map().get(c.id, "not in map") for c in
-            user.clinicians)) or ""
+            (clinician_name_map().get(c.id, "not in map") for c in user.clinicians)) or ""
         qb_status = qb_status_visit_name(
             patient.userid, research_study_id=rs_id, as_of_date=now)
         patient.empro_status = str(qb_status['status'])
