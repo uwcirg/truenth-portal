@@ -27,7 +27,7 @@
 	    </div>
   	</div>
   	<div class="orgs-filter-warning" v-show="siteFilterApplied()" data-template='<div class="popover filter-popover alert-icon" role="tooltip" id="filterPopover" ><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-trigger="hover" data-container="body" data-toggle="popover" data-placement="top" data-content="{{_('Site filter applied')}}">
-		<img class="alert-icon" src="{{url_for('static', filename='img/filterIcon.png')}}">
+		<img class="alert-icon" src="{{url_for('static', filename='img/filterIcon.png')}}" alt="{{_("Site filter applied")}}"/>
 	</div>
 {%-endmacro %}
 {% macro deletedUsersFilter() -%}
@@ -42,12 +42,10 @@
 {%- endmacro %}
 {%- macro testUsersCheckbox(postUrl) -%}
 	<caption id="frmTestUsersContainer" class="tnth-hide">
-		<form id="frmTestUsers" method="GET" action="{{postUrl}}">
-			<label class="text-normal text-warning">
-				<input type="checkbox" name="include_test_role" id="include_test_role" value="True" {%if include_test_role %}checked{% endif %}/>
-				{{_("include test accounts")}}
-			</label>
-		</form>
+		<label class="text-normal text-warning">
+			<input type="checkbox" name="include_test_role" id="include_test_role" value="True" />
+			{{_("include test accounts")}}
+		</label>
 	</caption>
 {%- endmacro -%}
 <!-- this widget is only applicable for sub-study users -->
@@ -88,4 +86,24 @@
 			</div>
 		</div>
   	</div>
+{%- endmacro -%}
+{%- macro ajaxDataScript(research_study_id) -%}
+	<script>
+	var loadIntervalId = 0;
+    // custom ajax request here
+    function patientDataAjaxRequest(params) {
+		loadIntervalId = setInterval(() => {
+			if (typeof window.AdminObj === "undefined") return;
+			window.AdminObj.getRemotePatientListData(params);
+			clearInterval(loadIntervalId);
+		}, 50);
+    }
+  </script>
+{%- endmacro -%}
+{%- macro filterOptionsVar() -%}
+<script>
+	// placeholder variables
+	var qStatusFilterOptions = {};
+	var clinicianActionStateFilterOptions = {};
+</script>
 {%- endmacro -%}

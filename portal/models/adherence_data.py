@@ -23,7 +23,8 @@ class AdherenceData(db.Model):
     """
     __tablename__ = 'adherence_data'
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
+    patient_id = db.Column(
+        db.ForeignKey('users.id', ondelete='cascade'), index=True, nullable=False)
     rs_id_visit = db.Column(
         db.Text, index=True, nullable=False,
         doc="rs_id:visit_name")

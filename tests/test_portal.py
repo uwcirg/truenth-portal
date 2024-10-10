@@ -75,32 +75,6 @@ class TestPortal(TestCase):
             intervention.display_for_user(user).link_label
             in response.get_data(as_text=True))
 
-    def test_staff_html(self):
-        """Interventions can customize the staff text """
-        client = self.add_client()
-        intervention = INTERVENTION.sexual_recovery
-        client.intervention = intervention
-        ui = UserIntervention(
-            user_id=TEST_USER_ID,
-            intervention_id=intervention.id)
-        ui.staff_html = "Custom text for <i>staff</i>"
-        with SessionScope(db):
-            db.session.add(ui)
-            db.session.commit()
-
-        self.bless_with_basics()
-        self.login()
-        self.promote_user(role_name=ROLE.INTERVENTION_STAFF.value)
-
-        # This test requires PATIENT_LIST_ADDL_FIELDS includes the
-        # 'reports' field
-        self.app.config['PATIENT_LIST_ADDL_FIELDS'] = ['reports']
-        response = self.client.get('/patients/')
-
-        ui = db.session.merge(ui)
-        results = response.get_data(as_text=True)
-        assert ui.staff_html in results
-
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
         client = self.add_client()

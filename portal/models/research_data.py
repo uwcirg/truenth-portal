@@ -23,9 +23,11 @@ class ResearchData(db.Model):
     """
     __tablename__ = 'research_data'
     id = db.Column(db.Integer, primary_key=True)
-    subject_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
+    subject_id = db.Column(
+        db.ForeignKey('users.id', ondelete='cascade'), index=True, nullable=False)
     questionnaire_response_id = db.Column(
-        db.ForeignKey('questionnaire_responses.id'), index=True, unique=True, nullable=False,
+        db.ForeignKey('questionnaire_responses.id', ondelete='cascade'),
+        index=True, unique=True, nullable=False,
         doc="source questionnaire response")
     instrument = db.Column(db.Text, index=True, nullable=False)
     research_study_id = db.Column(db.Integer, index=True, nullable=False)

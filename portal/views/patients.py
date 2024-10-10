@@ -1,6 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from datetime import datetime
-
+import json
 from flask import (
     Blueprint,
     abort,
@@ -11,85 +10,226 @@ from flask import (
 )
 from flask_babel import gettext as _
 from flask_user import roles_required
+from sqlalchemy import asc, desc
 
-from .clinician import clinician_query
 from ..extensions import oauth
 from ..models.coding import Coding
 from ..models.intervention import Intervention
-from ..models.organization import Organization
+from ..models.organization import Organization, OrgTree
+from ..models.patient_list import PatientList
 from ..models.qb_status import patient_research_study_status
-from ..models.qb_timeline import QB_StatusCacheKey, qb_status_visit_name
 from ..models.role import ROLE
 from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.table_preference import TablePreference
-from ..models.user import current_user, get_user, patients_query
+from ..models.user import current_user, get_user
 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 
-def org_preference_filter(user, table_name):
+def users_table_pref_from_research_study_id(user, research_study_id):
+    """Returns user's table preferences for given research_study id"""
+    if research_study_id == 0:
+        table_name = 'patientList'
+    elif research_study_id == 1:
+        table_name = 'substudyPatientList'
+    else:
+        raise ValueError('Invalid research_study_id')
+
+    return TablePreference.query.filter_by(
+        table_name=table_name, user_id=user.id).first()
+
+
+def org_preference_filter(user, research_study_id):
     """Obtain user's preference for filtering organizations
 
     :returns: list of org IDs to use as filter, or None
-
     """
-    # check user table preference for organization filters
-    pref = TablePreference.query.filter_by(
-        table_name=table_name, user_id=user.id).first()
+    pref = users_table_pref_from_research_study_id(
+        user=user, research_study_id=research_study_id)
     if pref and pref.filters:
         return pref.filters.get('orgs_filter_control')
-    return None
 
 
-def render_patients_list(
-        request, research_study_id, table_name, template_name):
-    include_test_role = request.args.get('include_test_role')
+def preference_filter(user, research_study_id, arg_filter):
+    """Obtain user's preference for filtering
 
-    if request.form.get('reset_cache'):
-        QB_StatusCacheKey().update(datetime.utcnow())
-    if research_study_id == EMPRO_RS_ID:
-        clinician_name_map = {None: None}
-        for clinician in clinician_query(current_user()):
-            clinician_name_map[clinician.id] = f"{clinician.last_name}, {clinician.first_name}"
+    Looks first in request args, defaults to table preferences if not found
+
+    :param user: current user
+    :param research_study_id: 0 or 1, i.e. EMPRO_STUDY_ID
+    :param arg_filter: value of request.args.get("filter")
+
+    returns: dictionary of key/value pairs for filtering
+    """
+    # if arg_filter is defined, use as return value
+    if arg_filter:
+        # Convert from query string to dict
+        filters = json.loads(arg_filter)
+        return filters
+
+    # otherwise, check db for filters from previous requests
+    pref = users_table_pref_from_research_study_id(
+        user=user, research_study_id=research_study_id)
+    if pref and pref.filters:
+        # return all but orgs and column selections
+        return {
+            k: v for k, v in pref.filters.items()
+            if k not in ['orgs_filter_control', 'column_selections']}
+
+
+def preference_sort(user, research_study_id, arg_sort, arg_order):
+    """Obtain user's preference for sorting
+
+    Looks first in request args, defaults to table preferences if not found
+
+    :param user: current user
+    :param research_study_id: 0 or 1, i.e. EMPRO_STUDY_ID
+    :param arg_sort: value of request.args.get("sort")
+    :param arg_sort: value of request.args.get("order")
+
+    returns: tuple: (sort_field, sort_order)
+    """
+    # if args are defined, use as return value
+    if arg_sort and arg_order:
+        return arg_sort, arg_order
+
+    # otherwise, check db for filters from previous requests
+    pref = users_table_pref_from_research_study_id(
+        user=user, research_study_id=research_study_id)
+    if not pref:
+        return "userid", "asc"  # reasonable defaults
+    return pref.sort_field, pref.sort_order
+
+
+def filter_query(query, filter_field, filter_value):
+    """Extend patient list query with requested filter/search"""
+    if not hasattr(PatientList, filter_field):
+        # these should never get passed, but it has happened in test.
+        # ignore requests to filter by unknown column
+        return query
+
+    if filter_field == 'userid':
+        query = query.filter(PatientList.userid == int(filter_value))
+        return query
+
+    if filter_field in ('questionnaire_status', 'empro_status', 'action_state'):
+        query = query.filter(getattr(PatientList, filter_field) == filter_value)
+
+    pattern = f"%{filter_value.lower()}%"
+    query = query.filter(getattr(PatientList, filter_field).ilike(pattern))
+    return query
+
+
+def sort_query(query, sort_column, direction):
+    """Extend patient list query with requested sorting criteria"""
+    sort_method = asc if direction == 'asc' else desc
+
+    if not hasattr(PatientList, sort_column):
+        # these should never get passed, but it has happened in test.
+        # ignore requests to sort by unknown column
+        return query
+    query = query.order_by(sort_method(getattr(PatientList, sort_column)))
+    return query
+
+
+@patients.route("/page", methods=["GET"])
+@roles_required([
+    ROLE.INTERVENTION_STAFF.value,
+    ROLE.STAFF.value,
+    ROLE.STAFF_ADMIN.value])
+@oauth.require_oauth()
+def page_of_patients():
+    """called via ajax from the patient list, deliver next page worth of patients
+
+    Following query string parameters are expected:
+    :param search: search string,
+    :param sort: column to sort by,
+    :param order: direction to apply to sorted column,
+    :param offset: offset from first page of the given search params
+    :param limit: count in a page
+    :param research_study_id: default 0, set to 1 for EMPRO
+
+    """
+    def requested_orgs(user, research_study_id):
+        """Return set of requested orgs limited to those the user is allowed to view"""
+        # start with set of org ids the user has permission to view
+        viewable_orgs = set()
+        for org in user.organizations:
+            ids = OrgTree().here_and_below_id(org.id)
+            viewable_orgs.update(ids)
+
+        # Reduce viewable orgs by filter preferences
+        filtered_orgs = org_preference_filter(user=user, research_study_id=research_study_id)
+        if filtered_orgs:
+            viewable_orgs = viewable_orgs.intersection(filtered_orgs)
+        return viewable_orgs
 
     user = current_user()
-    query = patients_query(
-        acting_user=user,
-        include_test_role=include_test_role,
-        include_deleted=True,
-        research_study_id=research_study_id,
-        requested_orgs=org_preference_filter(user, table_name=table_name))
-
-    # get assessment status only if it is needed as specified by config
-    qb_status_cache_age = 0
-    if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
-        status_cache_key = QB_StatusCacheKey()
-        cached_as_of_key = status_cache_key.current()
-        qb_status_cache_age = status_cache_key.minutes_old()
-        patients_list = []
-        for patient in query:
-            if patient.deleted:
-                patients_list.append(patient)
-                continue
-            qb_status = qb_status_visit_name(
-                patient.id, research_study_id, cached_as_of_key)
-            patient.assessment_status = _(qb_status['status'])
-            patient.current_qb = qb_status['visit_name']
-            if research_study_id == EMPRO_RS_ID:
-                patient.clinician = '; '.join(
-                    (clinician_name_map.get(c.id, "not in map") for c in
-                     patient.clinicians)) or ""
-                patient.action_state = qb_status['action_state'].title() \
-                    if qb_status['action_state'] else ""
-            patients_list.append(patient)
+    research_study_id = int(request.args.get("research_study_id", 0))
+    # due to potentially translated content, need to capture all potential values to sort
+    # (not just the current page) for the front-end options list
+    options = []
+    if research_study_id == EMPRO_RS_ID:
+        distinct_status = PatientList.query.distinct(PatientList.empro_status).with_entities(
+            PatientList.empro_status)
+        options.append({"empro_status": [(status[0], _(status[0])) for status in distinct_status]})
+        distinct_action = PatientList.query.distinct(PatientList.action_state).with_entities(
+            PatientList.action_state)
+        options.append({"action_state": [(state[0], _(state[0])) for state in distinct_action]})
     else:
-        patients_list = query
+        distinct_status = PatientList.query.distinct(
+            PatientList.questionnaire_status).with_entities(PatientList.questionnaire_status)
+        options.append(
+            {"questionnaire_status": [(status[0], _(status[0])) for status in distinct_status]})
 
-    return render_template(
-        template_name, patients_list=patients_list, user=user,
-        qb_status_cache_age=qb_status_cache_age, wide_container="true",
-        include_test_role=include_test_role)
+    viewable_orgs = requested_orgs(user, research_study_id)
+    query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
+    if research_study_id == EMPRO_RS_ID:
+        # only include those in the study.  use empro_consentdate as a quick check
+        query = query.filter(PatientList.empro_consentdate.isnot(None))
+    if not request.args.get('include_test_role', "false").lower() == "true":
+        query = query.filter(PatientList.test_role.is_(False))
+
+    filters = preference_filter(
+        user=user, research_study_id=research_study_id, arg_filter=request.args.get("filter"))
+    if filters:
+        for key, value in filters.items():
+            query = filter_query(query, key, value)
+
+    sort_column, sort_order = preference_sort(
+        user=user, research_study_id=research_study_id, arg_sort=request.args.get("sort"),
+        arg_order=request.args.get("order"))
+    query = sort_query(query, sort_column, sort_order)
+
+    total = query.count()
+    query = query.offset(request.args.get('offset', 0))
+    query = query.limit(request.args.get('limit', 10))
+
+    # Returns structured JSON with totals and rows
+    data = {"total": total, "totalNotFiltered": total, "rows": [], "options": options}
+    for row in query:
+        data['rows'].append({
+            "userid": row.userid,
+            "firstname": row.firstname,
+            "lastname": row.lastname,
+            "birthdate": row.birthdate,
+            "email": row.email,
+            "questionnaire_status": _(row.questionnaire_status),
+            "empro_status": _(row.empro_status),
+            "action_state": _(row.action_state),
+            "visit": row.visit,
+            "empro_visit": row.empro_visit,
+            "study_id": row.study_id,
+            "consentdate": row.consentdate,
+            "empro_consentdate": row.empro_consentdate,
+            "clinician": row.clinician,
+            "org_id": row.org_id,
+            "org_name": row.org_name,
+            "deleted": row.deleted,
+            "test_role": row.test_role,
+        })
+    return jsonify(data)
 
 
 @patients.route('/', methods=('GET', 'POST'))
@@ -115,11 +255,11 @@ def patients_root():
     expected and will raise a 400: Bad Request
 
     """
-    return render_patients_list(
-        request,
-        research_study_id=0,
-        table_name='patientList',
-        template_name='admin/patients_by_org.html')
+    user = current_user()
+    return render_template(
+        'admin/patients_by_org.html', user=user,
+        wide_container="true",
+    )
 
 
 @patients.route('/substudy', methods=('GET', 'POST'))
@@ -140,11 +280,11 @@ def patients_substudy():
       staff, staff_admin: all patients with common consented organizations
 
     """
-    return render_patients_list(
-        request,
-        research_study_id=EMPRO_RS_ID,
-        table_name='substudyPatientList',
-        template_name='admin/patients_substudy.html')
+    user = current_user()
+    return render_template(
+        'admin/patients_substudy.html', user=user,
+        wide_container="true",
+    )
 
 
 @patients.route('/patient-profile-create')

@@ -6,6 +6,7 @@ from smtplib import SMTPRecipientsRefused
 
 from flask import current_app
 from flask_babel import force_locale
+from flask_login import login_manager
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
@@ -52,6 +53,10 @@ def single_patient_adherence_data(patient_id, research_study_id):
     patient = User.query.get(patient_id)
     if not patient.has_role(ROLE.PATIENT.value):
         return
+
+    # keep patient list data in sync
+    from .patient_list import patient_list_update_patient
+    patient_list_update_patient(patient_id=patient_id, research_study_id=research_study_id)
 
     as_of_date = datetime.utcnow()
     cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(

@@ -33,6 +33,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
+from ..models.patient_list import patient_list_update_patient
 from ..models.questionnaire_bank import trigger_date
 from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.questionnaire_response import QuestionnaireResponse
@@ -357,6 +358,8 @@ def delete_user(user_id):
     user = get_user(user_id, 'edit')
     try:
         user.delete_user(acting_user=current_user())
+        # update patient list given change in patient status
+        patient_list_update_patient(patient_id=user.id, research_study_id=None)
     except ValueError as v:
         return jsonify(message=str(v))
     return jsonify(message="deleted")
