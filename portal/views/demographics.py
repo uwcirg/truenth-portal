@@ -146,6 +146,7 @@ def demographics_set(patient_id):
       - ServiceToken: []
 
     """
+    from ..models.patient_list import patient_list_update_patient
     patient = get_user(patient_id, 'edit')
     if not request.json:
         abort(
@@ -174,4 +175,8 @@ def demographics_set(patient_id):
     auditable_event("updated demographics on user {0} from input {1}".format(
         patient_id, json.dumps(request.json)), user_id=current_user().id,
         subject_id=patient_id, context='user')
+
+    # update the patient_table cache with any change from above
+    patient_list_update_patient(patient_id)
+
     return jsonify(patient.as_fhir(include_empties=False))

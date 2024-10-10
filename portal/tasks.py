@@ -34,6 +34,7 @@ from .models.reporting import (
     research_report,
     single_patient_adherence_data,
 )
+from .models.research_data import cache_research_data
 from .models.research_study import ResearchStudy
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
@@ -131,6 +132,13 @@ def adherence_report_task(self, **kwargs):
     return adherence_report(**kwargs)
 
 
+@celery.task(queue=LOW_PRIORITY)
+@scheduled_task
+def cache_research_data_task(**kwargs):
+    """Queues up all patients needing a cache refresh"""
+    return cache_research_data(**kwargs)
+
+
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
 def research_report_task(self, **kwargs):
     current_app.logger.debug("launch research report task: %s", self.request.id)
@@ -192,6 +200,27 @@ def cache_assessment_status(**kwargs):
 
     """
     update_patient_loop(update_cache=True, queue_messages=False, as_task=True)
+
+
+@celery.task()
+@scheduled_task
+def cache_patient_list(**kwargs):
+    """Populate patient list cache
+
+    Patient list is a cached table, enabling quick pagination on the /patients
+    view functions.  Kept up to date on changes with qb_status as part of
+    the adherence cache chain.  This task is NOT scheduled but can be run on
+    new deploys to pick up all the deleted patients, that are otherwise missed
+    but do need to be in the patient list for proper function.
+    """
+    from portal.models.patient_list import patient_list_update_patient
+    patient_role_id = Role.query.filter(
+        Role.name == ROLE.PATIENT.value).with_entities(Role.id).first()[0]
+    all_patients = User.query.join(UserRoles).filter(and_(
+        User.id == UserRoles.user_id,
+        UserRoles.role_id == patient_role_id)).with_entities(User.id)
+    for patient_id in all_patients:
+        patient_list_update_patient(patient_id[0])
 
 
 @celery.task(queue=LOW_PRIORITY)

@@ -24,15 +24,9 @@
     <div id="adminTableContainer" class="patient-view admin-table table-responsive medium-text substudy" data-export-prefix="{{_('PatientList_')}}">
       <div id="adminTableToolbar" class="admin-toolbar">
         {{orgsSelector()}}
-        <div id="cacheResetContainer">
-            <form id="cacheResetForm" method="POST" action="{{url_for('patients.patients_substudy')}}">
-                <input type="hidden" name="reset_cache" id="reset_cache" value="True"/>
-                <input id="csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">
-                <button type="submit" class="button btn btn-default">{{_("Refresh Patient List")}} <span class="glyphicon glyphicon-refresh text-muted" arial-hidden="true"></span></button>
-                <span class="smaller-text byline-text text-muted">{{_("Last updated %(minutes)d minutes ago", minutes=qb_status_cache_age)}}</span> <!-- qb_status_cache_age should be calculated via view-->
-            </form>
-          </div>
       </div>
+      {# variable for checking if user is a researcher #}
+      {% set isResearcher = user.has_role(ROLE.RESEARCHER.value) and not(user.has_role(ROLE.ADMIN.value)) %}
       <table id="adminTable"
              data-table-id="adminTable"
              class="tnth-admin-table"
@@ -46,65 +40,38 @@
              data-show-toggle="true"
              data-show-columns="true"
              data-smart-display="true"
-             data-unique-id="id"
-             data-id-field="id"
+             data-unique-id="userid"
+             data-id-field="userid"
              data-filter-control="true"
-             data-show-export="true"
+             data-side-pagination="server"
+             data-ajax="patientDataAjaxRequest"
+             data-cache="false"
+             {%- if not isResearcher -%} data-show-export="true" {%- endif -%}
              data-export-data-type="all"
              >
             {{testUsersCheckbox(postUrl=url_for('patients.patients_substudy'))}}
           <thead>
               <tr>
-                  <th data-field="userid" data-sortable="true" data-class="id-field" data-width="1%">{{_("TrueNTH ID")}}</th>
+                  <th data-field="userid" data-id-field="true" data-sortable="true" data-class="id-field" data-width="1%" data-filter-control="input">{{_("TrueNTH ID")}}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input" data-width="150">{{ _("Username (email)") }}</th>
-                  <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-filter-control="input" data-visible="false">{{ _("Date of Birth") }}</th>
-                  <th data-field="clinician" data-sortable="true" data-class="clinician-field" data-filter-control="select">{{ _("Treating Clinician") }}</th>
-                  <th data-field="status" data-sortable="true" data-card-visible="true" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{_("EMPRO Questionnaire Status")}}</th>
-                  <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input" data-visible="false">{{ _("Visit") }}</th>
-                  <th data-field="action_state" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select">{{ _("Clinician Action Status") }}</th>
+                  <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-visible="false">{{ _("Date of Birth") }}</th>
+                  <th data-field="clinician" data-sortable="true" data-class="clinician-field" data-filter-control="input">{{ _("Treating Clinician") }}</th>
+                  <th data-field="empro_status" data-sortable="true" data-card-visible="true" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true" data-filter-data="var:qStatusFilterOptions">{{_("EMPRO Questionnaire Status")}}</th>
+                  <th data-field="empro_visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input" data-visible="false">{{ _("Visit") }}</th>
+                  <th data-field="action_state" data-sortable="true" data-class="intervention-actions-field" data-filter-control="select" data-filter-data="var:clinicianActionStateFilterOptions">{{ _("Clinician Action Status") }}</th>
                   <th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-visible="false" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>
-                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-visible="false" data-class="consentdate-field text-center" data-filter-control="input" data-visible="true">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
-                  <th data-field="organization" data-sortable="true" data-class="organization-field"  data-filter-control="select" data-visible="true">{{ _("Site(s)") }}</th>
+                  <th data-field="empro_consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-visible="false" data-class="consentdate-field text-center" data-visible="true">{{ _("Study Consent Date") }}</th>
+                  <th data-field="org_name" data-sortable="true" data-class="organization-field"  data-visible="true">{{ _("Site") }}</th>
               </tr>
           </thead>
-          <tbody id="admin-table-body" class="data-link">
-               {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
-                      <td>{{ patient.id }}</td>
-                      <td>{{ patient.first_name if patient.first_name }}</td>
-                      <td>{{ patient.last_name if patient.last_name }}</td>
-                      <td>{{ patient.email if patient.email }}</td>
-                      <td>{{ patient.birthdate.strftime('%-d %b %Y') if patient.birthdate }}</td>
-                      <td>{{patient.clinician if patient.clinician else ""}}</td>
-                      <td>{{patient.assessment_status if patient.assessment_status}}</td>
-                      <td>{{patient.current_qb if patient.current_qb}}</td>
-                      <td>
-                        {%- if patient.action_state in ("Required", "Due", "Overdue") -%}
-                          <a class="cta" href='{{url_for("patients.patient_profile", patient_id=patient.id, _anchor="postInterventionQuestionnaireLoc")}}'>{{patient.action_state}}</a>
-                        {%- else -%}
-                          {{patient.action_state}}
-                        {%- endif -%}
-                      </td>
-                      <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
-                      <td>{%- if patient.valid_consents -%}
-                        {%-for consent in patient.valid_consents -%}
-                          {%- if consent.research_study_id == 1 -%}
-                            {{consent.acceptance_date.strftime('%-d %b %Y')}}<br/>
-                          {%- endif -%}
-                        {%-endfor-%}
-                      {%-endif-%}
-                      </td>
-                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
-                  </tr>
-               {% endfor %}
-          </tbody>
       </table>
   </div>
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
   {{ExportPopover(title=_("Export EMPRO adherence report"))}}
 </div>
+{{ajaxDataScript(research_study_id=1)}}
+{{filterOptionsVar()}}
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}
-

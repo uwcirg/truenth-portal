@@ -851,7 +851,6 @@ def get_assessments():
 
     research_studies = set()
     questionnaire_list = request.args.getlist('instrument_id')
-    ignore_qb_requirement = request.args.get("ignore_qb_requirement", False)
     for q in questionnaire_list:
         research_studies.add(research_study_id_from_questionnaire(q))
     if len(research_studies) != 1:
@@ -872,7 +871,6 @@ def get_assessments():
         'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
         'lock_key': "research_report_task_lock",
-        'ignore_qb_requirement': request.args.get("ignore_qb_requirement"),
         'response_format': request.args.get('format', 'json').lower()
     }
 
@@ -930,6 +928,10 @@ def assessment_update(patient_id):
       - ServiceToken: []
 
     """
+    from ..models.research_data import (
+        add_questionnaire_response,
+        invalidate_qnr_research_data,
+    )
 
     if not hasattr(request, 'json') or not request.json:
         return jsonify(message='Invalid request - requires JSON'), 400
@@ -990,6 +992,9 @@ def assessment_update(patient_id):
     response.update({'message': 'previous questionnaire response found'})
     existing_qnr = existing_qnr.first()
 
+    # remove this QNR from the report data cache, so it can be subsequently updated
+    invalidate_qnr_research_data(existing_qnr)
+
     # TN-3184, report any in-process QNRs attempting to change authored dates
     date_change_snippet = ""
     if FHIR_datetime.parse(existing_qnr.document["authored"]) != FHIR_datetime.parse(updated_qnr["authored"]):
@@ -1019,6 +1024,7 @@ def assessment_update(patient_id):
     response.update({'message': 'questionnaire response updated successfully'})
     if research_study_id is not None:
         invalidate_users_QBT(patient.id, research_study_id=research_study_id)
+    add_questionnaire_response(existing_qnr, research_study_id=research_study_id)
     return jsonify(response)
 
 
@@ -1635,6 +1641,8 @@ def assessment_add(patient_id):
       - ServiceToken: []
 
     """
+    from ..models.research_data import add_questionnaire_response
+
     if not hasattr(request, 'json') or not request.json:
         return jsonify(message='Invalid request - requires JSON'), 400
 
@@ -1735,6 +1743,7 @@ def assessment_add(patient_id):
 
     if research_study_id is not None:
         invalidate_users_QBT(patient.id, research_study_id=research_study_id)
+    add_questionnaire_response(questionnaire_response, research_study_id)
     return jsonify(response)
 
 

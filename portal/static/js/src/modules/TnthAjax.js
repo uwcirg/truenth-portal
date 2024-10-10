@@ -23,7 +23,7 @@ export default { /*global $ */
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
         var REQUEST_TIMEOUT_INTERVAL = 5000; // default timed out at 5 seconds
-        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
+        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: params && params.max_attempts ? params.max_attempts : MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         params.timeout = params.timeout || REQUEST_TIMEOUT_INTERVAL;
@@ -365,18 +365,27 @@ export default { /*global $ */
 
             const dataState = String(data.state).toLowerCase();
             params = params || {};
+            const isUnprocessed = EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(dataState) !== -1;
 
             //if the trigger data has not been processed, try again until maximum number of attempts has been reached
             if (params.retryAttempt < params.maxTryAttempts &&
-                EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(dataState) !== -1) {
+                isUnprocessed) {
                 params.retryAttempt++;
                 setTimeout(function() {
                     this.getSubStudyTriggers(userId, params, callback);
                 }.bind(this), 1500*params.retryAttempt);
+                if (params.retryAttempt === params.maxTryAttempts) {
+                    this.postAuditLog(userId, {
+                        context: "assessment",
+                        message: `maximum retry attempts reached for retrieving triggers, state: ${dataState ? dataState : "unknown"}`
+                    });
+                }
                 return false;
             }
             params.retryAttempt = 0;
-            sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
+            if (!isUnprocessed) {
+                sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
+            }
             callback(data);
             return true;
         });
@@ -1231,7 +1240,7 @@ export default { /*global $ */
             callback({error: "User Id and table name is required for setting preference."});
             return false;
         }
-        this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {"data": params.data,"sync": params.sync}, function(data) {
+        this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {...params, "data": params.data,"sync": params.sync}, function(data) {
             if (!data || data.error) {
                 callback({"error": i18next.t("Error occurred setting table preference.")});
                 return false;
@@ -1266,6 +1275,21 @@ export default { /*global $ */
                     callback(data);
                 } else {
                     callback({"error": i18next.t("Error occurred retrieving email audit entries.")});
+                }
+            } else {
+                callback({"error": i18next.t("no data returned")});
+            }
+        });
+    },
+    "postAuditLog": function(userId, payload, callback) {
+        callback = callback || function() {};
+        //url, method, userId, params, callback
+        this.sendRequest("/api/auditlog", "POST", userId, {"data": payload, "contentType": "application/x-www-form-urlencoded; charset=UTF-8"}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    callback(data);
+                } else {
+                    callback({"error": i18next.t("Error occurred posting to audit log.")});
                 }
             } else {
                 callback({"error": i18next.t("no data returned")});
