@@ -1324,6 +1324,7 @@ let requestTimerId = 0;
         var tnthAjax = this.getDependency("tnthAjax");
         tableName = tableName || this.tableIdentifier;
         if (!tableName || !document.querySelector("#adminTable")) {
+          if (callback) callback();
           return false;
         }
         userId = userId || this.userId;
