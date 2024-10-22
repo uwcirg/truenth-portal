@@ -143,12 +143,6 @@ let requestTimerId = 0;
           errorElement.innerHTML = errorMessage;
         }
       },
-      clearError: function() {
-        var errorElement = document.getElementById("admin-table-error-message");
-        if (errorElement) {
-          errorElement.innerHTML = "";
-        }
-      },
       injectDependencies: function () {
         var self = this;
         window.portalModules =
@@ -206,8 +200,6 @@ let requestTimerId = 0;
           );
           return;
         }
-        //reset error
-        this.clearError();
         this.patientDataAjaxRequest(params);
       },
       patientDataAjaxRequest: function (params) {
@@ -227,12 +219,6 @@ let requestTimerId = 0;
           }
           self.accessed = true;
           params.success(results);
-        }).fail(function(xhr, status) {
-          console.log("Error ", xhr);
-          console.log("status", status);
-          self.setError("Error occurred loading data.");
-          params.success([]);
-          self.accessed = true;
         });
       },
       handleCurrentUser: function () {
@@ -1243,12 +1229,11 @@ let requestTimerId = 0;
             sync: true,
           },
           function (data) {
-            prefData = data || self.getDefaultTablePreference();
-            self.currentTablePreference = prefData;
-
             if (!data || data.error) {
               return false;
             }
+            prefData = data || self.getDefaultTablePreference();
+            self.currentTablePreference = prefData;
 
             if (setFilter) {
               //set filter values
@@ -1318,7 +1303,6 @@ let requestTimerId = 0;
           for (var item in prefData.filters) {
             fname = "#adminTable .bootstrap-table-filter-control-" + item;
             if ($(fname).length === 0) {
-              prefData.filters[item] = null;
               continue;
             }
             //note this is based on the trigger event for filtering specify in the plugin
@@ -1339,8 +1323,7 @@ let requestTimerId = 0;
       ) {
         var tnthAjax = this.getDependency("tnthAjax");
         tableName = tableName || this.tableIdentifier;
-        if (!tableName || !document.querySelector("#adminTable")) {
-          if (callback) callback();
+        if (!tableName) {
           return false;
         }
         userId = userId || this.userId;

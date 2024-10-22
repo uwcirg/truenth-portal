@@ -93,8 +93,6 @@
     // custom ajax request here
     function patientDataAjaxRequest(params) {
 		loadIntervalId = setInterval(() => {
-			//document DOM not ready, don't make ajax call yet
-			if (!document.querySelector("#adminTable")) return;
 			if (typeof window.AdminObj === "undefined") return;
 			window.AdminObj.getRemotePatientListData(params);
 			clearInterval(loadIntervalId);
