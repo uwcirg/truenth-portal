@@ -109,6 +109,10 @@ def filter_query(query, filter_field, filter_value):
         # ignore requests to filter by unknown column
         return query
 
+    if filter_field in ('birthdate', 'consentdate', 'empro_consentdate'):
+        # these are not filterable (partial strings on date complexity) - ignore such a request
+        return query
+
     if filter_field == 'userid':
         query = query.filter(PatientList.userid == int(filter_value))
         return query
