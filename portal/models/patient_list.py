@@ -53,49 +53,53 @@ def patient_list_update_patient(patient_id, research_study_id=None):
     if not user.has_role(ROLE.PATIENT.value):
         return
 
-    patient = PatientList.query.get(patient_id)
-    new_record = False
-    if not patient:
-        new_record = True
-        patient = PatientList(userid=patient_id)
-        db.session.add(patient)
+    from ..timeout_lock import TimeoutLock
+    # async possibility, only allow one thread at a time
+    key = f"patient_list_update_patient:{patient_id}"
+    with TimeoutLock(key, expires=60, timeout=60):
+        patient = PatientList.query.get(patient_id)
+        new_record = False
+        if not patient:
+            new_record = True
+            patient = PatientList(userid=patient_id)
+            db.session.add(patient)
 
-    if research_study_id is None or new_record:
-        patient.study_id = user.external_study_id
-        patient.firstname = user.first_name
-        patient.lastname = user.last_name
-        patient.email = user.email
-        patient.birthdate = user.birthdate
-        patient.deleted = user.deleted_id is not None
-        patient.test_role = True if user.has_role(ROLE.TEST.value) else False
-        patient.org_id = user.organizations[0].id if user.organizations else None
-        patient.org_name = user.organizations[0].name if user.organizations else None
+        if research_study_id is None or new_record:
+            patient.study_id = user.external_study_id
+            patient.firstname = user.first_name
+            patient.lastname = user.last_name
+            patient.email = user.email
+            patient.birthdate = user.birthdate
+            patient.deleted = user.deleted_id is not None
+            patient.test_role = True if user.has_role(ROLE.TEST.value) else False
+            patient.org_id = user.organizations[0].id if user.organizations else None
+            patient.org_name = user.organizations[0].name if user.organizations else None
 
-    # necessary to avoid recursive loop via some update paths
-    now = datetime.utcnow()
-    if patient.last_updated and patient.last_updated + timedelta(seconds=10) > now:
+        # necessary to avoid recursive loop via some update paths
+        now = datetime.utcnow()
+        if patient.last_updated and patient.last_updated + timedelta(seconds=10) > now:
+            db.session.commit()
+            return
+
+        patient.last_updated = now
+        if research_study_id == BASE_RS_ID or research_study_id is None:
+            rs_id = BASE_RS_ID
+            qb_status = qb_status_visit_name(
+                 patient.userid, research_study_id=rs_id, as_of_date=now)
+            patient.questionnaire_status = str(qb_status['status'])
+            patient.visit = qb_status['visit_name']
+            patient.consentdate, _ = consent_withdrawal_dates(user=user, research_study_id=rs_id)
+
+        if (research_study_id == EMPRO_RS_ID or research_study_id is None) and user.clinicians:
+            rs_id = EMPRO_RS_ID
+            patient.clinician = '; '.join(
+                (clinician_name_map().get(c.id, "not in map") for c in user.clinicians)) or ""
+            qb_status = qb_status_visit_name(
+                patient.userid, research_study_id=rs_id, as_of_date=now)
+            patient.empro_status = str(qb_status['status'])
+            patient.empro_visit = qb_status['visit_name']
+            patient.action_state = qb_status['action_state'].title() \
+                if qb_status['action_state'] else ""
+            patient.empro_consentdate, _ = consent_withdrawal_dates(
+                user=user, research_study_id=rs_id)
         db.session.commit()
-        return
-
-    patient.last_updated = now
-    if research_study_id == BASE_RS_ID or research_study_id is None:
-        rs_id = BASE_RS_ID
-        qb_status = qb_status_visit_name(
-             patient.userid, research_study_id=rs_id, as_of_date=now)
-        patient.questionnaire_status = str(qb_status['status'])
-        patient.visit = qb_status['visit_name']
-        patient.consentdate, _ = consent_withdrawal_dates(user=user, research_study_id=rs_id)
-
-    if (research_study_id == EMPRO_RS_ID or research_study_id is None) and user.clinicians:
-        rs_id = EMPRO_RS_ID
-        patient.clinician = '; '.join(
-            (clinician_name_map().get(c.id, "not in map") for c in user.clinicians)) or ""
-        qb_status = qb_status_visit_name(
-            patient.userid, research_study_id=rs_id, as_of_date=now)
-        patient.empro_status = str(qb_status['status'])
-        patient.empro_visit = qb_status['visit_name']
-        patient.action_state = qb_status['action_state'].title() \
-            if qb_status['action_state'] else ""
-        patient.empro_consentdate, _ = consent_withdrawal_dates(
-            user=user, research_study_id=rs_id)
-    db.session.commit()
