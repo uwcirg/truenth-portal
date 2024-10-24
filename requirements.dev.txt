@@ -20,7 +20,6 @@ pyparsing==2.4.7          # via packaging
 pytest >= 6.1.0
 pytest-flask==0.15.1
 pytest-timeout==1.4.2
-selenium==3.141.0
 snowballstemmer==2.0.0    # via sphinx
 sphinx-rtd-theme==0.5.1
 sphinx==3.3.1
@@ -36,5 +35,4 @@ virtualenv==20.4.2        # via tox
 waitress==1.4.3           # via webtest
 webob==1.8.5              # via webtest
 webtest==2.0.33           # via flask-webtest
-xvfbwrapper==0.2.9
 --editable .
