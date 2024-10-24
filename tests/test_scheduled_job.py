@@ -8,7 +8,7 @@ import pytest
 from portal.extensions import db
 from portal.models.role import ROLE
 from portal.models.scheduled_job import ScheduledJob
-from portal.tasks import test as task_test
+from portal.tasks import test as test_task
 from sqlalchemy.orm import session
 from tests import TestCase
 
@@ -122,7 +122,7 @@ class TestScheduledJob(TestCase):
         job = db.session.merge(job)
 
         kdict = {"job_id": job.id}
-        resp = task_test(**kdict)
+        resp = test_task(**kdict)
         assert len(resp.split()) == 6
         assert resp.split()[-1] == 'Test'
 
@@ -135,13 +135,13 @@ class TestScheduledJob(TestCase):
         job = db.session.merge(job)
 
         kdict = {"job_id": job.id}
-        resp = task_test(**kdict)
+        resp = test_task(**kdict)
         assert len(resp.split()) == 4
         assert resp.split()[-1] == 'inactive.'
 
         # test manual override run of inactive job
         kdict['manual_run'] = True
-        resp = task_test(**kdict)
+        resp = test_task(**kdict)
         assert len(resp.split()) == 6
         assert resp.split()[-1] == 'Test'
 

@@ -93,16 +93,6 @@ export default { /*global $ */
             $.ajax("/api/me").done(
                 function() {
                     console.log("user authorized");
-                    if ((typeof CsrfTokenChecker !== "undefined") && 
-                        !CsrfTokenChecker.checkTokenValidity()) {
-                        //if CSRF Token not valid, return error
-                        if (callback) {
-                            callback({"error": DEFAULT_SERVER_DATA_ERROR});
-                            fieldHelper.showError(targetField);
-                        }
-                        return;
-                    }
-                     
                     ajaxCall();
                 }
             ).fail(function() {
