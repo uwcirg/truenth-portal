@@ -26,6 +26,7 @@ from ..models.user import User
 from ..timeout_lock import TimeoutLock, LockTimeout
 
 EMPRO_LOCK_KEY = "empro-trigger-state-lock-{user_id}"
+EMPRO_LOCK_EXPIRATION = 2*60*60  # yes, 2 hours given interruptions by big jobs (see IRONN-270)
 OPT_OUT_DELAY = 1800  # seconds to allow user to provide opt-out choices
 
 class EMPRO_state(StateMachine):
@@ -296,6 +297,9 @@ def fire_trigger_events():
         # necessary to make deep copy in order to update DB JSON
         triggers = copy.deepcopy(ts.triggers)
         triggers['action_state'] = 'not applicable'
+        if 'actions' in triggers:
+            current_app.logger.error(
+                f"unexpected existing 'actions' in trigger_states.triggers({ts.id}): {triggers['actions']}")
         triggers['actions'] = dict()
         triggers['actions']['email'] = list()
 
@@ -413,6 +417,7 @@ def fire_trigger_events():
         try:
             with TimeoutLock(
                     key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
+                    expires=EMPRO_LOCK_EXPIRATION,
                     timeout=NEVER_WAIT):
                 process_processed(ts)
                 db.session.commit()
@@ -425,6 +430,7 @@ def fire_trigger_events():
             try:
                 with TimeoutLock(
                         key=EMPRO_LOCK_KEY.format(user_id=ts.user_id),
+                        expires=EMPRO_LOCK_EXPIRATION,
                         timeout=NEVER_WAIT):
                     process_pending_actions(ts)
                     db.session.commit()
@@ -555,7 +561,9 @@ def extract_observations(questionnaire_response_id, override_state=False):
 
     # given asynchronous possibility, require user's EMPRO lock
     with TimeoutLock(
-            key=EMPRO_LOCK_KEY.format(user_id=qnr.subject_id), timeout=60):
+            key=EMPRO_LOCK_KEY.format(user_id=qnr.subject_id),
+            expires=EMPRO_LOCK_EXPIRATION,
+            timeout=EMPRO_LOCK_EXPIRATION+60):
         ts = users_trigger_state(qnr.subject_id)
         sm = EMPRO_state(ts)
         if not override_state:
