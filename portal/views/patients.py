@@ -184,7 +184,7 @@ def page_of_patients():
         options.append({"action_state": [(state[0], _(state[0])) for state in distinct_action]})
         distinct_visits = PatientList.query.distinct(PatientList.empro_visit).with_entities(
             PatientList.empro_visit)
-        options.append({"empro_visit": [(visit[0], _(visit[0])) for visit in distinct_visits]})
+        options.append({"empro_visit": [(visit[0], translate_visit_name(visit[0])) for visit in distinct_visits]})
     else:
         distinct_status = PatientList.query.distinct(
             PatientList.questionnaire_status).with_entities(PatientList.questionnaire_status)
@@ -192,7 +192,7 @@ def page_of_patients():
             {"questionnaire_status": [(status[0], _(status[0])) for status in distinct_status]})
         distinct_visits = PatientList.query.distinct(PatientList.visit).with_entities(
             PatientList.visit)
-        options.append({"visit": [(visit[0], _(visit[0])) for visit in distinct_visits]})
+        options.append({"visit": [(visit[0], translate_visit_name(visit[0])) for visit in distinct_visits]})
 
     viewable_orgs = requested_orgs(user, research_study_id)
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
