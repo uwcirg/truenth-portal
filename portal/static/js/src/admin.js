@@ -608,6 +608,7 @@ let requestTimerId = 0;
         this.filterOptionsList.forEach((o) => {
           for (const [key, values] of Object.entries(o)) {
             values.forEach((value) => {
+              if (!value[1]) return true;
               if (
                 $(
                   `#adminTable .bootstrap-table-filter-control-${key} option[value='${value[0]}']`
@@ -1412,7 +1413,7 @@ let requestTimerId = 0;
               max_attempts: 1,
             },
             function (result) {
-              if (!result?.error) self.currentTablePreference = data;
+              if (result && !result.error) self.currentTablePreference = data;
               if (callback) callback();
             }
           );
