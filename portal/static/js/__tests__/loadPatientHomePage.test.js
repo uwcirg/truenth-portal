@@ -5,8 +5,8 @@ import puppeteer from "puppeteer";
 // const homepage = "https://eproms-test.cirg.washington.edu";
 // const testEmail = atob("YWNoZW4yNDAxK3Rlc3QxMTFAZ21haWwuY29t");
 // const testPassword = atob("RWxlYW5vcjI=");
-const testEmail = process.env.testEmail;
-const testPassword = process.env.testPassword;
+const testEmail = process.env.testPatientEmail;
+const testPassword = process.env.testPatientPassword;
 const homepage = process.env.homePageURL;
 
 describe("Login in to Patient Home Page", () => {
