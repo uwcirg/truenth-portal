@@ -30,6 +30,7 @@
     "clean-css": "^4.2.1",
     "core-js-compat": "^3.4.7",
     "del": "^6.0.0",
+    "dotenv": "^16.4.5",
     "expect-puppeteer": "^10.1.4",
     "fs": "0.0.1-security",
     "gulp": "^4.0.2",
