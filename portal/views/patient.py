@@ -328,7 +328,7 @@ def patient_timeline(patient_id):
     )
     from ..models.qbd import QBD
     from ..models.qb_status import QB_Status
-    from ..models.questionnaire_bank import visit_name
+    from ..models.questionnaire_bank import translate_visit_name, visit_name
     from ..models.questionnaire_response import aggregate_responses
     from ..models.research_protocol import ResearchProtocol
     from ..tasks import cache_single_patient_adherence_data
@@ -392,7 +392,7 @@ def patient_timeline(patient_id):
                 'at': FHIR_datetime.as_fhir(qbt.at),
                 'qb (id, iteration)': "{} ({}, {})".format(
                     qbd.questionnaire_bank.name, qbd.qb_id, qbd.iteration),
-                'visit': visit_name(qbd)}
+                'visit': translate_visit_name(visit_name(qbd))}
             if qbt.status == OverallStatus.due:
                 data['questionnaires'] = ','.join(
                     [q.name for q in qbd.questionnaire_bank.questionnaires])
