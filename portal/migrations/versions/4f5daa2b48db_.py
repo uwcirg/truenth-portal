@@ -1,7 +1,7 @@
 """remove non english rows from report data (IRONN-264)
 
 Revision ID: 4f5daa2b48db
-Revises: 967a074a0404
+Revises: 5a300be640fb
 Create Date: 2024-11-25 13:48:01.321510
 
 """
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '4f5daa2b48db'
-down_revision = '967a074a0404'
+down_revision = '5a300be640fb'
 
 
 def upgrade():
