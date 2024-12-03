@@ -592,6 +592,10 @@ def qbs_by_rp(rp_id, classification):
 
 
 def visit_name(qbd):
+    """returns string repr of visit, i.e. 'Month 3' or 'Baseline'
+
+    NB - only returns english version.  See `translate_visit_name()`
+    """
     from .research_study import (
         EMPRO_RS_ID,
         research_study_id_from_questionnaire,
@@ -617,12 +621,22 @@ def visit_name(qbd):
         clm += (clrd.years * 12) if clrd.years else 0
         total = clm * qbd.iteration + sm
         if rs_id == EMPRO_RS_ID:
-            return _('Month %(month_total)d', month_total=total+1)
-        return _('Month %(month_total)d', month_total=total)
+            return f'Month {total+1}'
+        return f'Month {total}'
 
     if rs_id == EMPRO_RS_ID:
-        return _('Month %(month_total)d', month_total=1)
-    return _(qbd.questionnaire_bank.classification.title())
+        return 'Month 1'
+    return qbd.questionnaire_bank.classification.title()
+
+
+def translate_visit_name(visit_name):
+    """parse the english version of visit name for front end translation needs"""
+    if not visit_name:
+        return visit_name
+    if visit_name.startswith('Month '):
+        number = int(visit_name[6:])
+        return _('Month %(month_total)d', month_total=number)
+    return _(visit_name)
 
 
 def add_static_questionnaire_bank():

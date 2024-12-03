@@ -1316,8 +1316,8 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
 
     :returns: dictionary with key/values for:
       status: string like 'expired'
-      visit_name: for the period, i.e. '3 months'
-      action_state: 'not applicable', or status of follow up action
+      visit_name: for the period, i.e. '3 months'. ALWAYS in english, clients must translate
+      action_state: 'not applicable', or status of follow-up action
 
     """
     from .research_study import EMPRO_RS_ID
