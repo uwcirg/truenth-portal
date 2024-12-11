@@ -43,7 +43,7 @@ def update_patient_adherence_data(patient_id):
     such as changing a user's study-id.
     """
     patient = User.query.get(patient_id)
-    AdherenceData.query.filter(AdherenceData.patient_id).delete()
+    AdherenceData.query.filter(AdherenceData.patient_id==patient_id).delete()
     for rs_id in ResearchStudy.assigned_to(patient):
         single_patient_adherence_data(patient_id=patient_id, research_study_id=rs_id)
 
