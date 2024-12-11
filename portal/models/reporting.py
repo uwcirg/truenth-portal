@@ -34,6 +34,7 @@ from .role import ROLE, Role
 from .user import User, UserRoles, patients_query
 from .user_consent import consent_withdrawal_dates
 
+
 def update_patient_adherence_data(patient_id):
     """Cache invalidation and force rebuild for given patient's adherence data
 
