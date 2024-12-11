@@ -6,7 +6,6 @@ from smtplib import SMTPRecipientsRefused
 
 from flask import current_app
 from flask_babel import force_locale
-from flask_login import login_manager
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
@@ -30,10 +29,22 @@ from .questionnaire_response import (
     qnr_csv_column_headers,
     generate_qnr_csv,
 )
-from .research_study import BASE_RS_ID, EMPRO_RS_ID
+from .research_study import BASE_RS_ID, EMPRO_RS_ID, ResearchStudy
 from .role import ROLE, Role
 from .user import User, UserRoles, patients_query
 from .user_consent import consent_withdrawal_dates
+
+def update_patient_adherence_data(patient_id):
+    """Cache invalidation and force rebuild for given patient's adherence data
+
+    NB - any timeline or questionnaire response data changes are invalidated and
+    updated as part of `invalidate_users_QBT()`.  This function is for edge cases
+    such as changing a user's study-id.
+    """
+    patient = User.query.get(patient_id)
+    AdherenceData.query.filter(AdherenceData.patient_id).delete()
+    for rs_id in ResearchStudy.assigned_to(patient):
+        single_patient_adherence_data(patient_id=patient_id, research_study_id=rs_id)
 
 
 def single_patient_adherence_data(patient_id, research_study_id):
