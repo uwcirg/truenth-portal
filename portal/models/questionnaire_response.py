@@ -910,11 +910,16 @@ def qnr_document_id(
         QuestionnaireResponse.subject_id == subject_id).filter(
         QuestionnaireResponse.document[
             ('questionnaire', 'reference')
-        ].astext.endswith(questionnaire_name)).filter(
-        QuestionnaireResponse.questionnaire_bank_id ==
-        questionnaire_bank_id).with_entities(
+        ].astext.endswith(questionnaire_name)).with_entities(
         QuestionnaireResponse.document[(
             'identifier', 'value')])
+    if questionnaire_name != 'irondemog_v3':
+        # Another special indefinite workaround. irondemog_v3 happens to live
+        # in multiple questionnaire banks, thus the lookup will fail when
+        # restricted by QB.id, should the org have transitioned since the user
+        # left work incomplete from the previous protocol (TN-2747)
+        qnr = qnr.filter(QuestionnaireResponse.questionnaire_bank_id == questionnaire_bank_id)
+
     if iteration is not None:
         qnr = qnr.filter(QuestionnaireResponse.qb_iteration == iteration)
     else:
