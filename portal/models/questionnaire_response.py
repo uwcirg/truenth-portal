@@ -28,6 +28,7 @@ from .questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
     trigger_date,
+    translate_visit_name,
     visit_name,
 )
 from .research_data import ResearchData
@@ -401,7 +402,7 @@ class QuestionnaireResponse(db.Model):
                 relative_start=None, iteration=self.qb_iteration,
                 recur_id=recur_id, qb_id=self.questionnaire_bank_id)
             results.append({
-                'visit_name': visit_name(qbd),
+                'visit_name': translate_visit_name(visit_name(qbd)),
                 'url': TRUENTH_VISIT_NAME_EXTENSION})
 
             expires_at = expires(self.subject_id, qbd)
@@ -909,11 +910,16 @@ def qnr_document_id(
         QuestionnaireResponse.subject_id == subject_id).filter(
         QuestionnaireResponse.document[
             ('questionnaire', 'reference')
-        ].astext.endswith(questionnaire_name)).filter(
-        QuestionnaireResponse.questionnaire_bank_id ==
-        questionnaire_bank_id).with_entities(
+        ].astext.endswith(questionnaire_name)).with_entities(
         QuestionnaireResponse.document[(
             'identifier', 'value')])
+    if questionnaire_name != 'irondemog_v3':
+        # Another special indefinite workaround. irondemog_v3 happens to live
+        # in multiple questionnaire banks, thus the lookup will fail when
+        # restricted by QB.id, should the org have transitioned since the user
+        # left work incomplete from the previous protocol (TN-2747)
+        qnr = qnr.filter(QuestionnaireResponse.questionnaire_bank_id == questionnaire_bank_id)
+
     if iteration is not None:
         qnr = qnr.filter(QuestionnaireResponse.qb_iteration == iteration)
     else:

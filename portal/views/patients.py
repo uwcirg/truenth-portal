@@ -17,6 +17,7 @@ from ..models.coding import Coding
 from ..models.intervention import Intervention
 from ..models.organization import Organization, OrgTree
 from ..models.patient_list import PatientList
+from ..models.questionnaire_bank import translate_visit_name
 from ..models.qb_status import patient_research_study_status
 from ..models.role import ROLE
 from ..models.research_study import EMPRO_RS_ID, ResearchStudy
@@ -181,11 +182,25 @@ def page_of_patients():
         distinct_action = PatientList.query.distinct(PatientList.action_state).with_entities(
             PatientList.action_state)
         options.append({"action_state": [(state[0], _(state[0])) for state in distinct_action]})
+        distinct_visits = PatientList.query.distinct(PatientList.empro_visit).with_entities(
+            PatientList.empro_visit)
+        sorted_visits = sorted(
+            [v[0] for v in distinct_visits if v[0]],
+            key=lambda x: (0 if not x.split()[-1].isdigit() else int(x.split()[-1]))
+        )
+        options.append({"empro_visit": [(visit, translate_visit_name(visit)) for visit in sorted_visits]})
     else:
         distinct_status = PatientList.query.distinct(
             PatientList.questionnaire_status).with_entities(PatientList.questionnaire_status)
         options.append(
             {"questionnaire_status": [(status[0], _(status[0])) for status in distinct_status]})
+        distinct_visits = PatientList.query.distinct(PatientList.visit).with_entities(
+            PatientList.visit)
+        sorted_visits = sorted(
+            [v[0] for v in distinct_visits if v[0]],
+            key=lambda x: (0 if not x.split()[-1].isdigit() else int(x.split()[-1]))
+        )
+        options.append({"visit": [(visit, translate_visit_name(visit)) for visit in sorted_visits]})
 
     viewable_orgs = requested_orgs(user, research_study_id)
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
@@ -222,8 +237,8 @@ def page_of_patients():
             "questionnaire_status": _(row.questionnaire_status),
             "empro_status": _(row.empro_status),
             "action_state": _(row.action_state),
-            "visit": row.visit,
-            "empro_visit": row.empro_visit,
+            "visit": translate_visit_name(row.visit),
+            "empro_visit": translate_visit_name(row.empro_visit),
             "study_id": row.study_id,
             "consentdate": row.consentdate,
             "empro_consentdate": row.empro_consentdate,
