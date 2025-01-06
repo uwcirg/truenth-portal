@@ -838,7 +838,7 @@ class OrgTree(object):
     def __init__(self):
         # Maintain a singleton root object and lookup_table
         try:
-            with TimeoutLock(key=ORG_TREE_LOCK_KEY, expires=300):
+            with TimeoutLock(key=ORG_TREE_LOCK_KEY, expires=300, timeout=300):
                 if not OrgTree.root:
                     self.__reset_cache()
         except LockTimeout:
