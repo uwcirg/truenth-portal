@@ -751,7 +751,7 @@ def patient_reminder_email(user_id):
     Query string
     :param research_study_id: set for targeted reminder emails, defaults to 0
 
-    :raises BadRequest: if the patient isn't currently eligible for reminder
+    :raises werkzeug.exceptions.BadRequest: if the patient isn't currently eligible for reminder
     """
     from ..models.qb_status import QB_Status
     user = get_user(user_id, 'edit')
