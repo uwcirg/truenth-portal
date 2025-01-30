@@ -308,7 +308,7 @@
         <div id="profile{{prefix}}EmailBtnMsgWrapper" class="profilePatientEmail__btn-msg-wrapper tnth-hide">
             <div id="profile{{prefix}}EmailLoadingIndicator" v-show="patientEmailForm.loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
             <div id="profile{{prefix}}EmailMessage" class="send-email-info text-info" v-html="messages.userInviteEmailInfoMessage"></div>
-            <div id="profile{{prefix}}EmailErrorMessage" class="send-email-info text-danger" v-html="messages.userInviteEmailErrorMessage"></div>
+            <div id="profile{{prefix}}EmailErrorMessage" class="send-email-info text-danger clamped-container" v-html="messages.userInviteEmailErrorMessage"></div>
         </div>
         {{emailReadyMessage()}}
     </div>
