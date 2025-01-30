@@ -772,7 +772,7 @@ def patient_reminder_email(user_id):
             as_of_date=datetime.utcnow())
         if qstats.overall_status not in (
                 OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress):
-            raise BadRequest('No questionnaires available for patient to complete')
+            raise BadRequest(_('No questionnaire is due.'))
 
         qbd = qstats.current_qbd()
         if qbd:
