@@ -32,6 +32,7 @@ from flask_user import roles_required
 from flask_wtf import FlaskForm
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import BadRequest
 from wtforms import (
     BooleanField,
     HiddenField,
@@ -70,6 +71,7 @@ from ..models.organization import (
     OrgTree,
     UserOrganization,
 )
+from ..models.overall_status import OverallStatus
 from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
@@ -749,6 +751,7 @@ def patient_reminder_email(user_id):
     Query string
     :param research_study_id: set for targeted reminder emails, defaults to 0
 
+    :raises werkzeug.exceptions.BadRequest: if the patient isn't currently eligible for reminder
     """
     from ..models.qb_status import QB_Status
     user = get_user(user_id, 'edit')
@@ -767,6 +770,10 @@ def patient_reminder_email(user_id):
             user,
             research_study_id=research_study_id,
             as_of_date=datetime.utcnow())
+        if qstats.overall_status not in (
+                OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress):
+            raise BadRequest(_('No questionnaire is due.'))
+
         qbd = qstats.current_qbd()
         if qbd:
             qb_id, qb_iteration = qbd.qb_id, qbd.iteration
