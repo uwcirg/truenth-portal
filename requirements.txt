@@ -67,7 +67,7 @@ pycryptodome==3.9.9       # via flask-user
 python-dateutil==2.9.0.post0
     # via celery
 python-editor==1.0.4      # via alembic
-python-levenshtein==0.12.0
+python-levenshtein==0.12.1
 python-memcached==1.59    # via flask-dogpile-cache
 python-statemachine==0.8.0	# via python-statemachine
 pytz==2020.5              # via babel
