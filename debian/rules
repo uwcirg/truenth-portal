@@ -8,7 +8,8 @@ DH_VIRTUALENV_ARGS = \
 	--python='/usr/bin/python3' \
 	--builtin-venv \
 	--preinstall=wheel \
-	--extra-pip-arg='--progress-bar=off'
+	--extra-pip-arg='--progress-bar=off' \
+	--extra-pip-arg='--verbose'
 
 # Directory where venvs for dh-virtualenv packages are built
 VENV_BUILD_DIR = '$(PWD)/debian/portal/opt/venvs'
