@@ -9,7 +9,7 @@ DH_VIRTUALENV_ARGS = \
 	--builtin-venv \
 	--preinstall=wheel \
 	--extra-pip-arg='--progress-bar=off' \
-	--extra-pip-arg='--log=/dev/stdout'
+	--extra-pip-arg='--quiet'
 
 # Directory where venvs for dh-virtualenv packages are built
 VENV_BUILD_DIR = '$(PWD)/debian/portal/opt/venvs'
