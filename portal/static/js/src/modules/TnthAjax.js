@@ -155,6 +155,12 @@ export default { /*global $ */
             el.css("opacity", 1);
             el.addClass("loading");
         },
+        hideLoader: function(targetField) {
+            if (!targetField || targetField.length === 0) { return false; }
+            var el = $("#" + (targetField.attr("data-save-container-id") || targetField.attr("id")) + "_load");
+            el.css("opacity", 0);
+            el.removeClass("loading");
+        },
         showUpdate: function(targetField) {
             var __timeout = this.delayDuration;
             if (!targetField || targetField.length === 0) { return false; }

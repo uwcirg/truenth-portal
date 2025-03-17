@@ -1,5 +1,7 @@
 import Utility from "./Utility.js";
 import tnthDates from "./TnthDate.js";
+import tnthAjax  from "./TnthAjax.js";
+
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 
 var ValidatorObj = { /*global  $ i18next */
@@ -25,26 +27,28 @@ var ValidatorObj = { /*global  $ i18next */
         if ($el.attr("data-user-id")) {
             addUserId = "&user_id=" + $el.attr("data-user-id");
         }
-        if (emailReg.test(emailVal)) {  // If this is a valid address, then use unique_email to check whether it's already in use
-            var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
-            Utility.sendRequest(url, {max_attempts:1}, function(data) {
-                if (data && data.constructor === String) {
-                    data = JSON.parse(data);
-                }
-                if (data.error) { //note a failed request will be logged
-                    $("#erroremail").html(i18next.t("Error occurred when verifying the uniqueness of email")).parents(".form-group").addClass("has-error");
-                    return false; //stop proceeding to update email
-                }
-                if (data.unique) {
-                    $("#erroremail").html("").parents(".form-group").removeClass("has-error");
-                    $("#erroremail").removeClass("with-errors");
-                    update($el);
-                    return true;
-                }
-                $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
-                return false;
-            });
-        }
+        const fieldHelper = tnthAjax.FieldLoaderHelper;
+        var url = "/api/unique_email?email=" + encodeURIComponent(emailVal) + addUserId;
+        fieldHelper.showLoader($el);
+        Utility.sendRequest(url, {max_attempts:1}, function(data) {
+            fieldHelper.hideLoader($el);
+            if (data && data.constructor === String) {
+                data = JSON.parse(data);
+            }
+            if (data.error) { //note a failed request will be logged
+                $("#erroremail").html(i18next.t("invalid email address")).parents(".form-group").addClass("has-error");
+                return false; //stop proceeding to update email
+            }
+            if (data.unique) {
+                $("#erroremail").html("").parents(".form-group").removeClass("has-error");
+                $("#erroremail").removeClass("with-errors");
+                update($el);
+                return true;
+            }
+            $("#erroremail").html(i18next.t("This e-mail address is already in use. Please enter a different address.")).parents(".form-group").addClass("has-error");
+            return false;
+        });
+    
         return emailReg.test(emailVal);
     },
     htmltagsValidation: function($el) {
