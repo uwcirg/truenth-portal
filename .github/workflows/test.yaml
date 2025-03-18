@@ -5,16 +5,9 @@ name: Test
 on: [push]
 jobs:
   test:
-    strategy:
-      matrix:
-        # create a job for every tox env
-        tox_env:
-          - py3
-          - docs
-          - celery_background
     runs-on: ubuntu-latest
     container: python:3.9
-    # Service containers to run with `container-job`
+    # service containers tests depend on
     services:
       # Label used to access the service container
       redis:
@@ -32,12 +25,20 @@ jobs:
         env:
           POSTGRES_DB: portaldb
           POSTGRES_PASSWORD: wplatrop
+
+    strategy:
+      matrix:
+        # create a job for every tox env
+        tox_env:
+          - py3
+          - docs
+          - celery_background
     env:
+      TOXENV: ${{ matrix.tox_env }}
       SESSION_REDIS: redis://redis:6379/0
       SECRET_KEY: static secret key
       SQLALCHEMY_DATABASE_TEST_URI: postgresql://postgres:wplatrop@postgres/portaldb
       REDIS_URL: redis://redis:6379/0
-      TOXENV: ${{ matrix.tox_env }}
     steps:
       - uses: actions/checkout@v4
 
