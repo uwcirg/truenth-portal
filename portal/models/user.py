@@ -262,13 +262,23 @@ def validate_email(email):
     This validation function is generally only used when an end user changing
     an address or another use requires validation.
 
-    Furthermore, due to the complexity of valid email addresses, just
-    look for some obvious signs - such as the '@' symbol and at least 6 chars.
-
     :raises :py:exc:`werkzeug.exceptions.BadRequest`: if obviously invalid
 
     """
-    if not email or '@' not in email or len(email) < 6:
+    # ignore the no email prefix
+    if email and email.startswith(NO_EMAIL_PREFIX):
+        return
+
+    # ignore service account patterns
+    if email and email.startswith('service account sponsored by '):
+        return
+
+    # ignore special __system__ account
+    if email and email == '__system__':
+        return
+
+    valid_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    if not email or not re.match(valid_pattern, email):
         raise BadRequest("requires a valid email address")
 
 

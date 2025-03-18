@@ -79,7 +79,7 @@ import {
                 } else {
                     self.attempts = 0;
                     var displayError = i18next.t("Server error occurred updating data.");
-                    $("#error_response_text").html(displayError);
+                    $("#error_response_text").html(displayError + (xhr && xhr.responseText ? "<br>" + xhr.responseText : ""));
                     (params.callback).call(self, {"error": displayError});
                     tnthAjax.sendError(xhr, params.apiUrl, self.userId);
                 }
@@ -594,6 +594,9 @@ import {
                 $("#createProfileForm .create-account-container").append("<div class='overlay'></div>");
             }
         };
+        this.isFormNotReady = function() {
+            return $(".form-group .loading").length > 0 || $(".form-group.has-error").length > 0;
+        }
         this.initButtons = function() {
             var self = this;
             $("#createProfileForm .back-button-container").prepend(this.__getLoaderHTML());
@@ -606,7 +609,8 @@ import {
             });
             $("#updateProfile").attr("disabled", true);
             $("#createProfileForm").on("submit", function (e) { //submit on clicking save button
-                if (e.isDefaultPrevented()) {
+                if (e.isDefaultPrevented() || self.isFormNotReady()) {
+                    console.log("invalid form entry");
                     // handle the invalid form...
                     return false;
                 } 
