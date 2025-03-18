@@ -21,7 +21,7 @@ jobs:
           --health-retries 5
       postgres:
         # DockerHub image
-        image: postgres:13
+        image: postgres:16
         env:
           POSTGRES_DB: portaldb
           POSTGRES_PASSWORD: wplatrop
