@@ -1748,6 +1748,10 @@ class User(db.Model, UserMixin):
                     ).count() > 0
                 ):
                     abort(400, "email address already in use")
+                try:
+                    self._email and validate_email(self._email)
+                except BadRequest:
+                    abort(400, "email address format invalid")
                 self.email = telecom.email
             telecom_cps = telecom.cp_dict()
             self.phone = (
