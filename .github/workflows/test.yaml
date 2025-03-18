@@ -35,7 +35,6 @@ jobs:
           - celery_background
     env:
       TOXENV: ${{ matrix.tox_env }}
-      SESSION_REDIS: redis://redis:6379/0
       SECRET_KEY: static secret key
       SQLALCHEMY_DATABASE_TEST_URI: postgresql://postgres:wplatrop@postgres/portaldb
       REDIS_URL: redis://redis:6379/0
