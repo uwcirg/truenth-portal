@@ -7,7 +7,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container: python:3.9
-    # service containers tests depend on
+    # service containers tests depend on; start tests once all services report healthy
     services:
       postgres:
         image: postgres:16
@@ -21,7 +21,6 @@ jobs:
           --health-retries 5
       redis:
         image: redis
-        # Set health checks to wait until redis has started
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
