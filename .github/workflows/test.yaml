@@ -7,7 +7,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container: python:3.9
-    # service containers tests depend on; start tests once all services report healthy
+    # start tests after all services report healthy
     services:
       postgres:
         image: postgres:16
