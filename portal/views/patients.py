@@ -140,6 +140,7 @@ def sort_query(query, sort_column, direction):
 
 @patients.route("/page", methods=["GET"])
 @roles_required([
+    ROLE.CLINICIAN.value,
     ROLE.INTERVENTION_STAFF.value,
     ROLE.STAFF.value,
     ROLE.STAFF_ADMIN.value])
