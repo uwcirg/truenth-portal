@@ -205,6 +205,7 @@ def page_of_patients():
 
     viewable_orgs = requested_orgs(user, research_study_id)
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
+    query = query.filter(PatientList.deleted==False)
     if research_study_id == EMPRO_RS_ID:
         # only include those in the study.  use empro_consentdate as a quick check
         query = query.filter(PatientList.empro_consentdate.isnot(None))
