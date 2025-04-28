@@ -49,8 +49,8 @@ class QB_Status(object):
 
         completed = QBT.query.filter(QBT.user_id == self.user.id).filter(
             QBT.research_study_id == self.research_study_id).filter(
-            QBT.status == OverallStatus.completed).with_entities(QBT.id).first()
-        self.at_least_one_completed = completed is not None
+            QBT.status == OverallStatus.completed).count()
+        self.at_least_one_completed = completed > 0
 
         # Obtain withdrawal date if applicable
         withdrawn = QBT.query.filter(QBT.user_id == self.user.id).filter(
