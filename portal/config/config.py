@@ -193,8 +193,8 @@ class BaseConfig(object):
     # Only set cookies over "secure" channels (HTTPS) for non-dev deployments
     SESSION_COOKIE_SECURE = SYSTEM_TYPE.lower() != 'development'
 
-    # include cookies in cross-domain requests eg portal banner
-    SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SAMESITE = os.environ.get('SESSION_COOKIE_SAMESITE', 'Lax')
+    SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN', SERVER_NAME)
     PREFERRED_URL_SCHEME = os.environ.get('PREFERRED_URL_SCHEME', 'http')
 
     BABEL_CONFIG_FILENAME = 'gil.babel.cfg'
@@ -274,6 +274,7 @@ class TestConfig(BaseConfig):
     MAIL_SUPPRESS_SEND = os.environ.get(
         'MAIL_SUPPRESS_SEND', str(TESTING)).lower() == 'true'
     SERVER_NAME = 'localhost:5005'
+    SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN', 'localhost')
     LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_DATABASE_URI = testing_sql_url()
