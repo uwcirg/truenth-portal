@@ -12,16 +12,10 @@ Docker is an open-source project that can be used to automate the deployment of 
 
 Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (``ARG``) and environment variables (``ENV``) that may be overridden.
 
-Docker-compose (through ``docker-compose.yaml``) defines the relationship (exposed ports, volume mappings) between the Shared Services web container and the other services it depends on (redis, postgresql).
+Docker compose (through ``docker-compose.yaml``) defines the relationship (exposed ports, volume mappings) between the Shared Services web container and the other services it depends on (redis, postgresql).
 
 Getting Started
 ===============
-Install `docker compose` as per environment.  For example, from a debian system::
-
-    # add user to docker group
-    sudo usermod -aG docker $USER
-    pip install --user docker_compose
-
 .. note::
     A clean environment and fresh git checkout are recommended, but not required
 
