@@ -60,14 +60,14 @@ cd "${docker_compose_directory}"
 
 if [ -z "$NO_PULL" ]; then
     echo "Updating images..."
-    docker-compose pull
+    docker compose pull
 fi
 
 if [ "$FORCE" != true ]; then
     # how long a system must be inactive before deploying
     min_inactivity_seconds=$((15 * 60))
 
-    inactive_seconds="$(docker-compose exec --env LOG_LEVEL=info web flask last-usage | tr -d '[[:space:]]')"
+    inactive_seconds="$(docker compose exec --env LOG_LEVEL=info web flask last-usage | tr -d '[[:space:]]')"
     if ! echo "${inactive_seconds}" | grep --quiet '^-*[[:digit:]]\+$'; then
         echo "error reading inactivity time:"
         echo "${inactive_seconds}"
@@ -86,4 +86,4 @@ echo "Starting containers..."
 # Capture stderr to check for restarted containers
 # shell idiom: stderr and stdout file descriptors are swapped and stderr `tee`d
 # allows output to terminal and saving to local variable
-restarted_containers="$(docker-compose up --detach web 3>&2 2>&1 1>&3 3>&- | tee /dev/stderr)"
+restarted_containers="$(docker compose up --detach web 3>&2 2>&1 1>&3 3>&- | tee /dev/stderr)"

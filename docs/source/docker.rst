@@ -16,7 +16,7 @@ Docker-compose (through ``docker-compose.yaml``) defines the relationship (expos
 
 Getting Started
 ===============
-Install `docker-compose` as per environment.  For example, from a debian system::
+Install `docker compose` as per environment.  For example, from a debian system::
 
     # add user to docker group
     sudo usermod -aG docker $USER
@@ -32,18 +32,18 @@ Copy and edit the default environment file (from the project root)::
     # SERVER_NAME=localhost:8080
 
 .. note::
-    All docker-compose commands are run from the ``docker/`` directory
+    All docker compose commands are run from the ``docker/`` directory
 
 Download and run the ``latest`` images::
 
-    docker-compose pull web
-    docker-compose up web
+    docker compose pull web
+    docker compose up web
 
 By default, the ``truenth_portal`` image with the ``latest`` tag is downloaded and used. To use an image with another tag, set the ``DOCKER_IMAGE_TAG`` environment variable::
 
     export DOCKER_IMAGE_TAG='stable'
-    docker-compose pull web
-    docker-compose up web
+    docker compose pull web
+    docker compose up web
 
 .. note::
     Any environment variable set in the shell can also be set in the ``.env`` file. Environment variables in the current shell override values in the ``.env`` file.
@@ -63,7 +63,7 @@ To build a Shared Services docker image from the current branch of your local re
 
 After the image is built, it can be started in the same way as any downloaded image::
 
-    docker-compose up web
+    docker compose up web
 
 Advanced Usage
 ==============
@@ -73,35 +73,35 @@ Running in Background
 Docker-compose services can be run in the background by adding the ``--detach`` option. Services started in detached mode will run until stopped or killed.::
 
     # Start the "web" service (and dependencies) in background
-    docker-compose up --detach web
+    docker compose up --detach web
 
 Viewing Logs
 ------------
 Docker-compose will only show logs of the requested services (usually ``web``), when not run in the background. To view the logs of all running services::
 
     # Tail and follow logs of all services
-    docker-compose logs --follow
+    docker compose logs --follow
 
     # Tail and follow logs of a specific service
-    docker-compose logs --follow celerybeat
+    docker compose logs --follow celerybeat
 
 PostgreSQL Access
 -----------------
-To interact with the running database container, started via the ``docker-compose`` instructions above, use ``docker exec`` as follows below::
+To interact with the running database container, started via the ``docker compose`` instructions above, use ``docker exec`` as follows below::
 
-    docker-compose exec db psql --username postgres --dbname portaldb
+    docker compose exec db psql --username postgres --dbname portaldb
 
 Redis Purge
 -----------
 In rare situations it's necessary to purge all cached data in the redis store::
 
-    docker-compose exec redis redis-cli flushdb
+    docker compose exec redis redis-cli flushdb
 
 Account Bootstrapping
 ---------------------
 To bootstrap an admin account after a fresh install, run the below ``flask`` CLI command::
 
-    docker-compose exec web \
+    docker compose exec web \
         flask add-user \
             --email 'admin_email@example.com' \
             --password 'exampleP@$$W0RD' \
@@ -112,13 +112,13 @@ Advanced Configuration
 
 Development
 -----------
-If you would like to use docker to work on the portal, you can configure ``docker-compose`` to use the development overrides as follows::
+If you would like to use docker to work on the portal, you can configure ``docker compose`` to use the development overrides as follows::
 
     # Set COMPOSE_FILE in the current shell
     export COMPOSE_FILE=docker-compose.yaml:docker-compose.dev.yaml
     # or add to .env to preserve the change between shell sessions
 
-    docker-compose up web
+    docker compose up web
 
 This will mount your checkout into a docker container and use the flask development server instead of the default (gunicorn).
 
@@ -128,10 +128,10 @@ This will mount your checkout into a docker container and use the flask developm
 
 Environment Variables
 ---------------------
-Environment variables defined in the ``portal.env`` environment file are only passed to the underlying containers. However, some environment variables are used for configuration specific to docker-compose.
+Environment variables defined in the ``portal.env`` environment file are only passed to the underlying containers. However, some environment variables are used for configuration specific to docker compose.
 
 An
-`additional environment file <https://docs.docker.com/compose/environment-variables/#the-env-file>`__, specifically named ``.env``, in the current working directory can define environment variables available through the entire docker-compose file (including containers). These docker-compose-level environment variables can also be set in the shell invoking docker-compose.
+`additional environment file <https://docs.docker.com/compose/environment-variables/#the-env-file>`__, specifically named ``.env``, in the current working directory can define environment variables available through the entire docker compose file (including containers). These docker compose-level environment variables can also be set in the shell invoking docker compose.
 
 One use for environmental variables defined in the ``.env`` file is overriding the default ``COMPOSE_PROJECT_NAME`` which can be used to namespace multiple deployments running on the same host. In production deployments ``COMPOSE_PROJECT_NAME`` is set to correspond to the domain being served.
 

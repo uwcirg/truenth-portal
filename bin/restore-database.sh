@@ -36,19 +36,19 @@ restore_sqldump() {
     local sqldump_path="$1"
 
     echo "Stopping services..."
-    docker-compose stop web celeryworker celeryworkerslow celerybeat
+    docker compose stop web celeryworker celeryworkerslow celerybeat
 
     echo "Dropping existing DB..."
-    docker-compose exec db \
+    docker compose exec db \
         dropdb --username postgres portaldb
 
     echo "Creating empty DB..."
-    docker-compose exec db \
+    docker compose exec db \
         createdb --username postgres portaldb
 
     echo "Loading SQL dumpfile: ${sqldump_path}..."
     # Disable pseudo-tty allocation
-    docker-compose exec -T db \
+    docker compose exec -T db \
         psql --dbname portaldb --username postgres < "${sqldump_path}"
     echo "Loaded SQL dumpfile"
 }
