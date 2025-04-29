@@ -41,21 +41,21 @@ BACKUPS_DIR="${backups_dir:-$default_backups_dir}"
 docker_compose_directory="${repo_path}/docker"
 cd "${docker_compose_directory}"
 
-if [ -z "$(docker-compose ps --quiet db)" ]; then
+if [ -z "$(docker compose ps --quiet db)" ]; then
     >&2 echo "Error: database not running"
     exit 1
 fi
 
 # get COMPOSE_PROJECT_NAME (see .env)
 compose_project_name="$(
-    docker inspect "$(docker-compose ps --quiet db)" \
+    docker inspect "$(docker compose ps --quiet db)" \
         --format '{{ index .Config.Labels "com.docker.compose.project"}}'
 )"
-web_image_hash="$(docker-compose images --quiet web | cut -c1-7)"
+web_image_hash="$(docker compose images --quiet web | cut -c1-7)"
 dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_hash}-${compose_project_name}"
 
 echo "Backing up current database..."
-docker-compose exec --user postgres db bash -c '\
+docker compose exec --user postgres db bash -c '\
     pg_dump \
         --dbname $POSTGRES_DB \
         --no-acl \

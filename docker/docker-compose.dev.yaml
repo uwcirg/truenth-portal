@@ -1,4 +1,4 @@
-# docker-compose development overrides
+# docker compose development overrides
 # mount code checkout into container and use development server for auto-reloading
 ---
 version: "3.4"
