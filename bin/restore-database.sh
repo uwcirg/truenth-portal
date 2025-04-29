@@ -48,7 +48,7 @@ restore_sqldump() {
 
     echo "Loading SQL dumpfile: ${sqldump_path}..."
     # Disable pseudo-tty allocation
-    docker compose exec -T db \
+    docker compose exec --no-TTY db \
         psql --dbname portaldb --username postgres < "${sqldump_path}"
     echo "Loaded SQL dumpfile"
 }
