@@ -198,8 +198,7 @@ emproObj.prototype.onAfterSubmitOptoutData = function (data) {
     EmproObj.setOptoutButtonsState(false);
     EmproObj.submittedOptOutDomains = EmproObj.selectedOptOutDomains;
     EmproObj.populateSelectedOptoutUI();
-    // TODO different text will appear in thank you modal, waiting for approval before changes
-    // EmproObj.handleFullOptout();
+    EmproObj.handleFullOptout();
     EmproObj.initOptOutModal(false);
     EmproObj.initThankyouModal(true);
   }, 1000);
