@@ -85,6 +85,11 @@ def update_single_patient_research_data(subject_id):
         QuestionnaireResponse.questionnaire_bank_id > 0).filter(
         QuestionnaireResponse.subject_id == subject_id)
     for qnr in qnrs:
+        # skip any already cached
+        if ResearchData.query.filter(
+                ResearchData.questionnaire_response_id == qnr.id).first():
+            continue
+
         # research_study_id of None triggers a lookup
         add_questionnaire_response(qnr, research_study_id=None)
 
