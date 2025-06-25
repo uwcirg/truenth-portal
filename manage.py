@@ -2,7 +2,6 @@
 
 FLASK_APP=manage.py flask --help
 
-(bogus comment line added to triger build)
 """
 import copy
 from datetime import datetime
@@ -104,6 +103,16 @@ def stamp_db():
 def upgrade_db():
     """Run any outstanding migration scripts"""
     _run_alembic_command(['--raiseerr', 'upgrade', 'head'])
+
+
+@click.option(
+    '--reprocess', '-r', is_flag=True,
+    help='Reprocess adherence cache for patients showing issues')
+@app.cli.command()
+def adherence_cache_test(reprocess=False):
+    """Compare current adherence cache to trigger states, generate report"""
+    from portal.trigger_states.adherence_cache_validation import validate
+    validate(reprocess)
 
 
 def flush_cache():

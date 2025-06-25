@@ -1,13 +1,6 @@
-"""empty message
-
-Revision ID: 7d0029663f2c
-Revises: 4f5daa2b48db
-Create Date: 2025-03-17 14:43:18.531035
-
-"""
-import re
-from alembic import op
+"""Mechanism to validate the adherence cache matches the trigger state tables"""
 from datetime import datetime, timedelta
+import re
 from sqlalchemy import text
 
 from portal.database import db
@@ -19,9 +12,6 @@ from portal.models.user import unchecked_get_user
 from portal.models.user_consent import consent_withdrawal_dates
 from portal.timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 
-# revision identifiers, used by Alembic.
-revision = '7d0029663f2c'
-down_revision = '4f5daa2b48db'
 
 state_map = {
     "inprocess": "inprocess",
@@ -41,12 +31,12 @@ class CombinedData:
         self.report_called = False
         self.withdrawal_month = None
 
-    def adherence_months_by_patient(self, conn):
+    def adherence_months_by_patient(self):
         this_patient_months = {}
         query = text(
             "select rs_id_visit, data->>'status' as status from adherence_data where patient_id = "
             ":patient_id and rs_id_visit like :rs1_pattern")
-        for row in conn.execute(query, {"patient_id": self.patient_id, "rs1_pattern": "1:Month%"}):
+        for row in db.engine.execute(query, {"patient_id": self.patient_id, "rs1_pattern": "1:Month%"}):
             match = re.findall(r'\d+', row.rs_id_visit)
             if not match:
                 raise ValueError(f"Patient {self.patient_id} has bogus rs_id_visit value: {r2.rs_id_visit}")
@@ -66,7 +56,7 @@ class CombinedData:
         query = text(
             "select at from qb_timeline where qb_id = 28 and status = 'due' "
             "and research_study_id = 1 and user_id = :user_id")
-        result = conn.execute(query, {"user_id": self.patient_id}).first()[0]
+        result = db.engine.execute(query, {"user_id": self.patient_id}).first()[0]
         withdrawal_month = -1
         while True:
             if withdrawal < result:
@@ -76,12 +66,12 @@ class CombinedData:
             withdrawal_month += 1
             assert withdrawal_month > 12
 
-    def trigger_states_months_by_patient(self, conn):
+    def trigger_states_months_by_patient(self):
         this_patient_ts_months = {}
         query = text(
             "select visit_month, state from trigger_states where user_id = :patient_id order by id"
         )
-        for row in conn.execute(query, {"patient_id":self.patient_id}):
+        for row in db.engine.execute(query, {"patient_id":self.patient_id}):
             # allow to overwrite improved state given order
             visit_month = row.visit_month + 1  # 0 index, align with adherence
             this_patient_ts_months[visit_month] = state_map[row.state]
@@ -129,7 +119,7 @@ class CombinedData:
                 if ad == 'Completed' and ts == 'triggered':
                     note = "(Matching state pending clinician follow-up)"
                 if (
-                        ad in ('Due', 'Not Yet Available') and
+                        ad in ('Due', 'Overdue', 'Not Yet Available') and
                         ts == 'Expired' and
                         i == max(self.ts_data.keys()) and
                         not self.withdrawal_month):
@@ -139,27 +129,29 @@ class CombinedData:
                 self.report(f"\tmonth {i}:\t {ad} != {ts} {note}")
 
 
-def upgrade():
-    conn = op.get_bind()
+def validate(reprocess):
     reprocess_ids = []
     def patient_loop():
         query = "select distinct(user_id) from trigger_states order by user_id"
-        for row in conn.execute(query):
+        for row in db.engine.execute(query):
             pat_id = row.user_id
             patient = unchecked_get_user(pat_id, allow_deleted=True)
             if patient.has_role(ROLE.TEST.value):
                 continue
             pat_diff = CombinedData(pat_id)
-            pat_diff.adherence_months_by_patient(conn)
-            pat_diff.trigger_states_months_by_patient(conn)
+            pat_diff.adherence_months_by_patient()
+            pat_diff.trigger_states_months_by_patient()
 
             if pat_diff.show_differences():
                 reprocess_ids.append(pat_id)
 
     patient_loop()
     now = datetime.utcnow()
+    if not reprocess:
+        return
+
     for pat_id in reprocess_ids[0:0]:
-        # force a rebuild of adherence data, see if results improve
+        # force a rebuild of adherence data on all patients found to have problems
         cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
             patient_id=pat_id,
             research_study_id=EMPRO_RS_ID))
@@ -168,16 +160,3 @@ def upgrade():
         AdherenceData.query.filter(AdherenceData.valid_till < valid).delete()
         db.session.commit()
         single_patient_adherence_data(patient_id=pat_id, research_study_id=EMPRO_RS_ID)
-        """second_try = adherence_months_by_patient(pat_id)
-        if second_try != patient_adherence_months[pat_id]:
-            print(pat_id, " got better!")
-            print(patient_adherence_months[pat_id], " -> ", second_try, " : ", patient_ts_months[pat_id])
-    #ad_only, ts_only, mods, _ = dict_compare(adherence_months, ts_months)
-    #print(ad_only)
-    """
-    raise NotImplemented("Migration to become CLI call - don't allow to run")
-
-def downgrade():
-    # ### commands auto generated by Alembic - please adjust! ###
-    pass
-    # ### end Alembic commands ###
