@@ -84,9 +84,6 @@ class CombinedData:
         print(message)
 
     def show_differences(self):
-        if self.patient_id == 9090:
-            pass
-            #import pdb; pdb.set_trace()
         if self.adherence_data is None and self.ts_data is None:
             return None
         for i in range(1,13):
