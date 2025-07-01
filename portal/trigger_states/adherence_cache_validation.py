@@ -21,6 +21,19 @@ state_map = {
 }
 
 
+def baseline_id():
+    baseline_ss_id = None
+
+    def lookup():
+        nonlocal baseline_ss_id
+        if baseline_ss_id is not None:
+            return baseline_ss_id
+        query = text("select id from questionnaire_banks where name = :name")
+        baseline_ss_id = db.engine.execute(query, {"name": "ironman_ss_baseline"}).first()[0]
+        return baseline_ss_id
+    return lookup()
+
+
 class CombinedData:
     """Special container for comparing a patients adherence vs trigger states data"""
 
@@ -54,9 +67,9 @@ class CombinedData:
         if not withdrawal:
             return
         query = text(
-            "select at from qb_timeline where qb_id = 28 and status = 'due' "
+            "select at from qb_timeline where qb_id = :baseline and status = 'due' "
             "and research_study_id = 1 and user_id = :user_id")
-        result = db.engine.execute(query, {"user_id": self.patient_id}).first()[0]
+        result = db.engine.execute(query, {"baseline": baseline_id(), "user_id": self.patient_id}).first()[0]
         withdrawal_month = -1
         while True:
             if withdrawal < result:
@@ -64,7 +77,7 @@ class CombinedData:
                 return
             result += timedelta(days=30)
             withdrawal_month += 1
-            assert withdrawal_month > 12
+            assert withdrawal_month < 12
 
     def trigger_states_months_by_patient(self):
         this_patient_ts_months = {}
