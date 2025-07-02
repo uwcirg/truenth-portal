@@ -105,7 +105,7 @@ class CombinedData:
             if ad is None and ts is None:
                 continue
             if ad and not ts:
-                if ad in ('Due', 'Expired', 'Overdue'):
+                if ad in ('Due', 'Expired', 'Overdue', 'Not Yet Available'):
                     # trigger states often never started w/o user intervention
                     continue
                 if ad == 'Withdrawn':
