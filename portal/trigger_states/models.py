@@ -1,8 +1,8 @@
 from copy import deepcopy
 from datetime import datetime, timedelta
 from flask import current_app
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy import Enum, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import make_transient
 
 from ..database import db
@@ -12,7 +12,7 @@ from ..models.audit import Audit
 opt_out_this_visit_key = '_opt_out_this_visit'
 
 
-trigger_state_enum = ENUM(
+trigger_state_enum = Enum(
     'unstarted',
     'due',
     'inprocess',
