@@ -2,8 +2,7 @@
 from datetime import datetime
 
 from flask import current_app
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum, UniqueConstraint
 
 from ..database import db
 from ..date_tools import RelativeDelta
@@ -15,7 +14,7 @@ from .overall_status import OverallStatus
 from .reference import Reference
 
 # https://www.hl7.org/fhir/valueset-request-status.html
-request_status_types = ENUM(
+request_status_types = Enum(
     'draft', 'active', 'suspended', 'cancelled', 'completed',
     'entered-in-error', 'unknown', name='request_statuses',
     create_type=False)
