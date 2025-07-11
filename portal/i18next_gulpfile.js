@@ -284,6 +284,11 @@ const combineTranslationJsons = function(callback) {
                  */
                 let destDir = translationDestinationDir+(file.replace("_", "-"));
 
+                if(!fs.existsSync(destDir)) {
+                  console.log("Directory does not exist ", destDir);
+                  return true;
+                }
+
                 /*
                  * merge json files into one for frontend to consume
                  * note this plug-in will remove duplicate entries
