@@ -1,3 +1,5 @@
+import HttpApi from "i18next-http-backend";
+
 /*** wrapper object to initalize i18next ***/
 export default (function() {
     function init(options, callback) {
@@ -131,11 +133,11 @@ export default (function() {
         }
         if (String(options.lng).toLowerCase() === "en-us" || sessionStorage.getItem(sessionItemKey)) {
             //still need to initialize i18next but skip call to backend
-            i18next.init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
+            i18next.init(configOptions, function(err, t) { /* global i18next HttpApi */
                 callback(t);
             });
         } else {
-            i18next.use(i18nextXHRBackend).init(configOptions, function(err, t) { /* global i18next i18nextXHRBackend */
+            i18next.use(HttpApi).init(configOptions, function(err, t) { /* global i18next HttpApi */
                 callback(t);
             });
         }

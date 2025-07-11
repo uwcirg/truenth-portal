@@ -16,7 +16,8 @@
   "license": "BSD-Source-Code",
   "dependencies": {
     "@babel/polyfill": "^7.4.0",
-    "@babel/runtime": "^7.4.2"
+    "@babel/runtime": "^7.4.2",
+    "i18next-http-backend": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
@@ -30,18 +31,17 @@
     "core-js-compat": "^3.4.7",
     "del": "^6.0.0",
     "fs": "0.0.1-security",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.1",
     "gulp-clean-css": "^4.2.0",
-    "gulp-cli": "^2.3.0",
+    "gulp-cli": "^3.1.0",
     "gulp-concat": "^2.6.1",
-    "gulp-less": "^4.0.1",
+    "gulp-less": "^5.0.0",
     "gulp-merge-json": "^2.1.1",
     "gulp-rename": "^2.0.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-using": "^0.1.1",
     "i18next-conv": "^4.0.3",
     "i18next-scanner": "^2.10.1",
-    "lodash": "^4.17.21",
     "path": "^0.12.7",
     "replace-in-file": "^6.2.0",
     "run-sequence": "^2.2.0",
@@ -50,7 +50,7 @@
     "vue-loader": "^15.7.0",
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^5.60.0",
+    "webpack": "^5.99.9",
     "webpack-cli": "^4.9.1",
     "webpack-merge": "^5.8.0"
   }
