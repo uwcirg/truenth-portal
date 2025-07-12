@@ -51,9 +51,6 @@ module.exports = {
         ]
     },
     plugins: [
-        // new webpack.SourceMapDevToolPlugin({ /*create sourcemap for bundled file - for ease of debugging in case of error */
-        //     filename: '../../maps/[file].map',
-        // }),
         new VueLoaderPlugin()
     ]
 };
