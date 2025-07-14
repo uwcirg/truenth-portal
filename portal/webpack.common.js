@@ -130,6 +130,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "EMPRO Resources",
       template: `./static/js/src/${emproResourcesAlias}/app.html`,
+      //output html file to template directory to be served up, see: https://github.com/uwcirg/truenth-portal/blob/4ffd3a23a1cf69013b818f10f5470ee45c7cc731/portal/views/portal.py#L217
       filename: path.join(
         __dirname,
         `${templateDirectory}/substudy_tailored_content.html`
