@@ -1,14 +1,14 @@
-FROM node:12 as substudy_app
+# FROM node:12 as substudy_app
 
-RUN mkdir /tmp/substudy_app
-WORKDIR /tmp/substudy_app
+# RUN mkdir /tmp/substudy_app
+# WORKDIR /tmp/substudy_app
 
-# Copy required front-end files only
-COPY  portal/eproms_substudy_tailored_content/  ./
+# # Copy required front-end files only
+# COPY  portal/eproms_substudy_tailored_content/  ./
 
-RUN npm install
+# RUN npm install
 
-RUN npm run build
+# RUN npm run build
 # -----------------------------------------------------------------------------
 
 
@@ -75,8 +75,8 @@ RUN \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
 
 # Copy substudy app files built in substudy_app stage
-COPY --from=substudy_app /tmp/substudy_app/dist/bundle/ /opt/venvs/portal/lib/python3.9/site-packages/portal/static/bundle/
-COPY --from=substudy_app /tmp/substudy_app/dist/templates/ /opt/venvs/portal/lib/python3.9/site-packages/portal/static/templates/
+# COPY --from=substudy_app /tmp/substudy_app/dist/bundle/ /opt/venvs/portal/lib/python3.9/site-packages/portal/static/bundle/
+# COPY --from=substudy_app /tmp/substudy_app/dist/templates/ /opt/venvs/portal/lib/python3.9/site-packages/portal/static/templates/
 
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \

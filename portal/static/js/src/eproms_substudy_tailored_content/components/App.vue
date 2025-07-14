@@ -14,9 +14,9 @@
 <script>
     import Vue from 'vue';
     import "custom-event-polyfill";
-    import bootstrap from "bootstrap";
-    import $ from 'expose-loader?exposes[]=$&exposes[]=jQuery!jquery';
-    import "bootstrap/dist/css/bootstrap.min.css";
+   // import bootstrap from "bootstrap";
+  //  import $ from 'expose-loader?exposes[]=$&exposes[]=jQuery!jquery';
+  //  import "bootstrap/dist/css/bootstrap.min.css";
     import "../style/app.less";
     import Error from "./Error.vue";
     import DomainSection from "./DomainSection.vue";

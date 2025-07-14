@@ -1,20 +1,26 @@
 {
   "presets": [
-    ["@babel/env", {
-      "modules": false,
-      "useBuiltIns": "usage",
-      "corejs": 2
-    }]
+    [
+      "@babel/env",
+      {
+        "modules": false,
+        "useBuiltIns": "usage",
+        "corejs": 3,
+        "targets": {
+          "browsers": ["> 0.25%, not dead"]
+        }
+      }
+    ]
   ],
   "plugins": [
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-transform-regenerator",
-    ["@babel/plugin-transform-runtime",
-     {
+    [
+      "@babel/plugin-transform-runtime",
+      {
         "helpers": true,
         "regenerator": true
-     }
+      }
     ]
   ]
 }
-

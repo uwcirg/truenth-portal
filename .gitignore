@@ -37,6 +37,7 @@ coverage.xml
 
 # generated CSS files
 portal/static/css/*.css
+portal/*/static/css/*.css
 
 # nodeJS virtual environment and files
 node_env/
@@ -53,3 +54,4 @@ portal/static/bundle
 portal/eproms_substudy_tailored_content/node_modules
 portal/eproms_substudy_tailored_content/dist
 portal/eproms_substudy_tailored_content/src/__tests__/__snapshots__
+portal/static/js/dist

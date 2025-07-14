@@ -1,3 +1,4 @@
+//import $ from "jquery";
 export function getWrapperJS (el) {
     if (!el) return;
     let jsSet = document.querySelectorAll(`${el} script`); 
