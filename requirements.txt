@@ -16,10 +16,8 @@ babel==2.9.0
     # via
     #   flask-babel
     #   portal (setup.cfg)
-billiard==4.2.0
-    # via
-    #   celery
-    #   portal (setup.cfg)
+billiard==4.2.1
+    # via celery
 blinker==1.4
     # via
     #   flask-mail
