@@ -26,4 +26,4 @@ PATH="${PATH}:${repo_root}/bin"
 echo "Extracting and transforming frontend strings..."
 nodejs-wrapper.sh \
     gulp.js i18nextConvertJSONToPOT \
-        --gulpfile "${repo_root}/portal/i18next_gulpfile.js"
+        --gulpfile "${repo_root}/portal/i18next_gulpfile.mjs"

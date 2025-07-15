@@ -88,9 +88,6 @@ export default (function () {
            */
           callback = callback || function () {};
           options = options ? options : {};
-          console.log("payload ", data);
-          console.log("options ", options);
-          console.log("url ", url);
           var sessionItemKey = "i18nextData_" + options.language;
           if (
             data &&
