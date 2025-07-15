@@ -57,6 +57,12 @@ module.exports = {
         use: {
           loader:
             "babel-loader" /*transpile ES2015+ code to browser readable code*/,
+          options: {
+          targets: "> 0.25%, not dead",
+          presets: [
+            ['@babel/preset-env']
+          ]
+        }
         },
       },
       {

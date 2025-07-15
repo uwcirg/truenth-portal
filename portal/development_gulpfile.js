@@ -27,7 +27,7 @@ const PORTAL_FOOTER = "portalFooter";
 const PSATRACKER = "psaTracker";
 const ORGTREEVIEW = "orgTreeView";
 const ED = "exerciseDiet";
-const cleancss = require("clean-css");
+//const cleancss = require("clean-css");
 const postCSS = require("gulp-clean-css"); //gulp wrapper around clean-css to minify css
 
 /*eslint no-console: off */
@@ -81,9 +81,7 @@ const epromsLess = function(callback) {
     console.log("Compiling EPROMS Less...");
     src(lessPath + "/" + EPROMS + ".less")
         .pipe(sourcemaps.init())
-        .pipe(less({
-            plugins: [cleancss]
-        }))
+        .pipe(less())
         .pipe(postCSS())
         .pipe(sourcemaps.write("../../../" + mapPath))
         .pipe(dest(EPROMSPath + cssPath));
@@ -99,9 +97,7 @@ const portalLess = function(callback) {
         .pipe(sourcemaps.init({
             sources: [lessPath + "/" + PORTAL + ".less"]
         }))
-        .pipe(less({
-            plugins: [cleancss]
-        }))
+        .pipe(less())
         .pipe(postCSS())
         .pipe(sourcemaps.write("../../"+mapPath)) /* see documentation, https://www.npmjs.com/package/gulp-sourcemaps, to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
@@ -121,9 +117,7 @@ const gilLess = function(callback) {
         .pipe(sourcemaps.init({
             sources: [lessPath + "/" + GIL + ".less"]
         }))
-        .pipe(less({
-            plugins: [cleancss]
-        }))
+        .pipe(less())
         .pipe(postCSS())
         .pipe(sourcemaps.write("../../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(GILPath + cssPath))
@@ -141,9 +135,7 @@ const topnavLess = function(callback) {
     console.log("Compiling portal wrapper less...");
     src(lessPath + "/" + TOPNAV + ".less")
         .pipe(sourcemaps.init())
-        .pipe(less({
-            plugins: [cleancss]
-        }))
+        .pipe(less())
         .pipe(postCSS())
         .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
@@ -163,9 +155,7 @@ const portalFooterLess = function(callback) {
     console.log("Compiling portal footer less...");
     src(lessPath + "/" + PORTAL_FOOTER + ".less")
         .pipe(sourcemaps.init())
-        .pipe(less({
-            plugins: [cleancss]
-        }))
+        .pipe(less())
         .pipe(postCSS())
         .pipe(sourcemaps.write(rootPath+"../maps")) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
@@ -185,9 +175,7 @@ const psaTrackerLess = function(callback) {
     console.log("Compiling PSA Tracker less...");
     src(lessPath + "/" + PSATRACKER + ".less")
         .pipe(sourcemaps.init())
-        .pipe(less({
-            plugins: [cleancss]
-        }))
+        .pipe(less())
         .pipe(postCSS())
         .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
@@ -205,9 +193,7 @@ const orgTreeViewLess = function(callback) {
     console.log("Compiling org tree less...");
     src(lessPath + "/" + ORGTREEVIEW + ".less")
         .pipe(sourcemaps.init())
-        .pipe(less({
-            plugins: [cleancss]
-        }))
+        .pipe(less())
         .pipe(postCSS())
         .pipe(sourcemaps.write("../../"+mapPath)) /* note to write external source map files, pass a path relative to the destination */
         .pipe(dest(cssPath))
@@ -228,9 +214,7 @@ const exerciseDietLess = function(callback) {
         .pipe(sourcemaps.init({
             sources: [lessPath + "/" + ED + ".less"]
         }))
-        .pipe(less({
-            plugins: [cleancss]
-        }))
+        .pipe(less())
         .pipe(postCSS())
          /* note to write external source map files, pass a path relative to the destination
             in this case, relative to the css directory for exercise and diet

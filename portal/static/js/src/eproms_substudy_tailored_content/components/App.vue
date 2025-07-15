@@ -13,7 +13,6 @@
 </template>
 <script>
     import Vue from 'vue';
-    import "custom-event-polyfill";
     import "../style/app.less";
     import Error from "./Error.vue";
     import DomainSection from "./DomainSection.vue";

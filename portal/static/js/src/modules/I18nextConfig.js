@@ -47,7 +47,7 @@ export default (function () {
     var source =
       options.loadPath || "/static/files/locales/{{lng}}/translation.json"; //consuming translation json from each corresponding locale
     var defaultOptions = {
-      fallbackLng: "en-US",
+      fallbackLng: false,
       lng: "en-US",
       preload: false,
       debug: false,
@@ -187,15 +187,13 @@ export default (function () {
       String(options.lng).toLowerCase() === "en-us" ||
       sessionStorage.getItem(sessionItemKey)
     ) {
-      //still need to initialize i18next but skip call to backend
-      i18next.init(configOptions, function (err, t) {
-        /* global i18next HttpApi */ callback(t);
-      });
-    } else {
-      i18next.use(HttpApi).init(configOptions, function (err, t) {
-        /* global i18next HttpApi */ callback(t);
-      });
+      // i18next initialized
+      return;
     }
+
+    i18next.use(HttpApi).init(configOptions, function (err, t) {
+      /* global i18next HttpApi */ callback(t);
+    });
   }
   return {
     init: function (options, callback) {
