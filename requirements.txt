@@ -18,10 +18,8 @@ babel==2.9.0
     #   portal (setup.cfg)
 billiard==4.2.1
     # via celery
-blinker==1.4
-    # via
-    #   flask-mail
-    #   portal (setup.cfg)
+blinker==1.9.0
+    # via flask-mail
 cachelib==0.13.0
     # via
     #   flask-oauthlib
