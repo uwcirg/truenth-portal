@@ -122,6 +122,7 @@ flask-sqlalchemy-caching==1.0.4
     # via portal (setup.cfg)
 flask-swagger==0.2.14
     # via portal (setup.cfg)
+git+https://github.com/uwcirg/Flask-User.git@0.6.21.2#egg=flask-user # pyup: <0.7 # pin until 1.0 is ready for prod
 flask-wtf==0.14.3
     # via portal (setup.cfg)
 fuzzywuzzy==0.17.0
