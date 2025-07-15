@@ -8,10 +8,8 @@ alembic==1.4.3
     # via
     #   flask-migrate
     #   portal (setup.cfg)
-amqp==5.2.0
-    # via
-    #   kombu
-    #   portal (setup.cfg)
+amqp==5.3.1
+    # via kombu
 attrs==25.3.0
     # via jsonschema
 babel==2.9.0
