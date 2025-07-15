@@ -16,8 +16,6 @@ babel==2.9.0
     # via
     #   flask-babel
     #   portal (setup.cfg)
-bcrypt==3.2.0
-    # via portal (setup.cfg)
 billiard==4.2.0
     # via
     #   celery
@@ -37,9 +35,7 @@ certifi==2019.9.11
     #   portal (setup.cfg)
     #   requests
 cffi==1.14.6
-    # via
-    #   bcrypt
-    #   portal (setup.cfg)
+    # via portal (setup.cfg)
 chardet==3.0.4
     # via
     #   portal (setup.cfg)
@@ -231,7 +227,6 @@ requests-oauthlib==1.1.0
     #   portal (setup.cfg)
 six==1.14.0
     # via
-    #   bcrypt
     #   flask-dance
     #   jsonschema
     #   onetimepass
