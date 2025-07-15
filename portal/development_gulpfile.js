@@ -27,7 +27,6 @@ const PORTAL_FOOTER = "portalFooter";
 const PSATRACKER = "psaTracker";
 const ORGTREEVIEW = "orgTreeView";
 const ED = "exerciseDiet";
-//const cleancss = require("clean-css");
 const postCSS = require("gulp-clean-css"); //gulp wrapper around clean-css to minify css
 
 /*eslint no-console: off */
