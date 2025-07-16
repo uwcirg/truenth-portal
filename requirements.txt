@@ -107,9 +107,7 @@ fuzzywuzzy==0.17.0
 healthcheck==1.3.3
     # via portal (setup.cfg)
 idna==2.10
-    # via
-    #   portal (setup.cfg)
-    #   requests
+    # via requests
 importlib-metadata==4.13.0
     # via portal (setup.cfg)
 itsdangerous==1.1.0
@@ -235,10 +233,8 @@ tzdata==2024.1
     # via
     #   celery
     #   portal (setup.cfg)
-urllib3==1.26.5
-    # via
-    #   portal (setup.cfg)
-    #   requests
+urllib3==1.26.20
+    # via requests
 urlobject==3.0.0
     # via flask-dance
 validators==0.14.0
