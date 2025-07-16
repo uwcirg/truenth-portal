@@ -16,8 +16,10 @@ babel==2.9.0
     # via
     #   flask-babel
     #   portal (setup.cfg)
-bcrypt==4.3.0
-    # via flask-user
+bcrypt==3.2.0
+    # via
+    #   flask-user
+    #   portal (setup.cfg)
 billiard==4.2.1
     # via celery
 blinker==1.9.0
@@ -30,6 +32,8 @@ celery==5.3.1
     # via portal (setup.cfg)
 certifi==2025.7.14
     # via requests
+cffi==1.17.1
+    # via bcrypt
 charset-normalizer==3.4.2
     # via requests
 click==8.1.7
@@ -158,6 +162,8 @@ polib==1.1.1
     # via portal (setup.cfg)
 prompt-toolkit==3.0.51
     # via click-repl
+pycparser==2.22
+    # via cffi
 pycryptodome==3.23.0
     # via flask-user
 pyrsistent==0.20.0
@@ -197,6 +203,7 @@ requests-oauthlib==1.1.0
     #   portal (setup.cfg)
 six==1.17.0
     # via
+    #   bcrypt
     #   flask-dance
     #   jsonschema
     #   onetimepass
