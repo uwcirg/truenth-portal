@@ -157,8 +157,6 @@ prompt-toolkit==3.0.47
     # via
     #   click-repl
     #   portal (setup.cfg)
-pycparser==2.20
-    # via portal (setup.cfg)
 pycryptodome==3.9.9
     # via portal (setup.cfg)
 pyrsistent==0.20.0
@@ -169,24 +167,20 @@ python-dateutil==2.9.0.post0
     #   celery
     #   portal (setup.cfg)
 python-editor==1.0.4
-    # via
-    #   alembic
-    #   portal (setup.cfg)
+    # via alembic
 python-levenshtein==0.12.1
     # via portal (setup.cfg)
 python-memcached==1.59
     # via portal (setup.cfg)
 python-statemachine==0.8.0
     # via portal (setup.cfg)
-pytz==2020.5
+pytz==2025.2
     # via
     #   babel
     #   flask-babel
-    #   portal (setup.cfg)
-pyyaml==5.4
+pyyaml==6.0.2
     # via
     #   flask-swagger
-    #   portal (setup.cfg)
     #   swagger-spec-validator
 redis==3.5.3
     # via portal (setup.cfg)
