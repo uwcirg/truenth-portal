@@ -46,10 +46,9 @@ click-repl==0.3.0
     # via celery
 coverage==5.4
     # via portal (setup.cfg)
-decorator==4.4.0
+decorator==5.2.1
     # via
     #   dogpile-cache
-    #   portal (setup.cfg)
     #   validators
 dogpile-cache==0.9.0
     # via portal (setup.cfg)
