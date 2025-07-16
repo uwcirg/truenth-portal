@@ -39,17 +39,11 @@ click==8.1.7
     #   flask
     #   portal (setup.cfg)
 click-didyoumean==0.3.1
-    # via
-    #   celery
-    #   portal (setup.cfg)
-click-plugins==1.1.1
-    # via
-    #   celery
-    #   portal (setup.cfg)
+    # via celery
+click-plugins==1.1.1.2
+    # via celery
 click-repl==0.3.0
-    # via
-    #   celery
-    #   portal (setup.cfg)
+    # via celery
 coverage==5.4
     # via portal (setup.cfg)
 decorator==4.4.0
