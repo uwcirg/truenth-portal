@@ -126,10 +126,8 @@ jsonschema==3.0.2
     # via
     #   portal (setup.cfg)
     #   swagger-spec-validator
-kombu==5.3.7
-    # via
-    #   celery
-    #   portal (setup.cfg)
+kombu==5.4.2
+    # via celery
 lazy==1.6
     # via flask-dance
 mako==1.1.0
@@ -221,6 +219,7 @@ typing-extensions==4.12.2
 tzdata==2024.1
     # via
     #   celery
+    #   kombu
     #   portal (setup.cfg)
 urllib3==1.26.20
     # via requests
@@ -233,7 +232,6 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-    #   portal (setup.cfg)
 wcwidth==0.2.13
     # via prompt-toolkit
 werkzeug==1.0.1
