@@ -188,6 +188,7 @@ export default (function () {
       sessionStorage.getItem(sessionItemKey)
     ) {
       // i18next initialized
+      callback();
       return;
     }
 
