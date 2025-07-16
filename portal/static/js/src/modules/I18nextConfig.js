@@ -183,12 +183,16 @@ export default (function () {
       callback();
       return false;
     }
-    if (
-      String(options.lng).toLowerCase() === "en-us" ||
-      sessionStorage.getItem(sessionItemKey)
-    ) {
+    if (sessionStorage.getItem(sessionItemKey)) {
       // i18next initialized
       callback();
+      return false;
+    }
+    if (String(options.lng).toLowerCase() === "en-us") {
+      //still need to initialize i18next but skip call to backend
+      i18next.init(configOptions, function (err, t) {
+        /* global i18next i18nextXHRBackend */ callback(t);
+      });
       return;
     }
 
