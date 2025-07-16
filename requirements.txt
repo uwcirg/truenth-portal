@@ -141,11 +141,10 @@ mako==1.1.0
     # via
     #   alembic
     #   portal (setup.cfg)
-markupsafe==1.1.1
+markupsafe==3.0.2
     # via
     #   jinja2
     #   mako
-    #   portal (setup.cfg)
 oauthlib==2.1.0
     # via
     #   flask-dance
