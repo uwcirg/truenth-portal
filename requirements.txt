@@ -26,16 +26,10 @@ cachelib==0.13.0
     #   flask-session
 celery==5.3.1
     # via portal (setup.cfg)
-certifi==2019.9.11
-    # via
-    #   portal (setup.cfg)
-    #   requests
-cffi==1.14.6
-    # via portal (setup.cfg)
-chardet==3.0.4
-    # via
-    #   portal (setup.cfg)
-    #   requests
+certifi==2025.7.14
+    # via requests
+chardet==4.0.0
+    # via requests
 click==8.1.7
     # via
     #   celery
@@ -173,9 +167,7 @@ prompt-toolkit==3.0.47
     #   click-repl
     #   portal (setup.cfg)
 pycparser==2.20
-    # via
-    #   cffi
-    #   portal (setup.cfg)
+    # via portal (setup.cfg)
 pycryptodome==3.9.9
     # via portal (setup.cfg)
 pyrsistent==0.20.0
