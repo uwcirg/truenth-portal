@@ -48,8 +48,6 @@ click-plugins==1.1.1.2
     # via celery
 click-repl==0.3.0
     # via celery
-coverage==5.4
-    # via portal (setup.cfg)
 decorator==5.2.1
     # via
     #   dogpile-cache
