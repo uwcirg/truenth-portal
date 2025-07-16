@@ -156,10 +156,8 @@ onetimepass==1.0.1
     # via portal (setup.cfg)
 packaging==25.0
     # via kombu
-passlib==1.7.1
-    # via
-    #   flask-user
-    #   portal (setup.cfg)
+passlib==1.7.4
+    # via flask-user
 polib==1.1.1
     # via portal (setup.cfg)
 prompt-toolkit==3.0.51
