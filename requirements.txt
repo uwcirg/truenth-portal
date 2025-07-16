@@ -137,10 +137,8 @@ kombu==5.5.4
     # via celery
 lazy==1.6
     # via flask-dance
-mako==1.1.0
-    # via
-    #   alembic
-    #   portal (setup.cfg)
+mako==1.3.10
+    # via alembic
 markupsafe==1.1.1
     # via
     #   jinja2
