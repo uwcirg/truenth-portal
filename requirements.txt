@@ -18,6 +18,8 @@ babel==2.9.0
     #   portal (setup.cfg)
 billiard==4.2.1
     # via celery
+blinker==1.9.0
+    # via flask-mail
 cachelib==0.13.0
     # via
     #   flask-oauthlib
@@ -57,6 +59,8 @@ flask==1.0.3
     #   flask-babel
     #   flask-caching
     #   flask-dance
+    #   flask-login
+    #   flask-mail
     #   flask-migrate
     #   flask-oauthlib
     #   flask-recaptcha
@@ -64,6 +68,7 @@ flask==1.0.3
     #   flask-sqlalchemy
     #   flask-sqlalchemy-caching
     #   flask-swagger
+    #   flask-wtf
     #   portal (setup.cfg)
 flask-babel==1.0.0
     # via portal (setup.cfg)
@@ -72,6 +77,10 @@ flask-caching==1.8.0
     #   flask-sqlalchemy-caching
     #   portal (setup.cfg)
 flask-dance[sqla]==1.4.0
+    # via portal (setup.cfg)
+flask-login==0.4.1
+    # via portal (setup.cfg)
+flask-mail==0.9.1
     # via portal (setup.cfg)
 flask-migrate==2.5.3
     # via portal (setup.cfg)
@@ -91,6 +100,8 @@ flask-sqlalchemy-caching==1.0.4
 flask-swagger==0.2.14
     # via portal (setup.cfg)
 git+https://github.com/uwcirg/Flask-User.git@0.6.21.2#egg=flask-user # pyup: <0.7 # pin until 1.0 is ready for prod
+flask-wtf==0.14.3
+    # via portal (setup.cfg)
 fuzzywuzzy==0.17.0
     # via portal (setup.cfg)
 healthcheck==1.3.3
@@ -104,6 +115,7 @@ importlib-metadata==4.13.0
 itsdangerous==1.1.0
     # via
     #   flask
+    #   flask-wtf
     #   portal (setup.cfg)
 jinja2==2.11.3
     # via
@@ -246,7 +258,9 @@ werkzeug==1.0.1
     #   flask
     #   portal (setup.cfg)
 wtforms==2.2.1
-    # via portal (setup.cfg)
+    # via
+    #   flask-wtf
+    #   portal (setup.cfg)
 zipp==3.23.0
     # via importlib-metadata
 
