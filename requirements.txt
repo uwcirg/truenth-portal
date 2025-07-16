@@ -212,8 +212,6 @@ sqlalchemy-utils==0.41.2
     # via flask-dance
 swagger-spec-validator==2.7.3
     # via portal (setup.cfg)
-typing-extensions==4.12.2
-    # via portal (setup.cfg)
 tzdata==2025.2
     # via
     #   celery
