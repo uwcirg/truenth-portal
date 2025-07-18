@@ -3,14 +3,14 @@
  * nodeJS virtual environment install via pip nodeenv
  * install NPM (node package manager)
  * install all required modules (i.e. run npm install in the directory containing package.json)
- * run gulp --gulpfile i18next_gulpfile.js will perform default task -
+ * run gulp --gulpfile i18next_gulpfile.mjs will perform default task -
  * which will perform text extraction and translate resulting json to pot file
- * run gulp --gulpfile i18next_gulpfile.js [task name]  will run individual task
+ * run gulp --gulpfile i18next_gulpfile.mjs [task name]  will run individual task
  * NB:  should NOT run this in Production environment, the resulting modules in node_modules/ folder from running `npm install` should never be checked in
  */
 import gulp from "gulp";
 const { series, src, dest } = gulp;
-import del from "del";
+import {deleteSync} from "del";
 import scanner from "i18next-scanner";
 import merge_json from "gulp-merge-json";
 import using from "gulp-using";
@@ -126,7 +126,7 @@ function writeJsonFileFromPoFile(locale, messageFilePath, outputFileName) {
  */
 const cleanEpromsSrcTask = function (callback) {
   console.log("delete EPROMS source JSON file...");
-  del.sync([translationSourceDir + epromsNameSpace + ".json"]);
+  deleteSync([translationSourceDir + epromsNameSpace + ".json"]);
   callback();
 };
 export const cleanEpromsSrc = series(cleanEpromsSrcTask);
@@ -135,7 +135,7 @@ export const cleanEpromsSrc = series(cleanEpromsSrcTask);
  */
 const cleanTruenthSrcTask = function (callback) {
   console.log("Delete TRUEnth source JSON file...");
-  del.sync([translationSourceDir + truenthNameSpace + ".json"]);
+  deleteSync([translationSourceDir + truenthNameSpace + ".json"]);
   callback();
 };
 export const cleanTruenthSrc = series(cleanTruenthSrcTask);
@@ -144,7 +144,7 @@ export const cleanTruenthSrc = series(cleanTruenthSrcTask);
  */
 const cleanSrcTask = function (callback) {
   console.log("Deleting json files in source directory...");
-  del.sync([translationSourceDir + nameSpace + ".json"]);
+  deleteSync([translationSourceDir + nameSpace + ".json"]);
   callback();
 };
 export const cleanSrc = series(cleanSrcTask);
@@ -154,7 +154,7 @@ export const cleanSrc = series(cleanSrcTask);
  */
 const cleanDestTask = function (callback) {
   console.log("Deleting json files in destination directory...");
-  del.sync([translationDestinationDir + "*/*.json"]);
+  deleteSync([translationDestinationDir + "*/*.json"]);
   callback();
 };
 export const cleanDest = series(cleanDestTask);
