@@ -139,10 +139,11 @@ lazy==1.6
     # via flask-dance
 mako==1.3.10
     # via alembic
-markupsafe==3.0.2
+markupsafe==2.0.1
     # via
     #   jinja2
     #   mako
+    #   portal (setup.cfg)
 oauthlib==2.1.0
     # via
     #   flask-dance
