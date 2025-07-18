@@ -231,10 +231,8 @@ vine==5.1.0
     #   kombu
 wcwidth==0.2.13
     # via prompt-toolkit
-werkzeug==1.0.1
-    # via
-    #   flask
-    #   portal (setup.cfg)
+werkzeug==2.1.2
+    # via flask
 wtforms==2.2.1
     # via
     #   flask-wtf
