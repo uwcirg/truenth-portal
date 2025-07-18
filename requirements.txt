@@ -16,8 +16,10 @@ babel==2.9.0
     # via
     #   flask-babel
     #   portal (setup.cfg)
-bcrypt==4.3.0
-    # via flask-user
+bcrypt==4.0.1
+    # via
+    #   flask-user
+    #   portal (setup.cfg)
 billiard==4.2.1
     # via celery
 blinker==1.9.0
