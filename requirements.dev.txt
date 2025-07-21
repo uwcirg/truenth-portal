@@ -220,9 +220,8 @@ page-objects==1.1.0
     # via portal (setup.cfg)
 passlib==1.7.4
     # via flask-user
-pluggy==0.13.1
+pluggy==1.6.0
     # via
-    #   portal (setup.cfg)
     #   pytest
     #   tox
 polib==1.1.1
@@ -242,6 +241,7 @@ pycryptodome==3.23.0
 pygments==2.7.4
     # via
     #   portal (setup.cfg)
+    #   pytest
     #   sphinx
 pyparsing==2.4.7
     # via portal (setup.cfg)
@@ -249,7 +249,7 @@ pyrsistent==0.20.0
     # via jsonschema
 pysocks==1.7.1
     # via urllib3
-pytest==7.4.4
+pytest==8.4.1
     # via
     #   portal (setup.cfg)
     #   pytest-flask
