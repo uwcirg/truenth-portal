@@ -238,8 +238,6 @@ pygments==2.7.4
     #   portal (setup.cfg)
     #   pytest
     #   sphinx
-pyparsing==2.4.7
-    # via portal (setup.cfg)
 pyrsistent==0.20.0
     # via jsonschema
 pysocks==1.7.1
