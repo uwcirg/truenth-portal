@@ -28,10 +28,8 @@ bcrypt==3.2.0
     # via
     #   flask-user
     #   portal (setup.cfg)
-beautifulsoup4==4.9.3
-    # via
-    #   portal (setup.cfg)
-    #   webtest
+beautifulsoup4==4.13.4
+    # via webtest
 billiard==4.2.1
     # via celery
 blinker==1.9.0
@@ -303,7 +301,6 @@ six==1.17.0
     #   swagger-spec-validator
     #   tox
     #   validators
-    #   webtest
 sniffio==1.3.1
     # via trio
 snowballstemmer==2.0.0
@@ -371,6 +368,7 @@ typing==3.7.4.3
     # via portal (setup.cfg)
 typing-extensions==4.14.1
     # via
+    #   beautifulsoup4
     #   exceptiongroup
     #   selenium
 tzdata==2025.2
@@ -392,22 +390,16 @@ vine==5.1.0
     #   kombu
 virtualenv==20.32.0
     # via tox
-waitress==1.4.3
-    # via
-    #   portal (setup.cfg)
-    #   webtest
+waitress==3.0.2
+    # via webtest
 wcwidth==0.2.13
     # via prompt-toolkit
-webob==1.8.5
-    # via
-    #   portal (setup.cfg)
-    #   webtest
+webob==1.8.9
+    # via webtest
 websocket-client==1.8.0
     # via selenium
-webtest==2.0.33
-    # via
-    #   flask-webtest
-    #   portal (setup.cfg)
+webtest==3.0.6
+    # via flask-webtest
 werkzeug==1.0.1
     # via
     #   flask
