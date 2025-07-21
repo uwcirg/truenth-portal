@@ -13,6 +13,7 @@ crypto.createHash = (algorithm) =>
   crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
 const emproResourcesAlias = "eproms_substudy_tailored_content";
 module.exports = {
+  mode: "production",
   entry: {
     /* files to be transpiled and optimized */
     account: JsSrcPath + "/accountCreation.js",

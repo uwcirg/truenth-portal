@@ -8,5 +8,4 @@ module.exports = {
     path.resolve(__dirname, './webpack.config.js'),
   ],
   devtool: "inline-source-map",
-  mode: "development"
 };
