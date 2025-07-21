@@ -230,10 +230,8 @@ prompt-toolkit==3.0.51
     # via click-repl
 psycopg2-binary==2.8.6
     # via portal (setup.cfg)
-py==1.10.0
-    # via
-    #   portal (setup.cfg)
-    #   tox
+py==1.11.0
+    # via tox
 pycparser==2.22
     # via cffi
 pycryptodome==3.23.0
