@@ -312,16 +312,24 @@ sphinx==3.3.1
     #   sphinx-rtd-theme
 sphinx-rtd-theme==0.5.1
     # via portal (setup.cfg)
-sphinxcontrib-applehelp==2.0.0
-    # via sphinx
-sphinxcontrib-devhelp==2.0.0
-    # via sphinx
-sphinxcontrib-htmlhelp==2.1.0
-    # via sphinx
+sphinxcontrib-applehelp==1.0.4
+    # via
+    #   portal (setup.cfg)
+    #   sphinx
+sphinxcontrib-devhelp==1.0.2
+    # via
+    #   portal (setup.cfg)
+    #   sphinx
+sphinxcontrib-htmlhelp==2.0.1
+    # via
+    #   portal (setup.cfg)
+    #   sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-qthelp==2.0.0
-    # via sphinx
+sphinxcontrib-qthelp==1.0.3
+    # via
+    #   portal (setup.cfg)
+    #   sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via
     #   portal (setup.cfg)
