@@ -62,7 +62,7 @@ class InterventionEditForm(FlaskForm):
 
     def validate_link_url(form, field):
         """Custom validation to allow null and known origins only"""
-        if len(field.data.strip()):
+        if field.data and len(field.data.strip()):
             try:
                 validate_origin(field.data)
             except Unauthorized:
