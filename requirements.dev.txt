@@ -210,7 +210,6 @@ outcome==1.3.0.post0
 packaging==25.0
     # via
     #   kombu
-    #   portal (setup.cfg)
     #   pytest
     #   sphinx
     #   tox
