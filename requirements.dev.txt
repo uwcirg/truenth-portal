@@ -4,8 +4,10 @@
 #
 #    pip-compile --extra=dev --output-file=requirements.dev.txt setup.cfg
 #
-alabaster==0.7.16
-    # via sphinx
+alabaster==0.7.12
+    # via
+    #   portal (setup.cfg)
+    #   sphinx
 alembic==1.4.3
     # via
     #   flask-migrate
