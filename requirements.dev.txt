@@ -362,8 +362,6 @@ trio==0.30.0
     #   trio-websocket
 trio-websocket==0.12.2
     # via selenium
-typing==3.7.4.3
-    # via portal (setup.cfg)
 typing-extensions==4.14.1
     # via
     #   beautifulsoup4
