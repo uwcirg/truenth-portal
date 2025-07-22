@@ -142,7 +142,6 @@ markupsafe==2.0.1
     #   jinja2
     #   mako
     #   portal (setup.cfg)
-    #   wtforms
 oauthlib==2.1.0
     # via
     #   flask-dance
@@ -236,8 +235,10 @@ werkzeug==1.0.1
     # via
     #   flask
     #   portal (setup.cfg)
-wtforms==3.2.1
-    # via flask-wtf
+wtforms==2.2.1
+    # via
+    #   flask-wtf
+    #   portal (setup.cfg)
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

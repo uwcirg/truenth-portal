@@ -24,7 +24,7 @@ babel==2.9.0
     #   flask-babel
     #   portal (setup.cfg)
     #   sphinx
-bcrypt==3.2.0
+bcrypt==4.0.1
     # via
     #   flask-user
     #   portal (setup.cfg)
@@ -46,8 +46,6 @@ certifi==2025.7.14
     # via
     #   requests
     #   selenium
-cffi==1.17.1
-    # via bcrypt
 charset-normalizer==3.4.2
     # via requests
 click==8.1.7
@@ -186,7 +184,7 @@ lazy==1.6
     # via flask-dance
 mako==1.3.10
     # via alembic
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
     #   jinja2
     #   mako
@@ -229,8 +227,6 @@ psycopg2-binary==2.8.6
     # via portal (setup.cfg)
 py==1.11.0
     # via tox
-pycparser==2.22
-    # via cffi
 pycryptodome==3.23.0
     # via flask-user
 pygments==2.19.2
@@ -290,7 +286,6 @@ selenium==4.34.2
     #   portal (setup.cfg)
 six==1.17.0
     # via
-    #   bcrypt
     #   flask-dance
     #   jsonschema
     #   onetimepass
