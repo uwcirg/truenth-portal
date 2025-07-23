@@ -4,8 +4,12 @@
  */
 const path = require("path");
 module.exports = {
-  extends: [
-    path.resolve(__dirname, './webpack.config.js'),
-  ],
-  devtool: "inline-source-map",
+  extends: [path.resolve(__dirname, "./webpack.config.js")],
+  watch: true,
+  watchOptions: {
+    aggregateTimeout: 300,
+    poll: 1000,
+    ignored: /node_modules/,
+  },
+  devtool: "eval",
 };

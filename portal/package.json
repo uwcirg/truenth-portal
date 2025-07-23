@@ -41,7 +41,7 @@
     "gulp-using": "^0.1.1",
     "html-webpack-plugin": "^5.6.3",
     "i18next-conv": "^15.1.1",
-    "i18next-scanner": "^2.10.1",
+    "i18next-scanner": "^4.6.0",
     "less-loader": "^12.3.0",
     "mini-css-extract-plugin": "^2.9.2",
     "path": "^0.12.7",

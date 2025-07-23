@@ -1,4 +1,3 @@
-//import $ from "jquery";
 import NavMethods from "./Nav";
 import VideoMethods from "./Video";
 import {checkIE, getUrlParameter, tryParseJSON, ElementClosestPolyfill, postData, PromiseAllSettledPolyfill} from "./Utility";
