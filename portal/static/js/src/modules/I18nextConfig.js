@@ -59,7 +59,7 @@ async function initI18n(options, callback) {
       ...optionsToUse,
     },
     function (err, t) {
-      console.log("Error initializing i18next ", err);
+      if (err) console.log("Error initializing i18next ", err);
       if (callback) callback();
     }
   );

@@ -3,8 +3,8 @@
   "version": "2.0.0",
   "description": "fills the front-end needs including incorporating i18next for frontend translation needs",
   "scripts": {
-    "develop:js": "webpack --watch --config webpack.config.development.js",
-    "build": "webpack && gulp --gulpfile development_gulpfile.mjs lessAll",
+    "develop:js": "webpack --watch --mode development",
+    "build": "webpack --mode production && gulp --gulpfile development_gulpfile.mjs lessAll",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Clinical Informatics Research Group",
