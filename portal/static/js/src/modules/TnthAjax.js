@@ -74,6 +74,20 @@ export default { /*global $ */
                                 callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
                             }
                         }).fail(function(xhr) {
+                            // catch auth error, e.g. unaunthorized or stale CSRF session token error before re-trying
+                            const doomedStatus = parseInt(xhr.status) === 400 || parseInt(xhr.status) === 401;
+                            const xhrResponseText = xhr.responseText ? String(xhr.responseText).toLowerCase() : "";
+                            if (
+                              doomedStatus &&
+                              (xhrResponseText.includes("csrf token") ||
+                                xhrResponseText.includes("unauthorize"))
+                            ) {
+                              if (callback) {
+                                callback({ error: DEFAULT_SERVER_DATA_ERROR });
+                                fieldHelper.showError(targetField);
+                              }
+                              return false;
+                            }
                             if (params.attempts < params.max_attempts) {
                                 (function(self, url, method, userId, params, callback) {
                                     setTimeout(function () {
