@@ -82,6 +82,7 @@ export default { /*global $ */
                               (xhrResponseText.includes("csrf token") ||
                                 xhrResponseText.includes("unauthorize"))
                             ) {
+                              console.log("Request error ", xhrResponseText);
                               if (callback) {
                                 callback({ error: DEFAULT_SERVER_DATA_ERROR });
                                 fieldHelper.showError(targetField);
