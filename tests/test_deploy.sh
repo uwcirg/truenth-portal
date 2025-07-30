@@ -13,7 +13,7 @@ Usage:
    --help
           Show this help message
 
-    Build, start and test docker-compose deployment
+    Build, start and test docker compose deployment
 USAGE
 }
 
@@ -42,10 +42,10 @@ deploy-docker.sh -n -f
 
 # sleep until after first healthcheck occurs
 sleep 6m
-docker-compose logs web
+docker compose logs web
 
-web_health="$(docker inspect --format "{{ .State.Health.Status }}" $(docker-compose ps --quiet web))"
-docker-compose down --volumes
+web_health="$(docker inspect --format "{{ .State.Health.Status }}" $(docker compose ps --quiet web))"
+docker compose down --volumes
 
 if [ "$web_health" = healthy ]; then
     echo "Web process healthy; exiting"
