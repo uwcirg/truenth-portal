@@ -136,6 +136,13 @@ module.exports = (env, argv) => {
       ],
       splitChunks: {
         chunks: (chunk) => chunk.name === emproResourcesAlias,
+        cacheGroups: {
+          vendors: {
+            test: /[\\/]node_modules[\\/]/,
+            name: "vendors",
+            chunks: "all",
+          },
+        },
       },
     },
     plugins: [
@@ -151,7 +158,7 @@ module.exports = (env, argv) => {
           __dirname,
           `/static/js/src/${emproResourcesAlias}/assets/favicon.ico`
         ),
-        chunks: [emproResourcesAlias],
+        chunks: [emproResourcesAlias, "vue"],
       }),
       new webpack.ProvidePlugin({
         Vue: ["vue/dist/vue.esm.js", "default"],
