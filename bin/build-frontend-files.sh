@@ -30,5 +30,5 @@ nodejs-wrapper.sh \
     npm --prefix "${repo_root}/portal" run build
 
 echo "Copying substudy template file..."
-COPY ${repo_root}/portal/static/templates/substudy_tailored_content.html \
-    /opt/venvs/portal/lib/python3.9/site-packages/portal/static/templates/
+COPY ${repo_root}/portal/static/templates /opt/venvs/portal/lib/python3.9/site-packages/portal/static/templates/
+COPY ${repo_root}/portal/static/dist /opt/venvs/portal/lib/python3.9/site-packages/portal/static/dist/

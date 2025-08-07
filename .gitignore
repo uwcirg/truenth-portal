@@ -49,5 +49,4 @@ portal/static/js/.eslintrc.js
 portal/eproms/static/js/.eslintrc.js
 
 # auto-generated folders housing files from the frontend build, i.e. substudy tailored content
-portal/static/templates
 portal/static/bundle
