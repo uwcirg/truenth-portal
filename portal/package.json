@@ -47,7 +47,6 @@
     "path": "^0.12.7",
     "replace-in-file": "^8.3.0",
     "style-loader": "^4.0.0",
-    "url-loader": "^4.1.1",
     "vue": "^2.6.10",
     "vue-loader": "^15.7.0",
     "vue-style-loader": "^4.1.2",

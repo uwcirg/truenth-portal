@@ -145,10 +145,7 @@ module.exports = (env, argv) => {
           templateDirectory,
           "substudy_tailored_content.html"
         ),
-        // favicon: path.join(
-        //   __dirname,
-        //   `/static/js/src/${emproResourcesAlias}/assets/favicon.ico`
-        // ),
+        favicon: path.join(__dirname, templateDirectory, "favicon.ico"),
         chunks: [emproResourcesAlias],
       }),
       new webpack.ProvidePlugin({
