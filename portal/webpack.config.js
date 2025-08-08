@@ -154,10 +154,10 @@ module.exports = (env, argv) => {
           __dirname,
           `${templateDirectory}/substudy_tailored_content.html`
         ),
-        favicon: path.join(
-          __dirname,
-          `/static/js/src/${emproResourcesAlias}/assets/favicon.ico`
-        ),
+        // favicon: path.join(
+        //   __dirname,
+        //   `/static/js/src/${emproResourcesAlias}/assets/favicon.ico`
+        // ),
         chunks: [emproResourcesAlias, "vue"],
       }),
       new webpack.ProvidePlugin({
