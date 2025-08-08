@@ -1,13 +1,13 @@
 const path = require("path");
 const webpack = require("webpack");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-//const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const crypto = require("crypto");
 const JsSrcPath = "./static/js/src";
-//const templateDirectory = "/static/templates/";
+const templateDirectory = "/static/templates/";
 const crypto_orig_createHash = crypto.createHash;
 crypto.createHash = (algorithm) =>
   crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
@@ -95,7 +95,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.(png|jpe?g|gif|svg)$/i,
-          type: 'asset/inline'
+          type: "asset/inline",
           // type: 'asset/resource', // Handles images as separate files
           // generator: {
           //   filename: '[name].[ext]', // Optional: customize output path
@@ -136,20 +136,20 @@ module.exports = (env, argv) => {
       },
     },
     plugins: [
-      // new HtmlWebpackPlugin({
-      //   title: "EMPRO Resources",
-      //   template: `./static/js/src/${emproResourcesAlias}/app.html`,
-      //   //output html file to template directory to be served up, see: https://github.com/uwcirg/truenth-portal/blob/4ffd3a23a1cf69013b818f10f5470ee45c7cc731/portal/views/portal.py#L217
-      //   filename: path.join(
-      //     __dirname,
-      //     `${templateDirectory}/substudy_tailored_content.html`
-      //   ),
-      //   // favicon: path.join(
-      //   //   __dirname,
-      //   //   `/static/js/src/${emproResourcesAlias}/assets/favicon.ico`
-      //   // ),
-      //   chunks: [emproResourcesAlias, "vue"],
-      // }),
+      new HtmlWebpackPlugin({
+        title: "EMPRO Resources",
+        template: `./static/js/src/${emproResourcesAlias}/app.html`,
+        //output html file to template directory to be served up, see: https://github.com/uwcirg/truenth-portal/blob/4ffd3a23a1cf69013b818f10f5470ee45c7cc731/portal/views/portal.py#L217
+        filename: path.join(
+          __dirname,
+          `${templateDirectory}/substudy_tailored_content.html`
+        ),
+        // favicon: path.join(
+        //   __dirname,
+        //   `/static/js/src/${emproResourcesAlias}/assets/favicon.ico`
+        // ),
+        chunks: [emproResourcesAlias],
+      }),
       new webpack.ProvidePlugin({
         Vue: ["vue/dist/vue.esm.js", "default"],
       }),
