@@ -1,7 +1,7 @@
 """Mechanism to validate Adherence Cache data against QB Timeline"""
 from datetime import datetime
 import re
-from sqlalchemy import text
+from sqlalchemy import and_, delete, text
 
 from portal.database import db
 from portal.models.adherence_data import AdherenceData
@@ -117,6 +117,13 @@ class CombinedData:
                     raise ValueError(f"mismatch on patient {self.patient_id}, withdrawal months between "
                                      f"adherence {self.withdrawal_month} and timeline {month} disagree")
                 self.withdrawal_month = month
+
+                # TN-3349, if the first event in the timeline is withdrawal, the user withdrew
+                # before the study started.  there won't be adherence data.  don't collect any
+                # additional timeline data as it'll only prove misleading.
+                if len(patient_timeline_months) == 0:
+                    break
+
             # update with latest status, as order in db implies what's most current
             patient_timeline_months[month] = {"status": row.status}
         self.timeline_data = patient_timeline_months
@@ -172,7 +179,6 @@ class CombinedData:
 
 
 def validate(research_study_id, reprocess):
-    from sqlalchemy import delete, and_
     reprocess_ids = []
     def patient_loop():
         query = text(
