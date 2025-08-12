@@ -23,10 +23,8 @@ babel==2.17.0
     # via
     #   flask-babel
     #   sphinx
-bcrypt==4.0.1
-    # via
-    #   flask-user
-    #   portal (setup.cfg)
+bcrypt==4.3.0
+    # via flask-user
 beautifulsoup4==4.13.4
     # via webtest
 billiard==4.2.1
@@ -41,11 +39,11 @@ cachelib==0.13.0
     #   flask-session
 celery==5.3.1
     # via portal (setup.cfg)
-certifi==2025.7.14
+certifi==2025.8.3
     # via
     #   requests
     #   selenium
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via requests
 click==8.1.7
     # via
@@ -373,7 +371,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.32.0
+virtualenv==20.33.1
     # via tox
 waitress==3.0.2
     # via webtest
