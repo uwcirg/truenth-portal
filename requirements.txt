@@ -28,9 +28,9 @@ cachelib==0.13.0
     #   flask-session
 celery==5.3.1
     # via portal (setup.cfg)
-certifi==2025.7.14
+certifi==2025.8.3
     # via requests
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via requests
 click==8.1.7
     # via
@@ -227,10 +227,8 @@ vine==5.1.0
     #   kombu
 wcwidth==0.2.13
     # via prompt-toolkit
-werkzeug==1.0.1
-    # via
-    #   flask
-    #   portal (setup.cfg)
+werkzeug==2.1.2
+    # via flask
 wtforms==2.2.1
     # via
     #   flask-wtf
