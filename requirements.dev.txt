@@ -41,11 +41,11 @@ cachelib==0.13.0
     #   flask-session
 celery==5.3.1
     # via portal (setup.cfg)
-certifi==2025.7.14
+certifi==2025.8.3
     # via
     #   requests
     #   selenium
-charset-normalizer==3.4.2
+charset-normalizer==3.4.3
     # via requests
 click==8.1.7
     # via
@@ -188,6 +188,7 @@ markupsafe==2.0.1
     #   jinja2
     #   mako
     #   portal (setup.cfg)
+    #   wtforms
 mock==4.0.3
     # via portal (setup.cfg)
 oauthlib==2.1.0
@@ -373,7 +374,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.32.0
+virtualenv==20.33.1
     # via tox
 waitress==3.0.2
     # via webtest
@@ -392,10 +393,8 @@ werkzeug==1.0.1
     #   pytest-flask
 wsproto==1.2.0
     # via trio-websocket
-wtforms==2.2.1
-    # via
-    #   flask-wtf
-    #   portal (setup.cfg)
+wtforms==3.2.1
+    # via flask-wtf
 xvfbwrapper==0.2.13
     # via portal (setup.cfg)
 
