@@ -1,17 +1,3 @@
-# FROM node:12 as substudy_app
-
-# RUN mkdir /tmp/substudy_app
-# WORKDIR /tmp/substudy_app
-
-# # Copy required front-end files only
-# COPY  portal/eproms_substudy_tailored_content/  ./
-
-# RUN npm install
-
-# RUN npm run build
-# -----------------------------------------------------------------------------
-
-
 FROM debian:bullseye as builder
 
 ENV \
@@ -73,10 +59,6 @@ RUN \
     apt-get update --quiet > /dev/null && \
     apt-get install --quiet --quiet portal && \
     rm --force --recursive --verbose "${ARTIFACT_DIR}"
-
-# Copy substudy app files built in substudy_app stage
-# COPY --from=substudy_app /tmp/substudy_app/dist/bundle/ /opt/venvs/portal/lib/python3.9/site-packages/portal/static/bundle/
-# COPY --from=substudy_app /tmp/substudy_app/dist/templates/ /opt/venvs/portal/lib/python3.9/site-packages/portal/static/templates/
 
 ENV \
     BASH_ENV=/etc/profile.d/remap_envvars.sh \
