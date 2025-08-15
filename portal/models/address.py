@@ -4,13 +4,12 @@ Address data lives in the 'addresses' table.  Several entities link
 to address via foreign keys.
 
 """
-from sqlalchemy.dialects.postgresql import ENUM
-
+from sqlalchemy import Enum
 from ..database import db
 
-address_type = ENUM('postal', 'physical', 'both', name='address_type',
+address_type = Enum('postal', 'physical', 'both', name='address_type',
                     create_type=False)
-address_use = ENUM('home', 'work', 'temp', 'old', name='address_use',
+address_use = Enum('home', 'work', 'temp', 'old', name='address_use',
                    create_type=False)
 
 

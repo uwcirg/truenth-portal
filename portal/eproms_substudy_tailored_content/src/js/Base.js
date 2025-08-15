@@ -436,9 +436,6 @@ export default {
                     .then(() => {
                         // DOM updated
                         this.onDomainContentDidLoad();
-                        if (this.isAtMainPage(this.getSelectedDomain())) {
-                            return;
-                        }
                         //log accessed content domain url 
                         postData("/api/auditlog", {
                             "message": "GET " + window.location.pathname + window.location.hash,

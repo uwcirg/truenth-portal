@@ -5,7 +5,7 @@ from smtplib import SMTPRecipientsRefused
 from flask import current_app, url_for
 from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
 from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum
 
 from ..audit import auditable_event
 from ..database import db
@@ -18,7 +18,7 @@ from .relationship import RELATIONSHIP, Relationship
 from .role import ROLE, Role
 from .user import User, UserRelationship, UserRoles, current_user
 
-providers_list = ENUM(
+providers_list = Enum(
     *SUPPORTED_OAUTH_PROVIDERS, name='providers', create_type=False)
 
 

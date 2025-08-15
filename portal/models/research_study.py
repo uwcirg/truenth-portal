@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum
 
 from ..cache import TWO_HOURS, cache
 from ..database import db
@@ -15,7 +15,7 @@ status_types = (
     "closed-to-accrual-and-intervention", "completed", "disapproved",
     "in-review", "temporarily-closed-to-accrual",
     "temporarily-closed-to-accrual-and-intervention", "withdrawn")
-status_types_enum = ENUM(
+status_types_enum = Enum(
     *status_types, name='research_study_status_enum', create_type=False)
 
 

@@ -4,7 +4,7 @@ Designed around FHIR guidelines for representation of encounters.
 """
 from datetime import datetime
 
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum
 
 from ..database import db
 from ..date_tools import FHIR_datetime, as_fhir
@@ -26,12 +26,12 @@ class EncounterCodings(db.Model):
 
 
 # http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.status
-status_types = ENUM(
+status_types = Enum(
     'planned', 'arrived', 'in-progress', 'onleave', 'finished', 'cancelled',
     name='statuses', create_type=False)
 
 # authentication method type extension to the standard FHIR format
-auth_method_types = ENUM(
+auth_method_types = Enum(
     'password_authenticated', 'url_authenticated', 'staff_authenticated',
     'staff_handed_to_patient', 'service_token_authenticated',
     'url_authenticated_and_verified', 'failsafe',

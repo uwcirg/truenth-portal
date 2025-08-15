@@ -4,15 +4,15 @@ FHIR uses a telecom structure for email, fax, phone, etc.
 
 """
 from flask import current_app
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum
 
 from ..database import db
 
 cp_sys_list = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other']
 cp_use_list = ['home', 'work', 'temp', 'old', 'mobile']
 
-contactpoint_sys = ENUM(*cp_sys_list, name='cp_sys', create_type=False)
-contactpoint_use = ENUM(*cp_use_list, name='cp_use', create_type=False)
+contactpoint_sys = Enum(*cp_sys_list, name='cp_sys', create_type=False)
+contactpoint_use = Enum(*cp_use_list, name='cp_use', create_type=False)
 
 
 class ContactPoint(db.Model):

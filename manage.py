@@ -2,7 +2,6 @@
 
 FLASK_APP=manage.py flask --help
 
-(bogus comment line added to triger build)
 """
 import copy
 from datetime import datetime
@@ -105,6 +104,24 @@ def upgrade_db():
     """Run any outstanding migration scripts"""
     _run_alembic_command(['--raiseerr', 'upgrade', 'head'])
 
+
+@click.option(
+    '--reprocess', '-r', is_flag=True,
+    help='Reprocess adherence cache for patients showing issues')
+@click.option(
+    '--research_study_id', '-s',
+    type=click.IntRange(0,1), default=0,
+    help='Reprocess adherence cache for patients showing issues')
+@app.cli.command()
+def adherence_cache_test(research_study_id=0, reprocess=False):
+    """Compare current adherence cache to trigger states, generate report"""
+    from portal.models.adherence_cache_timeline_validation import validate as timeline_validate
+    from portal.trigger_states.adherence_cache_validation import validate as ts_validate
+
+    if research_study_id == 1:
+        ts_validate(reprocess)
+
+    timeline_validate(research_study_id, reprocess)
 
 def flush_cache():
     """Flush redis of all values.

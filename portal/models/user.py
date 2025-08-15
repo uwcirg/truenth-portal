@@ -16,8 +16,7 @@ from flask_babel import gettext as _
 from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
-from sqlalchemy import UniqueConstraint, and_, func, or_
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import and_, func, Enum, or_, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
@@ -66,7 +65,7 @@ DELETED_PREFIX = "__deleted_{time}__"
 DELETED_REGEX = r"__deleted_\d+__(.*)"
 
 # https://www.hl7.org/fhir/valueset-administrative-gender.html
-gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
+gender_types = Enum('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
 
 internal_identifier_systems = (

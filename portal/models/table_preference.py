@@ -2,14 +2,13 @@
 from datetime import datetime
 import json
 
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum, UniqueConstraint
 
 from ..database import db
 from ..date_tools import FHIR_datetime
 
 sort_order_types = ('asc', 'desc')
-sort_order_types_enum = ENUM(
+sort_order_types_enum = Enum(
     *sort_order_types, name='sort_order_enum', create_type=False)
 
 

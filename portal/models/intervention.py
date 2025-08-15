@@ -1,7 +1,6 @@
 """Intervention Module"""
 from flask import current_app
-from sqlalchemy import and_
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest
@@ -260,7 +259,7 @@ class Intervention(db.Model):
 
 
 access_types = ('forbidden', 'granted', 'subscribed')
-access_types_enum = ENUM(*access_types, name='access', create_type=False)
+access_types_enum = Enum(*access_types, name='access', create_type=False)
 
 
 class UserIntervention(db.Model):

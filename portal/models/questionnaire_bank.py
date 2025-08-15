@@ -3,8 +3,7 @@
 from flask import url_for
 from flask_babel import gettext as _
 from flask_sqlalchemy_caching import FromCache
-from sqlalchemy import CheckConstraint, UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import CheckConstraint, Enum, UniqueConstraint
 
 from ..cache import FIVE_MINS, TWO_HOURS, cache
 from ..database import db
@@ -23,7 +22,7 @@ from .research_protocol import ResearchProtocol
 from .user_consent import consent_withdrawal_dates
 
 classification_types = ('baseline', 'recurring', 'indefinite', 'other')
-classification_types_enum = ENUM(
+classification_types_enum = Enum(
     *classification_types, name='classification_enum', create_type=False)
 
 
