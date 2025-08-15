@@ -1,15 +1,14 @@
 """ model data for questionnaire response 'research data' reports """
-from datetime import datetime, timedelta
 from flask import current_app
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy import UniqueConstraint
-import re
+from sqlalchemy import text
 
 from ..database import db
 from ..date_tools import FHIR_datetime
 from .reference import Reference
 from .research_study import research_study_id_from_questionnaire
-from .user import User
+from .user import User, unchecked_get_user
+from .role import ROLE
 
 
 class ResearchData(db.Model):
@@ -144,3 +143,39 @@ def add_questionnaire_response(questionnaire_response, research_study_id):
         )
         db.session.add(research_data)
         db.session.commit()
+
+
+def validate(reprocess=False):
+    """Validate the research data cache, by comparing against the questionnaire_responses table
+
+    For every valid questionnaire_response with an associated visit, there should also be a
+    row in the research data table.
+
+    Generate a report for any missing, and if reprocess is set, regenerate those found missing.
+    """
+    from .questionnaire_response import QuestionnaireResponse
+    query = ("SELECT DISTINCT(subject_id) FROM questionnaire_responses WHERE questionnaire_bank_id > 0 AND"
+             " id NOT IN (SELECT questionnaire_response_id FROM research_data) ORDER BY subject_id")
+    missing_qnr_ids = []
+    for row in db.engine.execute(query):
+        pat_id = row.subject_id
+        patient = unchecked_get_user(pat_id, allow_deleted=True)
+        # skip over test and deleted patients
+        if patient.has_role(ROLE.TEST.value) or patient.deleted_id is not None:
+            continue
+
+        missing_research_data = text(
+            "SELECT id FROM questionnaire_responses WHERE questionnaire_bank_id > 0 AND"
+            " subject_id = :subject_id AND"
+            " id NOT IN (SELECT questionnaire_response_id FROM research_data WHERE "
+            " subject_id = :subject_id)")
+        patient_missing_qnr_ids = [
+            row.id for row in db.engine.execute(missing_research_data, {'subject_id': pat_id})]
+        print(f"Missing {len(patient_missing_qnr_ids)} research data rows for {pat_id}")
+        missing_qnr_ids.extend(patient_missing_qnr_ids)
+
+    if reprocess:
+        for qnr_id in missing_qnr_ids:
+            print(f"Reprocessing Questionnaire Response: {qnr_id}")
+            qnr = QuestionnaireResponse.query.get(qnr_id)
+            add_questionnaire_response(qnr, research_study_id=None)
