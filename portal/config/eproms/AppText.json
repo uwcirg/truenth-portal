@@ -21,6 +21,11 @@
       "resourceType": "AppText"
     },
     {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=890f6204-2dc8-5a5c-617e-4933fab65353&editorUrl=true",
+      "name": "IRONMAN newsletter",
+      "resourceType": "AppText"
+    },
+    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=a455d641-06cb-48b7-a4fd-ddc9fe98a921&editorUrl=true",
       "name": "IRONMAN patient terms and conditions URL",
       "resourceType": "AppText"
@@ -181,13 +186,28 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=faab8398-fa93-f1ca-9d81-3ddc38769d96",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=fbef98f2-53be-316c-a671-c1ebb423ed33",
       "name": "empro clinician trigger notification",
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=86b1c0ef-e3ee-e264-0190-71678d21b6a5",
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=a1f1a57c-b250-0cf5-548b-5b0284e82ae7",
+      "name": "empro clinician trigger notification partially opted out",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e875dceb-58d9-c8ce-3f44-6b95503e725a",
+      "name": "empro clinician trigger notification all opted out",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=3d1ab756-fe6c-eef5-5eda-78f17ac669ee",
       "name": "empro clinician trigger reminder",
+      "resourceType": "AppText"
+    },
+    {
+      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=76eff370-1b98-9387-bbfd-94ffc199ed49",
+      "name": "empro clinician trigger reminder partially opted out",
       "resourceType": "AppText"
     },
     {

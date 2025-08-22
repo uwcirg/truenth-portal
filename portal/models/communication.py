@@ -8,8 +8,7 @@ from string import Formatter
 
 from flask import current_app, url_for
 from flask_babel import force_locale, gettext as _
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
@@ -26,7 +25,7 @@ from .url_token import url_token
 from .user import User
 
 # https://www.hl7.org/fhir/valueset-event-status.html
-event_status_types = ENUM(
+event_status_types = Enum(
     'preparation', 'in-progress', 'suspended', 'aborted', 'completed',
     'entered-in-error', 'unknown', name='event_statuses',
     create_type=False)
@@ -114,6 +113,13 @@ def load_template_args(
         return (
             '<a href="{ae_link}">{label}</a>'.format(
                 ae_link=access_link(next_step='present_needed'), label=label))
+
+    def _lookup_main_study_registry_link():
+        label = _('Learn more about the IRONMAN registry')
+        registry_link = 'https://ironmanregistry.org/'
+        return (
+            '<a href="{registry_link}">{label}</a>'.format(
+                registry_link=registry_link, label=label))
 
     def _lookup_clinic_name():
         if user.organizations:
@@ -261,16 +267,16 @@ class Communication(db.Model):
     """
     __tablename__ = 'communications'
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column('status', event_status_types, nullable=False)
+    status = db.Column('status', event_status_types, index=True, nullable=False)
 
     # FHIR Communication spec says `basedOn` can return to any
     # object.  For current needs, this is always a CommunicationRequest
     communication_request_id = db.Column(
-        db.ForeignKey('communication_requests.id'), nullable=False)
+        db.ForeignKey('communication_requests.id'), index=True, nullable=False)
     communication_request = db.relationship('CommunicationRequest')
 
     user_id = db.Column(db.ForeignKey(
-        'users.id', ondelete='cascade'), nullable=False)
+        'users.id', ondelete='cascade'), index=True, nullable=False)
 
     # message_id is null until sent
     message_id = db.Column(db.ForeignKey(

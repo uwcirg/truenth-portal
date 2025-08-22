@@ -2,7 +2,6 @@
 
 FLASK_APP=manage.py flask --help
 
-(bogus comment line added to triger build)
 """
 import copy
 from datetime import datetime
@@ -21,6 +20,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from portal.audit import auditable_event
 from portal.date_tools import FHIR_datetime
+from portal.config.config_persistence import import_config
 from portal.config.site_persistence import SitePersistence
 from portal.extensions import db, user_manager
 from portal.factories.app import create_app
@@ -43,7 +43,11 @@ from portal.models.questionnaire_bank import (
     QuestionnaireBank,
     add_static_questionnaire_bank,
 )
-from portal.models.questionnaire_response import QuestionnaireResponse
+from portal.models.questionnaire_response import (
+    QuestionnaireResponse,
+    capture_patient_state,
+    present_before_after_state,
+)
 from portal.models.relationship import add_static_relationships
 from portal.models.research_study import (
     BASE_RS_ID,
@@ -99,6 +103,16 @@ def stamp_db():
 def upgrade_db():
     """Run any outstanding migration scripts"""
     _run_alembic_command(['--raiseerr', 'upgrade', 'head'])
+
+
+@click.option(
+    '--reprocess', '-r', is_flag=True,
+    help='Reprocess adherence cache for patients showing issues')
+@app.cli.command()
+def adherence_cache_test(reprocess=False):
+    """Compare current adherence cache to trigger states, generate report"""
+    from portal.trigger_states.adherence_cache_validation import validate
+    validate(reprocess)
 
 
 def flush_cache():
@@ -176,6 +190,20 @@ def seed(keep_unmentioned=False):
     # import site export file if found
     SitePersistence(target_dir=None).import_(
         keep_unmentioned=keep_unmentioned)
+
+
+@app.cli.command()
+def generate_site_cfg():
+    """Generate only the site.cfg file via site_persistence
+
+    Typically done via `sync` or `seed`, this option exists for the
+    backend job queues to generate the `site.cfg` file to maintain
+    consistent configuration with the front end, withou the overhead
+    of the rest of `sync`
+    """
+    app.logger.info("generate-site-cfg begin")
+    import_config(target_dir=None)
+    app.logger.info("generate-site-cfg complete")
 
 
 @click.option('--directory', '-d', default=None, help="Export directory")
@@ -495,8 +523,7 @@ def update_qnr_authored(qnr_id, authored, actor):
     """Modify authored date on given Questionnaire Response ID"""
     qnr = QuestionnaireResponse.query.get(qnr_id)
     if not qnr:
-        raise ValueError(
-            "Questionnaire Response {qnr_id} not found".format(qnr_id))
+        raise ValueError(f"Questionnaire Response {qnr_id} not found")
 
     acting_user = get_actor(actor, editable_ids=[qnr.subject_id])
     document = copy.deepcopy(qnr.document)
@@ -534,92 +561,67 @@ def update_qnr_authored(qnr_id, authored, actor):
     print(message)
 
 
-@click.option('--subject_id', type=int, multiple=True, help="Subject user ID", required=True)
+@click.option('--qnr_id', help="Questionnaire Response ID", required=True)
+@click.option(
+    '--link_id',
+    required=True,
+    help="linkId to correct, format example: irondemog.27")
 @click.option(
     '--actor',
-    default="__system__",
-    required=False,
+    required=True,
     help='email address of user taking this action, for audit trail'
 )
+@click.option(
+    '--replacement',
+    required=False,
+    help='JSON snippet for `answer` replacement.  Use --noop result as template'
+)
+@click.option(
+    '--noop',
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help='no op, echo current value for requested linkId'
+)
 @app.cli.command()
-def remove_post_withdrawn_qnrs(subject_id, actor):
-    """Remove QNRs posted beyond subject's withdrawal date"""
-    from sqlalchemy.types import DateTime
-    from portal.cache import cache
-    from portal.models.questionnaire_bank import trigger_date
+def update_qnr(qnr_id, link_id, actor, noop, replacement):
+    """Modify given linkId in given Questionnaire Response ID"""
+    qnr = QuestionnaireResponse.query.get(qnr_id)
+    if not qnr:
+        raise ValueError(f"Questionnaire Response {qnr_id} not found")
 
-    rs_id = 0  # only base study till need arises
-    acting_user = get_actor(actor, require_admin=True)
+    old_value = qnr.link_id(link_id)
+    if noop:
+        if replacement:
+            raise ValueError("--noop & --replacement are mutually exclusive")
+        click.echo(f"'{json.dumps(old_value)}'")
+        return
 
-    for subject_id in subject_id:
-        # Confirm user has withdrawn
-        subject = get_target(id=subject_id)
-        study_id = subject.external_study_id
+    new_value = json.loads(replacement)
+    acting_user = get_actor(actor, editable_ids=[qnr.subject_id])
+    document = copy.deepcopy(qnr.document)
+    if set(old_value.keys()) != set(new_value.keys()):
+        raise ValueError("inconsistent dictionary keys; can't continue")
+    if old_value["text"] != new_value["text"]:
+        raise ValueError("question text doesn't match existing; can't continue")
+    if old_value["linkId"] != new_value["linkId"]:
+        raise ValueError("linkId doesn't match; can't continue")
 
-        # Make sure we're not working w/ stale timeline data
-        QuestionnaireResponse.purge_qb_relationship(
-            subject_id=subject_id,
-            research_study_id=rs_id,
-            acting_user_id=acting_user.id)
-        cache.delete_memoized(trigger_date)
-        update_users_QBT(
-            subject_id,
-            research_study_id=rs_id,
-            invalidate_existing=True)
+    questions = qnr.replace_link_id(link_id, new_value)
+    document["group"]["question"] = questions
+    qnr.document = document
+    assert qnr in db.session
+    db.session.commit()
 
-        deceased_date = None if not subject.deceased else subject.deceased.timestamp
-        withdrawn_visit = QBT.withdrawn_qbd(subject_id, rs_id)
-        if not withdrawn_visit:
-            raise ValueError("Only applicable to withdrawn users")
-
-        # Obtain all QNRs submitted beyond withdrawal date
-        query = QuestionnaireResponse.query.filter(
-            QuestionnaireResponse.document["authored"].astext.cast(DateTime) >
-            withdrawn_visit.relative_start
-        ).filter(
-            QuestionnaireResponse.subject_id == subject_id).with_entities(
-            QuestionnaireResponse.id,
-            QuestionnaireResponse.questionnaire_bank_id,
-            QuestionnaireResponse.qb_iteration,
-            QuestionnaireResponse.document["questionnaire"]["reference"].
-                label("instrument"),
-            QuestionnaireResponse.document["authored"].
-                label("authored")
-        ).order_by(QuestionnaireResponse.document["authored"])
-
-        for qnr in query:
-            # match format in bug report for easy diff
-            sub_padding = " "*(11 - len(str(subject_id)))
-            stdy_padding = " "*(12 - len(study_id))
-            out = (
-                f"{sub_padding}{subject_id} | "
-                f"{study_id}{stdy_padding}| "
-                f"{withdrawn_visit.relative_start.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}    | "
-                f"{qnr.authored} | ")
-
-            # do not include any belonging to the last active visit, unless
-            # they came in after deceased date
-            if (
-                    qnr.questionnaire_bank_id == withdrawn_visit.qb_id and
-                    qnr.qb_iteration == withdrawn_visit.iteration and
-                    (not deceased_date or FHIR_datetime.parse(
-                        qnr.authored) < deceased_date)):
-                print(f"{out}keep")
-                continue
-            if "irondemog" in qnr.instrument:
-                print(f"{out}keep (indefinite)")
-                continue
-            print(f"{out}delete")
-            db.session.delete(QuestionnaireResponse.query.get(qnr.id))
-            auditable_event(
-                message=(
-                    "deleted questionnaire response submitted beyond "
-                    "withdrawal visit as per request by PCCTC"),
-                context="assessment",
-                user_id=acting_user.id,
-                subject_id=subject_id)
-        db.session.commit()
-    return
+    message = (
+        f"Updated QNR {qnr_id} {link_id} answer from {old_value['answer']}"
+        f" to {new_value['answer']}")
+    auditable_event(
+        message=message,
+        context="assessment",
+        user_id=acting_user.id,
+        subject_id=qnr.subject_id)
+    click.echo(message)
 
 
 @click.option('--src_id', type=int, help="Source Patient ID (WILL BE DELETED!)")
@@ -727,51 +729,6 @@ def merge_users(src_id, tgt_id, actor):
     print(message)
 
 
-def capture_patient_state(patient_id):
-    """Call to capture QBT and QNR state for patient, used for before/after"""
-    qnrs = QuestionnaireResponse.qnr_state(patient_id)
-    tl = QBT.timeline_state(patient_id)
-    return {'qnrs': qnrs, 'timeline': tl}
-
-
-def present_before_after_state(user_id, external_study_id, before_state):
-    from portal.dict_tools import dict_compare
-    after_qnrs = QuestionnaireResponse.qnr_state(user_id)
-    after_timeline = QBT.timeline_state(user_id)
-
-    # Compare results
-    added_q, removed_q, modified_q, same = dict_compare(
-        after_qnrs, before_state['qnrs'])
-    assert not added_q
-    assert not removed_q
-
-    added_t, removed_t, modified_t, same = dict_compare(
-        after_timeline, before_state['timeline'])
-
-    if any((added_t, removed_t, modified_t, modified_q)):
-        print(f"\nPatient {user_id} ({external_study_id}):")
-    if modified_q:
-        print("\tModified QNRs (old, new)")
-        for mod in sorted(modified_q):
-            print(f"\t\t{mod} {modified_q[mod][1]} ==>"
-                  f" {modified_q[mod][0]}")
-    if added_t:
-        print("\tAdditional timeline rows:")
-        for item in sorted(added_t):
-            print(f"\t\t{item} {after_timeline[item]}")
-    if removed_t:
-        print("\tRemoved timeline rows:")
-        for item in sorted(removed_t):
-            print(
-                f"\t\t{item} "
-                f"{before_state['timeline'][item]}")
-    if modified_t:
-        print(f"\tModified timeline rows: (old, new)")
-        for item in sorted(modified_t):
-            print(f"\t\t{item}")
-            print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
-
-
 @app.cli.command()
 @click.option(
     '--correct_overlaps', '-c', default=False, is_flag=True,
@@ -808,8 +765,8 @@ def find_overlaps(correct_overlaps, reprocess_qnrs):
                     acting_user_id=admin.id,
                 )
 
-            update_users_QBT(
-                patient.id, research_study_id=0, invalidate_existing=True)
+            invalidate_users_QBT(user_id=patient.id, research_study_id=0)
+            update_users_QBT(user_id=patient.id, research_study_id=0)
             present_before_after_state(
                 patient.id, patient.external_study_id, b4)
 
@@ -819,7 +776,8 @@ def find_overlaps(correct_overlaps, reprocess_qnrs):
     '--retired',
     required=True,
     help="datetime for site's current protocol expiration,"
-         " format example: 2019-04-09 15:14:43")
+         " format example: 2019-04-09 15:14:43  or the string 'none'"
+         " to generate patient differences without RP change")
 @app.cli.command()
 def preview_site_update(org_id, retired):
     """Preview Timeline changes for affected users
@@ -855,39 +813,79 @@ def preview_site_update(org_id, retired):
     for patient in query:
         patient_state[patient.id] = capture_patient_state(patient.id)
 
-    # Update the org's research protocol as requested - assume to the latest
-    previous_rp = organization.research_protocols[-1]
-    assert previous_rp.name == 'IRONMAN v3'
-    latest_rp = ResearchProtocol.query.filter(
-        ResearchProtocol.name == 'IRONMAN v5').one()
-    previous_org_rp = OrganizationResearchProtocol.query.filter(
-        OrganizationResearchProtocol.research_protocol_id ==
-        previous_rp.id).filter(
-        OrganizationResearchProtocol.organization_id == org_id).one()
-    previous_org_rp.retired_as_of = retired
-    new_org_rp = OrganizationResearchProtocol(
-        research_protocol=latest_rp,
-        organization=organization)
-    db.session.add(new_org_rp)
-    db.session.commit()
-    print(f"Extending Research Protocols for {organization}")
-    print(f"  - Adding RP {latest_rp.name}")
-    print(f"  - {previous_rp.name} now retired as of {retired}")
-    print("-"*80)
+    new_org_rp = None
+    if retired.lower() != 'none':
+        # Update the org's research protocol as requested - assume to the latest
+        previous_rp = organization.research_protocols[-1]
+        assert previous_rp.name == 'IRONMAN v3'
+        latest_rp = ResearchProtocol.query.filter(
+            ResearchProtocol.name == 'IRONMAN v5').one()
+        previous_org_rp = OrganizationResearchProtocol.query.filter(
+            OrganizationResearchProtocol.research_protocol_id ==
+            previous_rp.id).filter(
+            OrganizationResearchProtocol.organization_id == org_id).one()
+        previous_org_rp.retired_as_of = retired
+        new_org_rp = OrganizationResearchProtocol(
+            research_protocol=latest_rp,
+            organization=organization)
+        db.session.add(new_org_rp)
+        db.session.commit()
+        print(f"Extending Research Protocols for {organization}")
+        print(f"  - Adding RP {latest_rp.name}")
+        print(f"  - {previous_rp.name} now retired as of {retired}")
+        print("-"*80)
 
     # With new RP in place, cycle through patients, purge and
     # refresh timeline and QNR data, and report any diffs
+    total_qnrs, total_qnrs_assigned = 0, 0
+    total_qnrs_completed_b4, total_qnrs_completed_after = 0, 0
+    total_qbs_completed_b4, total_qbs_completed_after = 0, 0
+    patients_with_fewer_assigned = []
     for patient in query:
         QuestionnaireResponse.purge_qb_relationship(
             subject_id=patient.id,
             research_study_id=0,
             acting_user_id=admin.id,
         )
-        update_users_QBT(
-            patient.id, research_study_id=0, invalidate_existing=True)
-        present_before_after_state(
+        invalidate_users_QBT(user_id=patient.id, research_study_id=0)
+        update_users_QBT(user_id=patient.id, research_study_id=0)
+        after_qnrs, after_timeline, qnrs_lost_reference, _ = present_before_after_state(
             patient.id, patient.external_study_id, patient_state[patient.id])
+        total_qnrs += len(patient_state[patient.id]['qnrs'])
+        total_qbs_completed_b4 += len(
+            [1 for date_status in patient_state[patient.id]['timeline'].keys()
+             if date_status.endswith('Completed') and
+             not date_status.endswith('Partially Completed')])
+        total_qbs_completed_after += len(
+            [1 for date_status in after_timeline.keys()
+             if date_status.endswith('Completed') and
+             not date_status.endswith('Partially Completed')])
+        b4_total = sum(
+            [1 for qb_name in patient_state[patient.id]['qnrs'].values()
+             if qb_name[0] != "none of the above"])
+        total_qnrs_completed_b4 += b4_total
+        after_total = sum(
+            [1 for qb_name in after_qnrs.values()
+             if qb_name[0] != "none of the above"])
+        total_qnrs_completed_after += after_total
+        if b4_total != after_total:
+            patients_with_fewer_assigned.append((patient.id, qnrs_lost_reference))
+
+    print(f"{total_qnrs} QuestionnaireResponses for all patients in organization {org_id}")
+    print(organization.name)
+    print(f"  Patients in organization: {len(patient_state)}")
+    print(f"  Patients negatively affected by change: {len(patients_with_fewer_assigned)}")
+    print(f"  Number of those QNRs assigned to a QB before RP change: {total_qnrs_completed_b4}")
+    print(f"  Number of those QNRs assigned to a QB after RP change: {total_qnrs_completed_after}")
+    print(f"  Number of QuestionnaireBanks completed before RP change: {total_qbs_completed_b4}")
+    print(f"  Number of QuestionnaireBanks completed after RP change: {total_qbs_completed_after}")
+    print(" Details of patients having lost a QuestionnaireResponse association:")
+    for item in patients_with_fewer_assigned:
+        print(f"  Patient {item[0]}")
+        for qnr_deet in item[1]:
+            print(f"    visit: {qnr_deet[0]} questionnaire: {qnr_deet[1]}")
 
     # Restore organization to pre-test RPs
-    db.session.delete(new_org_rp)
-    db.session.commit()
+    if new_org_rp:
+        db.session.delete(new_org_rp)
+        db.session.commit()

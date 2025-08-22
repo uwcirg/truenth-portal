@@ -32,6 +32,7 @@ from flask_user import roles_required
 from flask_wtf import FlaskForm
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import BadRequest
 from wtforms import (
     BooleanField,
     HiddenField,
@@ -70,6 +71,7 @@ from ..models.organization import (
     OrgTree,
     UserOrganization,
 )
+from ..models.overall_status import OverallStatus
 from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
@@ -749,6 +751,7 @@ def patient_reminder_email(user_id):
     Query string
     :param research_study_id: set for targeted reminder emails, defaults to 0
 
+    :raises werkzeug.exceptions.BadRequest: if the patient isn't currently eligible for reminder
     """
     from ..models.qb_status import QB_Status
     user = get_user(user_id, 'edit')
@@ -767,6 +770,10 @@ def patient_reminder_email(user_id):
             user,
             research_study_id=research_study_id,
             as_of_date=datetime.utcnow())
+        if qstats.overall_status not in (
+                OverallStatus.due, OverallStatus.overdue, OverallStatus.in_progress):
+            raise BadRequest(_('No questionnaire is due.'))
+
         qbd = qstats.current_qbd()
         if qbd:
             qb_id, qb_iteration = qbd.qb_id, qbd.iteration
@@ -908,6 +915,7 @@ def config_settings(config_key):
         'LOCALIZED_AFFILIATE_ORG',
         'LR_',
         'MAINTENANCE_',
+        'OPT_OUT_DISABLED_ORG_IDS',
         'PROTECTED_FIELDS',
         'PROTECTED_ORG',
         'PATIENT_LIST_ADDL_FIELDS',
@@ -1061,6 +1069,15 @@ def celery_test(x=16, y=16):
 def celery_info():
     from ..tasks import info
     res = info.apply_async()
+    return jsonify(result=res.get(), task_id=res.task_id)
+
+
+@portal.route("/celery-settings")
+@roles_required([ROLE.ADMIN.value])
+@oauth.require_oauth()
+def celery_settings():
+    from ..tasks import settings
+    res = settings.apply_async()
     return jsonify(result=res.get(), task_id=res.task_id)
 
 
@@ -1243,7 +1260,7 @@ def communicate(email_or_id):
     if not u:
         message = 'no such user'
     elif u.deleted_id:
-        message = 'delted user - not allowed'
+        message = 'deleted user - not allowed'
     else:
         purge = request.args.get('purge', False)
         if purge in ('', '0', 'false', 'False'):

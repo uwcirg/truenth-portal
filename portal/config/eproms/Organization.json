@@ -663,6 +663,34 @@
     {
       "extension": [
         {
+          "timezone": "Australia/Melbourne",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146198,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-198"
+        }
+      ],
+      "language": "en_AU",
+      "name": "Alfred Health",
+      "partOf": {
+        "reference": "api/organization/21000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
           "url": "http://hl7.org/fhir/valueset/languages",
           "valueCodeableConcept": {
             "coding": [
@@ -1626,7 +1654,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+              {"name": "IRONMAN v3", "retired_as_of": "2020-07-24T05:00:00Z"},
+              {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -1864,6 +1893,34 @@
       ],
       "language": "en_US",
       "name": "VA of Western New York Healthcare System",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/Chicago",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146226,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-226"
+        }
+      ],
+      "language": "en_US",
+      "name": "University of Alabama, Tuscaloosa",
       "partOf": {
         "reference": "api/organization/22000"
       },
@@ -2247,7 +2304,8 @@
         },
         {
           "research_protocols": [
-            {"name": "IRONMAN v5"}
+            {"name": "IRONMAN v5"},
+            {"name": "EMPRO v1"}			
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -2374,6 +2432,118 @@
       ],
       "language": "en_US",
       "name": "Mayo Clinic Florida",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14674,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-74"
+        }
+      ],
+      "language": "en_US",
+      "name": "University of Massachusetts Memorial Medical Center",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/Chicago",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146193,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-193"
+        }
+      ],
+      "language": "en_US",
+      "name": "Baptist Clinical Research Institute",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 14698,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-98"
+        }
+      ],
+      "language": "en_US",
+      "name": "Howard University",
+      "partOf": {
+        "reference": "api/organization/22000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "America/New_York",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        }
+      ],
+      "id": 146246,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-246"
+        }
+      ],
+      "language": "en_US",
+      "name": "University Hospitals Cleveland Medical Center",
       "partOf": {
         "reference": "api/organization/22000"
       },
@@ -2881,7 +3051,8 @@
         {
           "research_protocols": [
             {"name": "IRONMAN v3", "retired_as_of": "2022-02-09T00:00:00Z"},
-            {"name": "IRONMAN v5"}
+            {"name": "IRONMAN v5"},
+            {"name": "EMPRO v1"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -2939,7 +3110,8 @@
         {
           "research_protocols": [
             {"name": "IRONMAN v3", "retired_as_of": "2022-09-21T23:00:00Z"},
-            {"name": "IRONMAN v5"}
+            {"name": "IRONMAN v5"},
+            {"name": "EMPRO v1"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -2967,7 +3139,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2023-12-29T00:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3073,7 +3246,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2024-02-12T12:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3101,7 +3275,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2024-02-12T12:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3214,7 +3389,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2023-05-12T00:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -3422,6 +3598,96 @@
       ],
       "language": "en_GB",
       "name": "Steve Biko Academic Hospital",
+      "partOf": {
+        "reference": "api/organization/27000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Africa/Johannesburg",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        },
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        }
+      ],
+      "id": 146191,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-191"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Rosebank Oncology",
+      "partOf": {
+        "reference": "api/organization/27000"
+      },
+      "resourceType": "Organization"
+    },
+    {
+      "extension": [
+        {
+          "timezone": "Africa/Johannesburg",
+          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
+        },
+        {
+          "research_protocols": [
+            {"name": "IRONMAN v5"}
+          ],
+          "url": "http://us.truenth.org/identity-codes/research-protocol"
+        },
+        {
+          "url": "http://hl7.org/fhir/valueset/languages",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "code": "en_GB",
+                "display": "English",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "af_ZA",
+                "display": "Afrikaans",
+                "system": "urn:ietf:bcp:47"
+              },
+              {
+                "code": "xh_ZA",
+                "display": "Xhosa",
+                "system": "urn:ietf:bcp:47"
+              }
+            ]
+          }
+        }
+      ],
+      "id": 146192,
+      "identifier": [
+        {
+          "system": "http://pcctc.org/",
+          "use": "secondary",
+          "value": "146-192"
+        }
+      ],
+      "language": "en_GB",
+      "name": "Groote Schuur Hospital",
       "partOf": {
         "reference": "api/organization/27000"
       },
@@ -3683,34 +3949,6 @@
       ],
       "language": "es_ES",
       "name": "Vall d'Hebron Institute of Oncology",
-      "partOf": {
-        "reference": "api/organization/29000"
-      },
-      "resourceType": "Organization"
-    },
-    {
-      "extension": [
-        {
-          "timezone": "Europe/Madrid",
-          "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
-        },
-        {
-          "research_protocols": [
-			{"name": "IRONMAN v3"}
-          ],
-          "url": "http://us.truenth.org/identity-codes/research-protocol"
-        }
-      ],
-      "id": 146103,
-      "identifier": [
-        {
-          "system": "http://pcctc.org/",
-          "use": "secondary",
-          "value": "146-103"
-        }
-      ],
-      "language": "es_ES",
-      "name": "Hospital Universitario Virgen de la Victoria",
       "partOf": {
         "reference": "api/organization/29000"
       },
@@ -4014,7 +4252,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2023-01-06T20:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -4042,7 +4281,8 @@
         },
         {
           "research_protocols": [
-			{"name": "IRONMAN v3"}
+            {"name": "IRONMAN v3", "retired_as_of": "2023-01-06T20:00:00Z"},
+            {"name": "IRONMAN v5"}
           ],
           "url": "http://us.truenth.org/identity-codes/research-protocol"
         }
@@ -4611,11 +4851,6 @@
                 "system": "urn:ietf:bcp:47"
               },
               {
-                "code": "zu_ZA",
-                "display": "Zulu",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
                 "code": "xh_ZA",
                 "display": "Xhosa",
                 "system": "urn:ietf:bcp:47"
@@ -4715,11 +4950,6 @@
               {
                 "code": "fr_CA",
                 "display": "Canadian French",
-                "system": "urn:ietf:bcp:47"
-              },
-              {
-                "code": "zu_ZA",
-                "display": "Zulu",
                 "system": "urn:ietf:bcp:47"
               },
               {

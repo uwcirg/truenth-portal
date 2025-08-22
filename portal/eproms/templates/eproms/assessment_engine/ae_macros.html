@@ -62,6 +62,20 @@
     {{render_logout()}}
 {%- endmacro -%}
 
+{%- macro empro_expired(user=user, substudy_assessment_status={}) -%}
+    {% set substudy_title = "EMPRO" %}
+    {% call render_card_content(title_text=_("%(substudy_title)s Study", substudy_title=substudy_title), card_class="") %}
+        <div class="text-content">
+             <!-- verbiage used also for expired main study questionnaire -->
+             <p>{{_("The assessment is no longer available. A research staff member will contact you for assistance.")}}</p>
+             {% if substudy_assessment_status.at_least_one_completed %}
+                <div class="button-container">
+                    {{empro_report_link(user)}}
+                </div>
+             {% endif %}
+        </div>
+    {% endcall %}
+{%- endmacro -%}
 <!-- sub-study macro -->
 {%- macro empro_due(
                     substudy_assessment_is_due=false,
@@ -81,21 +95,26 @@
         {%- call render_card_content(
             title_text=_("%(substudy_title)s Questionnaire", substudy_title=substudy_title),
             card_class="portal-description-incomplete" if substudy_assessment_is_ready else "disabled") -%}
-            {%- if not substudy_assessment_is_ready -%}
-                {%- if substudy_due_date -%}
-                    <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
-                        substudy_title=substudy_title,
-                        substudy_due_date=substudy_due_date,
-                        registry=_(assessment_status.assigning_authority))}}</div>
-                {%- else -%}
-                    <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
-                        registry=_(assessment_status.assigning_authority))}}</div>
-                {%- endif -%}
+            {%- if substudy_assessment_status.overall_status == OverallStatus.withdrawn -%}
+                <!-- Patient withdrawn, display appropriate text on card -->
+                <p>{{_("The assessment is no longer available. A research staff member will contact you for assistance.")}}</p>
             {%- else -%}
-                <div class="text-content">{{_("Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support.", substudy_due_date=substudy_due_date)}}</div>
+                {%- if not substudy_assessment_is_ready -%}
+                    {%- if substudy_due_date -%}
+                        <div class="text-content">{{_("Your %(substudy_title)s questionnaire is due on %(substudy_due_date)s. Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
+                            substudy_title=substudy_title,
+                            substudy_due_date=substudy_due_date,
+                            registry=_(assessment_status.assigning_authority))}}</div>
+                    {%- else -%}
+                        <div class="text-content">{{_("Please complete your open %(registry)s questionnaire first, to activate this one. Thank you for participating.",
+                            registry=_(assessment_status.assigning_authority))}}</div>
+                    {%- endif -%}
+                {%- else -%}
+                    <div class="text-content">{{_("Your questionnaire is ready. Please complete by %(substudy_due_date)s. By participating, we'll better understand your experience and offer useful tips and support.", substudy_due_date=substudy_due_date)}}</div>
+                {%- endif -%}
+                {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
+                    <!-- display any error if for some reason the assessment is not ready -->
             {%- endif -%}
-            {{render_call_to_button(button_label=button_label, button_url=url_for('assessment_engine_api.present_needed'))}}
-            <!-- display any error if for some reason the assessment is not ready -->
             {%- if substudy_assessment_errors and substudy_assessment_errors|length %}
                 <div class="error-message">
                     <span class='glyphicon glyphicon-alert warning icon' aria-hidden='true'></span>
@@ -139,10 +158,23 @@
                 substudy_assessment_status=substudy_assessment_status,
                 substudy_comp_date=substudy_comp_date,
                 enrolled_in_substudy=enrolled_in_substudy,
-                card_class="" if substudy_overall_completed_status else "disabled"
+                card_class="" if substudy_overall_completed_status or substudy_assessment_status.at_least_one_completed else "disabled"
             )}}
         </div>
     </div>
+{%- endmacro -%}
+{%- macro empro_report_link(user=user, inModal=false) -%}
+    {%- if inModal -%}
+        {%- if user and user.current_encounter().auth_method == 'url_authenticated' -%}
+            <!-- for an url authenticated user, trying to access the report will be prompted to login in -->
+            <a class="btn btn-empro-primary btn-report portal-weak-auth-disabled" href="{{url_for('patients.longitudinal_report', subject_id=user.id, instrument_id='ironman_ss')}}">{{_("View My Report")}}</a>
+        {%- else -%}
+            <a class="btn btn-empro-primary btn-report longitudinal-report-link">{{_("View My Report")}}</a>
+        {%- endif -%}
+    {%- else -%}
+        <a class="btn-lg btn-tnth-primary portal-weak-auth-disabled" href="{{url_for('patients.longitudinal_report', subject_id=user.id, instrument_id='ironman_ss')}}">{{_("View My Report")}}</a>
+    {%- endif -%}
+    <!--btn-lg btn-tnth-primary -->
 {%- endmacro -%}
 <!-- sub-study macro -->
 {%- macro empro_completed(
@@ -160,21 +192,24 @@
             title_text = _("%(substudy_title)s Study", substudy_title=substudy_title),
             card_class = card_class if card_class else "portal-description-complete") -%}
             <div class="text-content">
-                <p>{{_("View a summary of your questionnaire responses, as well as key health tips and resources.")}}</p>
                 {% if substudy_assessment_status.overall_status == OverallStatus.completed %}
+                    <p>{{_("View a summary of your questionnaire responses, as well as key health tips and resources.")}}</p>
                     <div class="buttons-container">
                         <br/>
                         <!-- this is an anchor link to open thank you modal -->
                         <a class="btn-lg btn-tnth-primary" data-toggle="modal" data-target="#emproModal">{{_("View report and resources", substudy_comp_date=substudy_comp_date)}}</a>
                     </div>
                 {% else %}
-                    <p>{{_("No %(substudy_title)s questionnaire has been completed yet.", substudy_title=substudy_title)}}</p>
+                    {% if substudy_assessment_status.at_least_one_completed %}
+                        <div class="button-container">
+                            {{empro_report_link(user)}}
+                        </div>
+                    {% else %}
+                        <p>{{_("No %(substudy_title)s questionnaire has been completed yet.", substudy_title=substudy_title)}}</p>
+                    {% endif %}
                 {% endif %}
             </div>
         {%- endcall -%}
-        {% if substudy_assessment_status.overall_status == OverallStatus.completed %}
-            {{empro_thankyou_modal(user)}}
-        {% endif %}
     {%- endif -%}
 {%- endmacro -%}
 {%- macro empro_thankyou_card(full_name="") -%}
@@ -189,6 +224,11 @@
 
     </div>
 {%- endmacro -%}
+{%- macro empro_no_contact_notice() -%}
+    <div class="no-contact-list-wrapper hide">
+        <b>Note:</b> You have chosen not to be contacted about <span id="noContactTriggerList"></span>. Your care team will not discuss these issues this month.
+    </div>
+{%- endmacro -%}
 {%- macro empro_modal_hardTrigger_supportTeam_block(organization="") -%}
     <div class="item">
         <h4>{{_("Your Support Team")}}</h4>
@@ -196,6 +236,7 @@
         <ul class="hardTriggersDisplayList">
            <!-- dynamically populated based on user trigger domain(s) -->
         </ul>
+        {{empro_no_contact_notice()}}
         <p><b>{{_("To help address any issues, we've informed your care team and they'll be in contact with you soon.")}}</b></p>
         {% if organization  %}
             <p>{{_("In the meantime, if you have any questions or need assistance, please contact your team at %(organization)s directly. They're happy to help.", organization=organization)}}</p>
@@ -207,12 +248,7 @@
         <h4>{{_("Your Report")}}</h4>
         <p>{{_("Here's where you'll find an ongoing summary of your responses, each time you complete a questionnaire.")}}</p>
         <div class="buttons-container">
-            {%- if user and user.current_encounter().auth_method == 'url_authenticated' -%}
-                <!-- for an url authenticated user, trying to access the report will be prompted to login in -->
-                <a class="btn btn-empro-primary btn-report portal-weak-auth-disabled" href="{{url_for('patients.longitudinal_report', subject_id=user.id, instrument_id='ironman_ss')}}">{{_("View My Report")}}</a>
-            {%- else -%}
-                <a class="btn btn-empro-primary btn-report longitudinal-report-link">{{_("View My Report")}}</a>
-            {%- endif -%}
+            {{empro_report_link(user, true)}}
         </div>
     </div>
 {%- endmacro -%}
@@ -237,8 +273,8 @@
 <!--sub-study macro -->
 {%- macro empro_thankyou_modal(user) -%}
     <!-- sub-study modal for display domain topic(s), resources link and summary report link to the user -->
-    <div class="modal fade" tabindex="-1" role="dialog" id="emproModal" {% if user and user.current_encounter().auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
-        <div class="modal-dialog">
+    <div class="modal fade" role="dialog" id="emproModal" tabindex="-1" aria-hidden="true" {% if user and user.current_encounter().auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <button type="button" class="close" data-dismiss="modal" aria-label="{{_('Close')}}">
                     <span aria-hidden="true">&times;</span>
@@ -277,6 +313,72 @@
         </div>
     </div>
     {{empro_script()}}
+{%- endmacro -%}
+<!--sub-study optout modal macro -->
+{%- macro empro_optout_modal(user) -%}
+    <!-- sub-study modal for display domain topic(s), resources link and summary report link to the user -->
+    <div class="modal fade" role="dialog" id="emproOptOutModal" data-backdrop="static" tabindex="-1" aria-hidden="true" {% if user and user.current_encounter().auth_method == 'url_authenticated'%}data-url-authenticated="true"{% endif %}>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{_('Close')}}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal-body">
+                    <div class="header-section">
+                        <h2 class="title">{{_("We want to check with you ...")}}</h2>
+                        <div class="subtitle" style="margin-bottom: 8px">
+                            {{_("About your preference to be contacted by your care team for these ongoing issues.")}}
+                        </div>
+                    </div>
+                    <!-- <div class="items-section">
+                        <div class="item wrap">
+                            <ul>
+                                <li>anxious</li>
+                                <li>discouraged</li>
+                                <li>fatigue</li>
+                            </ul>
+                        </div>
+                    </div> -->
+                    <p>{{_("We’ve noticed you’re continuing to experience challenges with the issues listed below.")}}</p>
+                    <p class="text-warning">
+                        <b>{{_("If you prefer not to be contacted by your care team for any (or all) of these issues, please check the box(es) below.")}}</b>
+                    </p>
+                    <p>
+                        {{_("Your care team will continue to contact you as usual for other identified issues.")}}<br/>
+                        {{_("If you have any questions or need assistance, please contact your team directly at  %(organization)s. They'll be happy to help.", organization=user.organizations[0].name if user else "")}}
+                    </p>
+                    <div class="items-wrapper">
+                        <p><b>{{_("Please do not contact me about:")}}</b></p>
+                        <div class="items optout-domains-checkbox-list">
+                            <!-- 
+                            <div class="item">
+                                <input type="checkbox">
+                                <span>anxious</span>
+                            </div>
+                            <div class="item">
+                                <input type="checkbox">
+                                <span>discouraged</span>
+                            </div>
+                            -->
+                        </div>
+                    </div>
+                    <div class="error-message"></div>
+                    <div class="continue-container hide">
+                        <button class="btn btn-default continue-button">Continue</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div>
+                        <button class="btn btn-empro-primary btn-submit btn-large">Submit</button>
+                        <!-- uncomment if want Dismiss button back -->
+                        <!-- <button class="btn btn-default btn-dismiss">Dismiss</button> -->
+                    </div>
+                    <div class="saving-indicator-container hide"><i class="fa fa-spinner fa-spin"></i> {{_("Saving your choices...")}}</div>
+                    <div class="save-success-indicator-container text-success hide"><i class="fa fa-check"></i> {{_("Your choices are saved successfully.")}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 {%- endmacro -%}
 {%- macro empro_script() -%}
     <script src="{{ url_for('static', filename='js/dist/empro.bundle.js') }}" defer></script>

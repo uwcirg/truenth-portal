@@ -3,6 +3,7 @@
 import base64
 from html import escape
 from datetime import datetime, timedelta
+from dateutil.parser import parse as dateparser
 from io import StringIO
 import os
 import re
@@ -15,8 +16,7 @@ from flask_babel import gettext as _
 from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
-from sqlalchemy import UniqueConstraint, and_, func, or_
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import and_, func, Enum, or_, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
@@ -60,11 +60,12 @@ from .value_quantity import ValueQuantity
 
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
+WITHDRAWN_PREFIX = "__withdrawn__"
 DELETED_PREFIX = "__deleted_{time}__"
 DELETED_REGEX = r"__deleted_\d+__(.*)"
 
 # https://www.hl7.org/fhir/valueset-administrative-gender.html
-gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
+gender_types = Enum('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
 
 internal_identifier_systems = (
@@ -140,6 +141,7 @@ def permanently_delete_user(
                 "Contradicting username and user_id values given")
 
     def purge_user(user, acting_user):
+        from ..trigger_states.models import TriggerState
         if not user:
             raise ValueError("No such user: {}".format(username))
         if acting_user.id == user.id:
@@ -155,6 +157,17 @@ def permanently_delete_user(
         tous = ToU.query.join(Audit).filter(Audit.subject_id == user.id)
         for t in tous:
             db.session.delete(t)
+
+        TriggerState.query.filter(TriggerState.user_id == user.id).delete()
+
+        # possible this user generated a temp user for auth flows - that
+        # user's deleted audit record holds a key to the user being purged.
+        # update to that user id
+        auds = Audit.query.filter(Audit.user_id == user.id).filter(
+            Audit.subject_id != user.id)
+        for a in auds:
+            if a.comment and a.comment.startswith("marking deleted user"):
+                a.user_id = a.subject_id
 
         # the rest should die on cascade rules
         db.session.delete(user)
@@ -248,13 +261,23 @@ def validate_email(email):
     This validation function is generally only used when an end user changing
     an address or another use requires validation.
 
-    Furthermore, due to the complexity of valid email addresses, just
-    look for some obvious signs - such as the '@' symbol and at least 6 chars.
-
     :raises :py:exc:`werkzeug.exceptions.BadRequest`: if obviously invalid
 
     """
-    if not email or '@' not in email or len(email) < 6:
+    # ignore the no email prefix
+    if email and email.startswith(NO_EMAIL_PREFIX):
+        return
+
+    # ignore service account patterns
+    if email and email.startswith('service account sponsored by '):
+        return
+
+    # ignore special __system__ account
+    if email and email == '__system__':
+        return
+
+    valid_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    if not email or not re.match(valid_pattern, email):
         raise BadRequest("requires a valid email address")
 
 
@@ -313,6 +336,7 @@ class User(db.Model, UserMixin):
 
     # For 2FA
     otp_secret = db.Column(db.String(16), default=generate_random_secret)
+    remember_me_cookie = db.Column(db.String(), default=None)
 
     user_audits = db.relationship('Audit', cascade='delete',
                                   foreign_keys=[Audit.user_id])
@@ -322,7 +346,7 @@ class User(db.Model, UserMixin):
                                      cascade='delete')
     _consents = db.relationship(
         'UserConsent', lazy='joined', cascade='delete',
-        order_by="desc(UserConsent.acceptance_date)")
+        order_by="desc(UserConsent.id)")
     indigenous = db.relationship(Coding, lazy='dynamic',
                                  secondary="user_indigenous")
     encounters = db.relationship('Encounter', cascade='delete')
@@ -485,24 +509,51 @@ class User(db.Model, UserMixin):
     TOTP_TOKEN_LEN = 6
     TOTP_TOKEN_LIFE = 30*60
 
-    def generate_otp(self):
+    def generate_otp(self, clock=None):
         """Generate One Time Password for 2FA from user's otp_secret"""
-        if self.otp_secret is None:
-            self.otp_secret = generate_random_secret()
+
+        # having experienced random problems, regenerate if the token doesn't
+        # immediately work
+        secret = self.otp_secret or generate_random_secret()
+        while True:
+            token = otp.get_totp(
+                secret=secret,
+                token_length=self.TOTP_TOKEN_LEN,
+                interval_length=self.TOTP_TOKEN_LIFE,
+                clock=clock)
+            if otp.valid_totp(
+                    token=token,
+                    secret=secret,
+                    token_length=self.TOTP_TOKEN_LEN,
+                    interval_length=self.TOTP_TOKEN_LIFE,
+                    clock=clock):
+                break
+            secret = generate_random_secret()
+
+        # persist if the secret had to be regenerated
+        if secret != self.otp_secret:
+            self.otp_secret = secret
             db.session.commit()
 
-        return otp.get_totp(
-            self.otp_secret,
-            token_length=self.TOTP_TOKEN_LEN,
-            interval_length=self.TOTP_TOKEN_LIFE)
+        current_app.logger.info(
+            f"generated 2FA {secret}:{token} for user {self.id}")
+        return token
 
-    def validate_otp(self, token):
+    def validate_otp(self, token, window=0):
+        """validate One Time Password token
+
+        :param token: the 6 digit token sent to the user
+        :param window: optional parameter, to check the previous and next
+          number of "windows" of valid time.  Works around clock skew issues
+        :return: True if valid; False otherwise
+        """
         assert(self.otp_secret)
         valid = otp.valid_totp(
             token,
             self.otp_secret,
             token_length=self.TOTP_TOKEN_LEN,
-            interval_length=self.TOTP_TOKEN_LIFE)
+            interval_length=self.TOTP_TOKEN_LIFE,
+            window=window)
         if valid:
             # due to the long timeout window, a second request
             # for a code within the first few minutes will generate
@@ -612,6 +663,9 @@ class User(db.Model, UserMixin):
 
         if self._email.startswith(NO_EMAIL_PREFIX) or not valid_email:
             return False, _("invalid email address")
+
+        if self._email.startswith(WITHDRAWN_PREFIX):
+            return False, _("withdrawn user; invalid address")
 
         if not ignore_preference and UserPreference.query.filter(
                 UserPreference.user_id == self.id).filter(
@@ -1251,6 +1305,7 @@ class User(db.Model, UserMixin):
             db.session.add(replaced)
         db.session.commit()
         self.check_consents()
+        self.mask_withdrawn()
 
     def check_consents(self):
         """Hook method for application of consent related rules"""
@@ -1281,6 +1336,68 @@ class User(db.Model, UserMixin):
                 current_app.logger.error(
                     "Multiple Primary Investigators for organization"
                     f" {consent.organization_id}")
+
+
+    def mask_withdrawn(self):
+        """withdrawn users get email mask to prevent any communication
+
+        after a few rounds of trouble with automated messages sneaking through,
+        now masking the email address to prevent any unintentional communications.
+
+        this method confirms the user was withdrawn from all studies, and if
+        so, adds an email maks.
+
+        alternatively, if the user has been reactivated and the withdrawn mask
+        is present, remove it.
+        """
+        from .research_study import EMPRO_RS_ID, BASE_RS_ID
+        from .user_consent import consent_withdrawal_dates
+
+        mask_user = None
+        # check former consent/withdrawal status for both studies
+        consent_g, withdrawal_g = consent_withdrawal_dates(self, BASE_RS_ID)
+        consent_e, withdrawal_e = consent_withdrawal_dates(self, EMPRO_RS_ID)
+
+        if not consent_g:
+            # never consented, done.
+            mask_user = False
+        if mask_user is None and not consent_e:
+            # only in global study
+            if withdrawal_g:
+                mask_user = True
+            else:
+                mask_user = False
+        elif mask_user is None:
+            # in both studies
+            if not withdrawal_g or not withdrawal_e:
+                # haven't withdrawn from both
+                mask_user = False
+            elif withdrawal_g and withdrawal_e:
+                # withdrawn from both
+                mask_user = True
+
+        # apply or remove mask if needed
+        comment = None
+        if mask_user is True:
+            if not self.email_ready()[0]:
+                # already masked or no email - no op
+                return
+            self._email = WITHDRAWN_PREFIX + self._email
+            comment = "mask withdrawn user email"
+        if mask_user is False:
+            if self._email and self._email.startswith(WITHDRAWN_PREFIX):
+                self._email = self._email[len(WITHDRAWN_PREFIX):]
+                comment = "remove withdrawn user email mask"
+
+        if comment:
+            audit = Audit(
+                user_id=self.id,
+                subject_id=self.id,
+                comment=comment,
+                context='user',
+                timestamp=datetime.utcnow())
+            db.session.add(audit)
+            db.session.commit()
 
     def deactivate_tous(self, acting_user, types=None):
         """ Mark user's current active ToU agreements as inactive
@@ -1474,8 +1591,7 @@ class User(db.Model, UserMixin):
     def update_birthdate(self, fhir):
         try:
             bd = fhir['birthDate']
-            self.birthdate = datetime.strptime(
-                bd.strip(), '%Y-%m-%d') if bd else None
+            self.birthdate = dateparser(bd.strip()) if bd else None
         except (AttributeError, ValueError):
             abort(400, "birthDate '{}' doesn't match expected format "
                        "'%Y-%m-%d'".format(fhir['birthDate']))
@@ -1631,6 +1747,10 @@ class User(db.Model, UserMixin):
                     ).count() > 0
                 ):
                     abort(400, "email address already in use")
+                try:
+                    self._email and validate_email(self._email)
+                except BadRequest:
+                    abort(400, "email address format invalid")
                 self.email = telecom.email
             telecom_cps = telecom.cp_dict()
             self.phone = (

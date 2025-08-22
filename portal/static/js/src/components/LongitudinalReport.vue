@@ -4,34 +4,44 @@
 		<div class="error-message" v-show="hasValue(errorMessage)" v-html="errorMessage"></div>
         <div class="content" :class="{'has-legend':shouldShowLegend()}" v-show="!loading">
             <div v-show="shouldShowLegend()" class="text-muted text-right report-legend" :class="{active: shouldShowLegend()}">
-                <span class="title" v-text="triggerLegendTitle"></span>
-                <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
-                <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
-                <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
+                <div class="flex" style="justify-content: flex-end; gap: 8px">
+                    <span class="title" v-text="triggerLegendTitle"></span>
+                    <div class="legend-list">
+                        <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
+                        <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
+                        <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
+                    </div>
+                </div>
             </div>
-            <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex()}">&lt;</span>
-            <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex()}">&gt;</span>
-            <table class="report-table" v-show="!hasValue(errorMessage)">
-                <THEAD>
-                    <TH class="title" v-text="questionTitleHeader"></TH>
-                    <TH class="cell date" :data-column-index="index+1" v-for="(item, index) in questionnaireDates" :key="'head_'+index">
-                        <span v-html="item"></span>
-                        <span class="in-progress-legend" aria-hidden="true" v-show="isAssessmentInProgress(index)"></span>
-                    </TH>
-                </THEAD>
-                <TBODY>
-                    <TR v-for="(item, qindex) in questions" :key="'question_'+ qindex">
-                        <TD class="item question domain" v-if="item.displayDomain">
-                            <span class= "domainText">{{item.code[0].display}}</span>
-                            {{item.text}}
-                        </TD>
-                        <TD class="item question" v-html="item.text" v-else></TD>
-                        <TD class="cell item" v-for="(d, index) in item.data" :key="'answer_'+qindex+'_'+index" :data-column-index="index+1">
-                            <span class="answer" v-html="d.a" v-bind:class="d.cssClass"></span>
-                        </TD>
-                    </TR>
-                </TBODY>
-            </table>
+            <div class="table-container">
+                <span class="nav-arrow start" @click="setGoBackward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToStartIndex(), hide: shouldHideNav()}">&lt;</span>
+                <span class="nav-arrow end" @click="setGoForward()" v-show="!hasValue(errorMessage)" :class="{disabled: getToEndIndex(), hide: shouldHideNav()}">&gt;</span>
+                <table class="report-table" v-show="!hasValue(errorMessage)">
+                    <THEAD>
+                        <TH class="title">
+                            <div class="flex-in-between">
+                                <span v-text="questionTitleHeader"></span>
+                            </div>
+                        </TH>
+                        <TH class="cell date" :data-column-index="index+1" v-for="(item, index) in questionnaireDates" :key="'head_'+index">
+                            <span v-html="item"></span>
+                            <span class="in-progress-legend" aria-hidden="true" v-show="isAssessmentInProgress(index)"></span>
+                        </TH>
+                    </THEAD>
+                    <TBODY>
+                        <TR v-for="(item, qindex) in questions" :key="'question_'+ qindex">
+                            <TD class="item question domain" v-if="item.displayDomain">
+                                <span class= "domainText">{{item.code[0].display}}</span>
+                                {{item.text}}
+                            </TD>
+                            <TD class="item question" v-html="item.text" v-else></TD>
+                            <TD class="cell item" v-for="(d, index) in item.data" :key="'answer_'+qindex+'_'+index" :data-column-index="index+1">
+                                <span class="answer" v-html="d.a" v-bind:class="d.cssClass"></span>
+                            </TD>
+                        </TR>
+                    </TBODY>
+                </table>
+            </div>
         </div>
 	</div>
 </template>
@@ -39,7 +49,11 @@
     import AssessmentReportData from "../data/common/AssessmentReportData.js";
     import tnthDates from "../modules/TnthDate.js";
     import SYSTEM_IDENTIFIER_ENUM from "../modules/SYSTEM_IDENTIFIER_ENUM";
-    import {EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
+    import {
+        EMPRO_TRIGGER_STATE_OPTOUT_KEY,
+        EMPRO_TRIGGER_PROCCESSED_STATES
+    } from "../data/common/consts.js";
+    let resizeVisIntervalId = 0;
 	export default {
     data () {
         return {
@@ -99,9 +113,7 @@
             /*
              * display column(s) responsively based on viewport width
              */
-            if (bodyWidth >= 1400) {
-                this.maxToShow = 4;
-            } else if (bodyWidth >= 992) {
+            if (bodyWidth >= 992) {
                 this.maxToShow = 3;
             } else if (bodyWidth >= 699) {
                 this.maxToShow = 2;
@@ -110,12 +122,15 @@
             }
             return;
         },
+        shouldHideNav() {
+            return this.questionnaireDates.length <= 1;
+        },
         setNavIndexes() {
             /*
              * set initial indexes for start and end navigation buttons
              */
-            this.navEndIndex = this.maxToShow >= this.questionnaireDates.length ? this.questionnaireDates.length: this.maxToShow;
-            this.navStartIndex = 1;
+            this.navEndIndex = this.questionnaireDates.length > 0 ? this.questionnaireDates.length : 1;
+            this.navStartIndex = this.navEndIndex - this.maxToShow + 1;
         },
         setGoForward() {
             /*
@@ -201,6 +216,7 @@
                     if (!Object.keys(item.triggers.domain[domain]).length) {
                         continue;
                     }
+                    const hasOptOut = item.triggers.domain[domain][EMPRO_TRIGGER_STATE_OPTOUT_KEY];
                     for (let q in item.triggers.domain[domain]) {
                         if (!item.triggers.source || !item.triggers.source.authored) {
                             continue;
@@ -211,7 +227,8 @@
                         if (item.triggers.domain[domain][q] === "hard") {
                             self.triggerData.hardTriggers.push({
                                 "authored": item.triggers.source.authored,
-                                "questionLinkId": q
+                                "questionLinkId": q,
+                                "optOut": hasOptOut
                             });
                         }
                         /*
@@ -226,6 +243,7 @@
                     }
                 }
             });
+            console.log("trigger data: ", self.triggerData);
         },
         hasTriggers() {
             return this.hasSoftTriggers() || this.hasHardTriggers();
@@ -235,6 +253,9 @@
         },
         hasHardTriggers() {
             return this.triggerData.hardTriggers.length;
+        },
+        hasOptOutTriggers() {
+            return this.triggerData.hardTriggers.find((item) => item.optOut);
         },
         hasInProgressData() {
             return this.assessmentData.filter(item => {
@@ -279,13 +300,19 @@
                     let hardTriggers = $.grep(this.triggerData.hardTriggers, subitem => {
                         let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
                         let linkIdComparison = subitem.questionLinkId === entry.linkId;
-                        return timeStampComparison && linkIdComparison
+                        return !subitem.optOut && timeStampComparison && linkIdComparison
                     });
 
                     let softTriggers = $.grep(this.triggerData.softTriggers, subitem => {
                         let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
                         let linkIdComparison = subitem.questionLinkId === entry.linkId;
                         return timeStampComparison && linkIdComparison;
+                    });
+
+                    let optedOutTriggers =  $.grep(this.triggerData.hardTriggers, subitem => {
+                        let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
+                        let linkIdComparison = subitem.questionLinkId === entry.linkId;
+                        return subitem.optOut && timeStampComparison && linkIdComparison
                     });
         
                     /*
@@ -301,15 +328,17 @@
                     let optionsLength = this.getQuestionOptions(entry.linkId);
                     let answerObj = {
                         q: q,
-                        a: a + (hardTriggers.length?" **": (softTriggers.length?" *": "")),
+                        a: a + (hardTriggers.length?" **": ((optedOutTriggers.length || softTriggers.length)?" *": (optedOutTriggers.length? "&nbsp;&nbsp;<span class='sub'>ⓘ</span>":""))),
                         linkId: entry.linkId,
                         value: answerValue,
-                        cssClass: 
-                        //last
-                        answerValue >= optionsLength.length ? "darkest" : 
-                        //penultimate
-                        (answerValue >= optionsLength.length - 1 ? "darker": 
-                        (answerValue <= 1 ? "no-value": ""))
+                        cssClass: (
+                            answerValue >= optionsLength.length ? 
+                                "darkest" : 
+                                //penultimate
+                                answerValue >= optionsLength.length - 1 ?
+                                    "darker" : 
+                                    (answerValue <= 1 ? "no-value": "")
+                        )
                     };
                     this.data[index].data.push(answerObj);
                     let currentDomain = "";
@@ -340,7 +369,11 @@
             }
             $(window).on("resize", () => {
                 window.requestAnimationFrame(() => {
-                    this.setInitVis();
+                    if (this.shouldHideNav()) return;
+                    clearTimeout(resizeVisIntervalId);
+                    resizeVisIntervalId = setTimeout(() => {
+                        this.setInitVis();
+                    }, 250);
                 });
             });
         },

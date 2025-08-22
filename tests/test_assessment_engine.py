@@ -1,5 +1,5 @@
 """Unit test module for Assessment Engine API"""
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 
@@ -369,11 +369,20 @@ class TestAssessmentEngine(TestCase):
         assert response.status_code == 200
 
     def test_update_assessment(self):
+        # mock questionnaire banks, as only QB associated QNRs land in the bundle
+        from .test_assessment_status import mock_eproms_questionnairebanks
+        mock_eproms_questionnairebanks()
+
         swagger_spec = swagger(self.app)
         completed_qnr = swagger_spec['definitions']['QuestionnaireResponse'][
             'example']
         instrument_id = (completed_qnr['questionnaire']['reference'].split(
             '/')[-1])
+
+        # patch the authored date, so QB assignment will line up
+        now = datetime.utcnow()
+        yesterday = now - timedelta(days=1)
+        completed_qnr['authored'] = FHIR_datetime.as_fhir(now)
 
         questions = completed_qnr['group']['question']
         incomplete_questions = []
@@ -391,7 +400,7 @@ class TestAssessmentEngine(TestCase):
         })
 
         self.login()
-        self.bless_with_basics()
+        self.bless_with_basics(setdate=yesterday, local_metastatic='localized')
         self.promote_user(role_name=ROLE.STAFF.value)
         self.promote_user(role_name=ROLE.RESEARCHER.value)
         self.add_system_user()
@@ -438,14 +447,23 @@ class TestAssessmentEngine(TestCase):
         assert update_qnr_response.status_code == 404
 
     def test_assessments_bundle(self):
+        # mock questionnaire banks, as only QB associated QNRs land in the bundle
+        from .test_assessment_status import mock_eproms_questionnairebanks
+        mock_eproms_questionnairebanks()
+
         swagger_spec = swagger(self.app)
         example_data = swagger_spec['definitions']['QuestionnaireResponse'][
             'example']
         instrument_id = example_data['questionnaire']['reference'].split('/')[
             -1]
 
+        # patch the authored date, so QB assignment will line up
+        now = datetime.utcnow()
+        yesterday = now - timedelta(days=1)
+        example_data['authored'] = FHIR_datetime.as_fhir(now)
+
         self.login()
-        self.bless_with_basics()
+        self.bless_with_basics(setdate=yesterday, local_metastatic='localized')
         self.promote_user(role_name=ROLE.STAFF.value)
         self.promote_user(role_name=ROLE.RESEARCHER.value)
         self.add_system_user()

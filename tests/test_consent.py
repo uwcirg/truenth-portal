@@ -13,6 +13,7 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.research_study import ResearchStudy
+from portal.models.user import User, WITHDRAWN_PREFIX
 from portal.models.user_consent import UserConsent
 from tests import TEST_USER_ID, TestCase
 
@@ -109,11 +110,11 @@ class TestUserConsent(TestCase):
             '/api/user/{}/consent'.format(TEST_USER_ID))
         assert response.status_code == 200
         assert len(response.json['consent_agreements']) == 3
-        # should be ordered by acceptance date, descending: (uc3, uc1, uc2)
+        # regardless of age, most recent action takes precedence
         uc1, uc2, uc3 = map(db.session.merge, (uc1, uc2, uc3))
         assert response.json['consent_agreements'][0] == uc3.as_json()
-        assert response.json['consent_agreements'][1] == uc1.as_json()
-        assert response.json['consent_agreements'][2] == uc2.as_json()
+        assert response.json['consent_agreements'][1] == uc2.as_json()
+        assert response.json['consent_agreements'][2] == uc1.as_json()
 
     def test_post_user_consent(self):
         self.shallow_org_tree()
@@ -377,6 +378,10 @@ class TestUserConsent(TestCase):
             user_id=TEST_USER_ID, organization_id=org1_id).first()
         assert dc.status == 'deleted'
 
+        # confirm withdrawn user email mask not in place
+        self.test_user = db.session.query(User).get(TEST_USER_ID)
+        assert not self.test_user._email.startswith(WITHDRAWN_PREFIX)
+
     def test_withdraw_user_consent(self):
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
@@ -420,6 +425,10 @@ class TestUserConsent(TestCase):
             (not current_app.config.get('GIL')))
         assert not new_consent.send_reminders
         assert new_consent.acceptance_date == suspend_date
+
+        # confirm withdrawn user email mask in place
+        self.test_user = db.session.query(User).get(TEST_USER_ID)
+        assert self.test_user._email.startswith(WITHDRAWN_PREFIX)
 
     def test_withdraw_user_consent_other_study(self):
         self.shallow_org_tree()
@@ -491,6 +500,10 @@ class TestUserConsent(TestCase):
         assert valid_consents[1].research_study_id == 1
         assert valid_consents[1].acceptance_date == study_1_acceptance_date
 
+        # confirm user email isn't masked
+        self.test_user = db.session.query(User).get(TEST_USER_ID)
+        assert not self.test_user._email.startswith(WITHDRAWN_PREFIX)
+
     def test_withdraw_too_early(self):
         """Avoid problems with withdrawals predating the existing consent"""
         self.shallow_org_tree()
@@ -519,3 +532,75 @@ class TestUserConsent(TestCase):
         assert resp.status_code == 400
         assert 1 == UserConsent.query.filter_by(
             user_id=TEST_USER_ID, organization_id=org_id).count()
+
+    def test_double_withdrawal(self):
+        """second withdrawal should replace the first"""
+        self.shallow_org_tree()
+        org = Organization.query.filter(Organization.id > 0).first()
+        org_id = org.id
+
+        acceptance_date = FHIR_datetime.parse("2018-06-30 12:12:12")
+        suspend_date = FHIR_datetime.parse("2018-06-30 12:12:15")
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        uc = UserConsent(
+            organization_id=org_id, user_id=TEST_USER_ID,
+            agreement_url=self.url, audit=audit,
+            acceptance_date=acceptance_date,
+            research_study_id=0)
+        with SessionScope(db):
+            db.session.add(uc)
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        assert len(self.test_user.valid_consents) == 1
+
+        self.login()
+
+        data = {'organization_id': org_id, 'acceptance_date': suspend_date}
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 200
+
+        # withdraw a second time with a few invalid values
+        too_early = acceptance_date - timedelta(days=1)
+        too_late = datetime.now() + timedelta(hours=25)
+        just_right = suspend_date + timedelta(days=30)
+
+        data = {'organization_id': org_id, 'acceptance_date': too_early}
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 400
+
+        data = {'organization_id': org_id, 'acceptance_date': too_late}
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 400
+
+        data = {'organization_id': org_id, 'acceptance_date': just_right}
+        resp = self.client.post(
+            '/api/user/{}/consent/withdraw'.format(TEST_USER_ID),
+            json=data,
+        )
+        assert resp.status_code == 200
+
+        # check that old consent is marked as deleted
+        old_consent = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            status='deleted').first()
+        assert old_consent.deleted_id
+
+        # check withdrawn consent was replaced
+        query = UserConsent.query.filter_by(
+            user_id=TEST_USER_ID, organization_id=org_id,
+            status='suspended')
+        assert query.count() == 1
+        assert query.first().acceptance_date == just_right
+
+        # confirm withdrawn user email mask in place
+        self.test_user = db.session.query(User).get(TEST_USER_ID)
+        assert self.test_user._email.startswith(WITHDRAWN_PREFIX)

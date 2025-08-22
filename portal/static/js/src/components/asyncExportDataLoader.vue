@@ -87,11 +87,15 @@
             clearTimeElapsed: function() {
                 this.exportTimeElapsed = 0;
             },
-            onBeforeExportData: function() {
+            clearInProgress: function() {
                 this.updateExportProgress("", "");
                 this.clearExportDataTimeoutID();
                 this.clearTimeElapsed();
                 this.clearExportDataUI();
+                this.setInProgress(false);
+            },
+            onBeforeExportData: function() {
+                this.clearInProgress();
                 this.setInProgress(true);
                 $("#" + this.initElementId).attr("disabled", true);
                 $(".export__display-container").addClass("active");
@@ -103,7 +107,6 @@
             },
             onAfterExportData: function(options) {
                 options = options || {};
-                let delay = options.delay||5000;
                 $("#" + this.initElementId).attr("disabled", false);
                 $(".export__status").removeClass("active");
                 this.setInProgress();
@@ -129,6 +132,8 @@
                         url: exportDataUrl,
                         success: function(data, status, request) {
                             let statusUrl= request.getResponseHeader("Location");
+                          //  console.log("status URL ", statusUrl)
+                            self.$emit("initExport", statusUrl);
                             self.updateExportProgress(statusUrl, function(data) {
                                 self.onAfterExportData(data);
                             });
@@ -165,7 +170,7 @@
                 let self = this;
                 let waitTime = 3000;
                 // send GET request to status URL
-                let rqId = $.getJSON(statusUrl, function(data) {
+                $.getJSON(statusUrl, function(data) {
                     if (!data) {
                         callback({error: true});
                         return;
@@ -183,12 +188,12 @@
                         percent = parseInt(data['current'] * 100 / data['total']) + "%";
                     } else {
                         percent = " -- %";
-                        //allow maximum allowed elapsed time of pending status and no progress percentage returned, 
-                        //if still no progress returned, then return error and display message
-                        if (exportStatus === "PENDING" && self.exportTimeElapsed > self.maximumPendingTime) {
-                            callback({error: true, message: "Processing job not responding. Please try again.", delay: 10000});
-                            return;
-                        }
+                    }
+                    //allow maximum allowed elapsed time of pending status and no progress percentage returned, 
+                    //if still no progress returned, then return error and display message
+                    if (exportStatus === "PENDING" && self.exportTimeElapsed > self.maximumPendingTime) {
+                        callback({error: true, message: "Processing job not responding. Please try again.", delay: 30000});
+                        return;
                     }
                     //update status and percentage displays
                     self.updateProgressDisplay(exportStatus, percent, true);
@@ -199,6 +204,9 @@
                             setTimeout(function() {
                                 window.location.assign(resultUrl);
                             }, 50); //wait a bit before retrieving results
+                        } else {
+                            callback({error: true, message: "Unknown status return from the processing job. Status: ", exportStatus});
+                            return;
                         }
                         self.updateProgressDisplay(data["state"], "");
                         setTimeout(function() {
@@ -214,7 +222,7 @@
                         (self.arrExportDataTimeoutID).push(self.exportDataTimeoutID);
                     }
                 }).fail(function() {
-                    callback({error: true});
+                    callback({error: true, message: "The processing job has failed."});
                 });
             }
         }

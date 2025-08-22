@@ -4,7 +4,7 @@ import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
-import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_PROCCESSED_STATES} from "../data/common/consts.js";
+import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_UNPROCCESSED_STATES} from "../data/common/consts.js";
 const MAX_ATTEMPTS = 3
 export default { /*global $ */
     "beforeSend": function() {
@@ -23,7 +23,7 @@ export default { /*global $ */
     "sendRequest": function(url, method, userId, params, callback) {
         if (!url) { return false; }
         var REQUEST_TIMEOUT_INTERVAL = 5000; // default timed out at 5 seconds
-        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
+        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: params && params.max_attempts ? params.max_attempts : MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
         params = params || defaultParams;
         params = $.extend({}, defaultParams, params);
         params.timeout = params.timeout || REQUEST_TIMEOUT_INTERVAL;
@@ -32,6 +32,7 @@ export default { /*global $ */
         var fieldHelper = this.FieldLoaderHelper, targetField = params.targetField || null;
         callback = callback || function() {};
         params.attempts++;
+        params.checkAuth = ["post", "put", "delete"].indexOf(String(method).toLowerCase()) !== -1;
         fieldHelper.showLoader(targetField);
         if (params.useWorker && window.Worker && !Utility.isTouchDevice()) { /*global isTouchDevice()*/
             Utility.initWorker(url, params, function(result) { /*global initWorker*/
@@ -63,31 +64,71 @@ export default { /*global $ */
                 "pragma": "no-cache"
             };
         }
-        $.ajax(params).done(function(data) {
-            params.attempts = 0;
-            if (data) {
-                fieldHelper.showUpdate(targetField);
-                callback(data);
-            } else {
-                fieldHelper.showError(targetField);
-                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
-            }
-        }).fail(function(xhr) {
-            if (params.attempts < params.max_attempts) {
-                (function(self, url, method, userId, params, callback) {
-                    setTimeout(function () {
-                      self.sendRequest(url, method, userId, params, callback);
-                    }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
-                })(self, url, method, userId, params, callback);
-            } else {
-                fieldHelper.showError(targetField);
-                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": xhr});
-                self.sendError(xhr, url, userId, params);
-                //reset attempts after reporting error so we know how many attempts have been made
-                //multiple attempts can signify server not being responsive or busy network
-                params.attempts = 0;
-            }
-        });
+        var ajaxCall = () => $.ajax(params).done(function(data) {
+                            params.attempts = 0;
+                            if (data) {
+                                fieldHelper.showUpdate(targetField);
+                                callback(data);
+                            } else {
+                                fieldHelper.showError(targetField);
+                                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
+                            }
+                        }).fail(function(xhr) {
+                            // catch auth error, e.g. unaunthorized or stale CSRF session token error before re-trying
+                            const doomedStatus = parseInt(xhr.status) === 400 || parseInt(xhr.status) === 401;
+                            const xhrResponseText = xhr.responseText ? String(xhr.responseText).toLowerCase() : "";
+                            if (
+                              doomedStatus &&
+                              (xhrResponseText.includes("csrf token") ||
+                                xhrResponseText.includes("unauthorize"))
+                            ) {
+                              console.log("Request error ", xhrResponseText);
+                              if (callback) {
+                                callback({ error: DEFAULT_SERVER_DATA_ERROR });
+                                fieldHelper.showError(targetField);
+                              }
+                              return false;
+                            }
+                            if (params.attempts < params.max_attempts) {
+                                (function(self, url, method, userId, params, callback) {
+                                    setTimeout(function () {
+                                    self.sendRequest(url, method, userId, params, callback);
+                                    }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
+                                })(self, url, method, userId, params, callback);
+                            } else {
+                                fieldHelper.showError(targetField);
+                                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": xhr});
+                                self.sendError(xhr, url, userId, params);
+                                //reset attempts after reporting error so we know how many attempts have been made
+                                //multiple attempts can signify server not being responsive or busy network
+                                params.attempts = 0;
+                            }
+                        });
+        if (params.checkAuth && params.attempts <= 1) {
+            $.ajax("/api/me").done(
+                function() {
+                    console.log("user authorized");
+                    if ((typeof CsrfTokenChecker !== "undefined") && 
+                        !CsrfTokenChecker.checkTokenValidity()) {
+                        //if CSRF Token not valid, return error
+                        if (callback) {
+                            callback({"error": DEFAULT_SERVER_DATA_ERROR});
+                            fieldHelper.showError(targetField);
+                        }
+                        return;
+                    }
+                     
+                    ajaxCall();
+                }
+            ).fail(function() {
+                if (callback) {
+                    callback({"error": DEFAULT_SERVER_DATA_ERROR});
+                    fieldHelper.showError(targetField);
+                }
+            });
+            return;
+        }
+        ajaxCall();
     },
     "sendError": function(xhr, url, userId, params) {
         if (!xhr) { return false; }
@@ -129,6 +170,12 @@ export default { /*global $ */
             el.css("opacity", 1);
             el.addClass("loading");
         },
+        hideLoader: function(targetField) {
+            if (!targetField || targetField.length === 0) { return false; }
+            var el = $("#" + (targetField.attr("data-save-container-id") || targetField.attr("id")) + "_load");
+            el.css("opacity", 0);
+            el.removeClass("loading");
+        },
         showUpdate: function(targetField) {
             var __timeout = this.delayDuration;
             if (!targetField || targetField.length === 0) { return false; }
@@ -144,7 +191,7 @@ export default { /*global $ */
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         successField.animate({"opacity": 1}, __timeout, function() {
                             setTimeout(function() {
-                                successField.animate({"opacity": 0}, __timeout * 2);
+                                successField.animate({"opacity": 0}, __timeout * 4);
                             }, __timeout * 2);
                         });
                     });
@@ -167,7 +214,7 @@ export default { /*global $ */
                     loadingField.animate({"opacity": 0}, __timeout, function() {
                         errorField.animate({"opacity": 1}, __timeout, function() {
                             setTimeout(function() {
-                                errorField.animate({"opacity": 0}, __timeout * 2);
+                                errorField.animate({"opacity": 0}, __timeout * 4);
                             }, __timeout * 2);
                         });
                     });
@@ -326,7 +373,7 @@ export default { /*global $ */
         callback = callback || function() {};
         params = params || {};
         params.retryAttempt = params.retryAttempt || 0;
-        params.maxTryAttempts = params.maxTryAttempts || MAX_ATTEMPTS;
+        params.maxTryAttempts = !isNaN(params.maxTryAttempts) ? params.maxTryAttempts : MAX_ATTEMPTS;
 
         if (!userId) {
             callback({error: i18next.t("User id is required.")});
@@ -347,17 +394,29 @@ export default { /*global $ */
                 return false;
             }
 
+            const dataState = String(data.state).toLowerCase();
+            params = params || {};
+            const isUnprocessed = EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(dataState) !== -1;
+
+            //if the trigger data has not been processed, try again until maximum number of attempts has been reached
             if (params.retryAttempt < params.maxTryAttempts &&
-                //if the trigger data has not been processed, try again until maximum number of attempts has been reached
-                EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(String(data.state).toLowerCase()) === -1) {
+                isUnprocessed) {
                 params.retryAttempt++;
                 setTimeout(function() {
                     this.getSubStudyTriggers(userId, params, callback);
-                }.bind(this), 1000*params.retryAttempt);
+                }.bind(this), 1500*params.retryAttempt);
+                if (params.retryAttempt === params.maxTryAttempts) {
+                    this.postAuditLog(userId, {
+                        context: "assessment",
+                        message: `maximum retry attempts reached for retrieving triggers, state: ${dataState ? dataState : "unknown"}`
+                    });
+                }
                 return false;
             }
             params.retryAttempt = 0;
-            sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
+            if (!isUnprocessed) {
+                sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
+            }
             callback(data);
             return true;
         });
@@ -370,6 +429,22 @@ export default { /*global $ */
             return false;
         }
         this.sendRequest(`/api/patient/${userId}/trigger_history`, "GET", userId, params, (data) => {
+            if (!data || data.error) {
+                callback({"error": true});
+                return false;
+            }
+            callback(data);
+            return true;
+        });
+    },
+    "setOptoutTriggers": function(userId, params, callback) {
+        callback = callback || function() {};
+        params = params || {};
+        if (!userId) {
+            callback({error: true});
+            return false;
+        }
+        this.sendRequest(`/api/patient/${userId}/triggers/opt_out`, "PUT", userId, params, (data) => {
             if (!data || data.error) {
                 callback({"error": true});
                 return false;
@@ -1087,6 +1162,10 @@ export default { /*global $ */
         params = params || {};
         params.data = JSON.stringify(data);
         this.sendRequest("/api/patient/" + userId + "/assessment", "POST", userId, params, function(data) {
+            if (data && data.error) {
+                callback({"error": true});
+                return;
+            }
             callback({data: data});
         });
     },
@@ -1192,7 +1271,7 @@ export default { /*global $ */
             callback({error: "User Id and table name is required for setting preference."});
             return false;
         }
-        this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {"data": params.data,"sync": params.sync}, function(data) {
+        this.sendRequest("/api/user/" + userId + "/table_preferences/" + tableName, "PUT", userId, {...params, "data": params.data,"sync": params.sync}, function(data) {
             if (!data || data.error) {
                 callback({"error": i18next.t("Error occurred setting table preference.")});
                 return false;
@@ -1227,6 +1306,21 @@ export default { /*global $ */
                     callback(data);
                 } else {
                     callback({"error": i18next.t("Error occurred retrieving email audit entries.")});
+                }
+            } else {
+                callback({"error": i18next.t("no data returned")});
+            }
+        });
+    },
+    "postAuditLog": function(userId, payload, callback) {
+        callback = callback || function() {};
+        //url, method, userId, params, callback
+        this.sendRequest("/api/auditlog", "POST", userId, {"data": payload, "contentType": "application/x-www-form-urlencoded; charset=UTF-8"}, function(data) {
+            if (data) {
+                if (!data.error) {
+                    callback(data);
+                } else {
+                    callback({"error": i18next.t("Error occurred posting to audit log.")});
                 }
             } else {
                 callback({"error": i18next.t("no data returned")});

@@ -13,7 +13,8 @@ var SessionMonitorObj = function() { /* global $ */
         var expiresIn = $("#sessionMonitorProps").attr("data-expires-in"); //session expires in time period from backend
         var __CRSF_TOKEN = $("#sessionMonitorProps").attr("data-crsftoken") || "";
         var __BASE_URL = $("#sessionMonitorProps").attr("data-baseurl") || "";
-        var SESSION_LIFETIME = this.calculatedLifeTime(expiresIn);
+        // expiresIn from backend is in seconds
+        var SESSION_LIFETIME = this.calculatedLifeTime(expiresIn ? expiresIn : 1800); // default to 30 minutes
         var sessMon = (function(n, o) {
             return function(t) {
                 "use strict";
@@ -29,6 +30,7 @@ var SessionMonitorObj = function() { /* global $ */
                     pingUrl: n + "/api/ping",
                     logoutUrl: n + LOGOUT_URL,
                     timeoutUrl: n + TIMEOUT_URL,
+                    lastActivityStorageKey: "TRUENTH_SESSION_LAST_ACTIVITY",
                     ping: function() {
                         var options = {
                             type: "POST",
@@ -44,6 +46,20 @@ var SessionMonitorObj = function() { /* global $ */
                                 "X-CSRFToken": o
                             };
                         }
+                        // extra check to ensure that the user's session hasn't gone staled
+                        if (typeof CsrfTokenChecker !== "undefined") {
+                            // extra check to ensure that the user's session hasn't gone staled
+                            $.ajax(__BASE_URL+"/api/me")
+                            .done(function() {
+                                console.log("user authorized");
+                            })
+                            .fail(function(xhr) {
+                                // user not authorized
+                                if (parseInt(xhr.status) === 401) {
+                                    window.location = l.logoutUrl;
+                                }
+                            });
+                       }
                         $.ajax(options);
                     },
                     setLogoutStorage: function() {
@@ -61,7 +77,30 @@ var SessionMonitorObj = function() { /* global $ */
                             sessionStorage.clear();
                         }
                         l.setLogoutStorage();
+                        l.removeTimeOnLoad();
                         window.location.href = l.logoutUrl;
+                    },
+                    initTimeOnLoad: function() {
+                        window.localStorage.setItem(l.lastActivityStorageKey, Date.now());
+                    },
+                    //get last active time
+                    getLastActiveTime: function(){
+                        var storedDateTime = window.localStorage.getItem(l.lastActivityStorageKey);
+                        return storedDateTime ? storedDateTime : Date.now();
+                    },
+                    removeTimeOnLoad: function() {
+                        window.localStorage.removeItem(l.lastActivityStorageKey);
+                    },
+                    //determine if some given period of time has elapsed since last stored active time
+                    isTimeExceeded: function() {
+                        var activeDuration = (Date.now() - parseFloat(l.getLastActiveTime()));
+                        if (!isNaN(activeDuration) && activeDuration >= 0) {
+                            console.log("session lifetime is ", l.sessionLifetime/1000/60, " minutes");
+                            console.log("time in session ", (activeDuration)/1000/60, " minutes ");
+                            // compare in milliseconds
+                            return activeDuration > l.sessionLifetime;
+                        }
+                        return false;
                     },
                     onwarning: function() {
                         var n = Math.round(l.timeBeforeWarning / 60 / 1e3),
@@ -79,10 +118,21 @@ var SessionMonitorObj = function() { /* global $ */
                     },
                     onbeforetimeout: function() {},
                     ontimeout: function() {
+                        //check if session time is up before actually logging out user
+                        if (!l.isTimeExceeded()) {
+                            return;
+                        }
                         if (typeof(sessionStorage) !== "undefined") {
                             sessionStorage.clear();
                         }
+                        console.log("Time exceeded, logging out...");
+                        l.timeout();
+                    },
+                    timeout: function() {
+                        // this should communicate to any open browser tab 
                         l.setTimeoutStorage();
+                        // remove session start timestamp from localStorage
+                        l.removeTimeOnLoad();
                         window.location.href = l.timeoutUrl;
                     }
                 };
@@ -90,13 +140,20 @@ var SessionMonitorObj = function() { /* global $ */
                 function s() {
                     $.when(l.onbeforetimeout()).always(l.ontimeout);
                 }
-
+                // this function is called each time on page load and on user activity
                 function e() {
-                    var n = l.sessionLifetime - l.timeBeforeWarning;
+                    var lifeTime = l.sessionLifetime && l.sessionLifetime > 0 ? l.sessionLifetime : 30*60*1000; // default to 30 minutes in miliseconds;
+                    var timeBeforeWarning = l.timeBeforeWarning && l.timeBeforeWarning > 0 ? l.timeBeforeWarning : 60000; // default to one minute in miliseconds
+                    var n = lifeTime - timeBeforeWarning;
                     window.clearTimeout(r);
                     window.clearTimeout(u);
+                    console.log("Initiating time on load...");
+                    // initialize the session start timestamp here, saved in localStorage
+                    l.initTimeOnLoad();
+                    // set timer for showing timeout warning modal, prior to when timeout happens
                     r = window.setTimeout(l.onwarning, n);
-                    u = window.setTimeout(s, l.sessionLifetime);
+                    // set timer for timing out session
+                    u = window.setTimeout(s, lifeTime);
                 }
 
                 function i(n) {
@@ -131,17 +188,15 @@ var SessionMonitorObj = function() { /* global $ */
             logoutUrl: __BASE_URL + LOGOUT_URL,
             timeoutUrl: __BASE_URL + TIMEOUT_URL,
             modalShown: !1,
-            intervalMonitor: !1,
             onwarning: function() {
+                // showing the session about to timeout modal
                 $("#session-warning-modal").modal("show");
                 if (sessMon.modalShown) {
-                    sessMon.intervalMonitor = setInterval(function() {
-                        sessMon.ontimeout();
-                    }, 12e4);
+                    console.log("session timing out, start count down...");
                 }
             }
         });
-        $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false}).on("show.bs.modal", function () {sessMon.modalShown = true;}).on("hide.bs.modal", function () { sessMon.modalShown = false; if (sessMon.intervalMonitor) { clearInterval(sessMon.intervalMonitor); }}).on("click", "#stay-logged-in", sessMon.extendsess).on("click", "#log-out", sessMon.logout);
+        $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false}).on("show.bs.modal", function () {sessMon.modalShown = true;}).on("hide.bs.modal", function () { sessMon.modalShown = false;}).on("click", "#stay-logged-in", sessMon.extendsess).on("click", "#log-out", sessMon.logout);
         var warningText = ($("#session-warning-modal").find("#remaining-time").text()).replace("{time}", (sessMon.timeBeforeWarning / 1000));
         $("#session-warning-modal").find("#remaining-time").text(warningText);
     };
@@ -200,8 +255,9 @@ var SessionMonitorObj = function() { /* global $ */
         }
         $(window).on("storage", cleanUp);
     },
+    //configured session lifetime from backend is in seconds
     this.calculatedLifeTime = function(configuredLifeTime) {
-        var calculated = 15 * 60;
+        var calculated = 30 * 60;
         configuredLifeTime = parseInt(configuredLifeTime);
         if (!isNaN(configuredLifeTime) && configuredLifeTime > 0) {
             calculated = configuredLifeTime;

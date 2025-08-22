@@ -4,18 +4,19 @@ from time import sleep
 
 from dateutil.relativedelta import relativedelta
 from flask import current_app
-import redis
 from redis.exceptions import ConnectionError
 from sqlalchemy.types import Enum as SQLA_Enum
 from werkzeug.exceptions import BadRequest
 
-from ..audit import Audit, auditable_event
+from ..audit import auditable_event
 from ..cache import cache, TWO_HOURS
 from ..database import db
 from ..date_tools import FHIR_datetime, RelativeDelta
+from ..factories.redis import create_redis
 from ..set_tools import left_center_right
-from ..timeout_lock import TimeoutLock
+from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration, TimeoutLock
 from ..trace import trace
+from .adherence_data import AdherenceData
 from .overall_status import OverallStatus
 from .qbd import QBD
 from .questionnaire_bank import (
@@ -25,6 +26,7 @@ from .questionnaire_bank import (
     visit_name,
 )
 from .questionnaire_response import QNR_results, QuestionnaireResponse
+from .research_data import ResearchData
 from .research_protocol import ResearchProtocol
 from .role import ROLE
 from .user import User
@@ -89,6 +91,8 @@ class QBT(db.Model):
         results = dict()
         for i in tl:
             qb = QuestionnaireBank.query.get(i.qb_id)
+            if qb is None:
+                continue
             recur_id = qb.recurs[0].id if qb.recurs else None
             vn = visit_name(QBD(
                 relative_start=None,
@@ -98,25 +102,6 @@ class QBT(db.Model):
             results[f"{i.at} {i.status}"] = [
                 vn, name_map[i.qb_id], i.qb_iteration]
         return results
-
-    @staticmethod
-    def withdrawn_qbd(user_id, research_study_id):
-        """Returns active QBD at time of user's withdrawal if applicable
-
-        :returns: a QBD representing the visit active at point of withdrawal
-          from given study, using `relative_start` to hold date-time of
-          withdrawal; or None if n/a
-        """
-        qbt = QBT.query.filter(QBT.user_id == user_id).filter(
-            QBT.research_study_id == research_study_id).filter(
-            QBT.status == OverallStatus.withdrawn).first()
-        if not qbt:
-            return None
-        return QBD(
-            relative_start=qbt.at,
-            iteration=qbt.qb_iteration,
-            recur_id=qbt.qb_recur_id,
-            qb_id=qbt.qb_id)
 
 
 class AtOrderedList(list):
@@ -283,6 +268,8 @@ def calc_and_adjust_start(user, research_study_id, qbd, initial_trigger):
         return qbd.relative_start
 
     delta = users_trigger - initial_trigger
+    # this case should no longer be possible; raise the alarm
+    raise RuntimeError("found user(%d) initial trigger to differ by: %s", user.id, str(delta))
     current_app.logger.debug("calc_and_adjust_start delta: %s", str(delta))
     return qbd.relative_start + delta
 
@@ -388,7 +375,8 @@ def cur_next_rp_gen(user, research_study_id, classification, trigger_date):
             )
             if curRPD.retired == nextRPD.retired:
                 raise ValueError(
-                    "Invalid state: multiple RPs w/ same retire date")
+                    "Invalid state: multiple RPs w/ same retire date: "
+                    f"{next_rp} : {curRPD.retired}")
         else:
             nextRPD = None
         yield curRPD, nextRPD
@@ -598,7 +586,7 @@ def ordered_qbs(user, research_study_id, classification=None):
     This does NOT include the indefinite classification unless requested,
      as it plays by a different set of rules.
 
-    :param user: the user to lookup
+    :param user: the user to look up
     :param research_study_id: the research study being processed
     :param classification: set to ``indefinite`` for that special handling
     :returns: QBD for each (QB, iteration, recur)
@@ -717,11 +705,6 @@ def ordered_qbs(user, research_study_id, classification=None):
                 if transition_now:
                     rp_flyweight.transition()
 
-            # done if user withdrew before QB starts
-            if withdrawal_date and withdrawal_date < rp_flyweight.cur_start:
-                trace("withdrawn as of {}".format(withdrawal_date))
-                break
-
             rp_flyweight.adjust_start()
             yield rp_flyweight.cur_qbd
 
@@ -759,19 +742,47 @@ def ordered_qbs(user, research_study_id, classification=None):
 
 
 def invalidate_users_QBT(user_id, research_study_id):
-    """Mark the given user's QBT rows invalid (by deletion)
+    """invalidate the given user's QBT rows and related cached data, by deletion
+
+    This also clears a users cached adherence and research data rows from their
+    respective caches.
 
     :param user_id: user for whom to purge all QBT rows
     :param research_study_id: set to limit invalidation to research study or
       use string 'all' to invalidate all QBT rows for a user
 
     """
+    if research_study_id is None:
+        raise ValueError('research_study_id must be defined or use "all"')
     if research_study_id == 'all':
         QBT.query.filter(QBT.user_id == user_id).delete()
+        AdherenceData.query.filter(
+            AdherenceData.patient_id == user_id).delete()
+        ResearchData.query.filter(ResearchData.subject_id == user_id).delete()
     else:
         QBT.query.filter(QBT.user_id == user_id).filter(
             QBT.research_study_id == research_study_id).delete()
+        adh_data = AdherenceData.query.filter(
+            AdherenceData.patient_id == user_id).filter(
+            AdherenceData.rs_id_visit.like(f"{research_study_id}:%"))
+        # SQL alchemy can't combine `like` expression with delete op.
+        for ad in adh_data:
+            db.session.delete(ad)
+        ResearchData.query.filter(ResearchData.subject_id == user_id).filter(
+            ResearchData.research_study_id == research_study_id).delete()
 
+        if not current_app.config.get("TESTING", False):
+            # clear the timeout lock as well, since we need a refresh
+            # after deletion of the adherence data
+            # otherwise, we experience a deadlock situation where tables can't be dropped 
+            # between test runs, as postgres believes a deadlock condition exists
+            cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                patient_id=user_id,
+                research_study_id=research_study_id))
+            cache_moderation.reset()
+
+
+    # clear cached qb_status_visit_name() using current as_of value
     # args have to match order and values - no wild carding avail
     as_of = QB_StatusCacheKey().current()
     if research_study_id != 'all':
@@ -812,7 +823,11 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
     for row in qbt_rows:
         # Confirm expected order
         if last_at:
-            assert row.at >= last_at
+            if last_at > row.at:
+                raise ValueError(
+                    f"patient {row.user_id} has overlapping qb_timeline rows"
+                    f" {last_at} and {row.at}"
+                )
 
         key = f"{row.qb_id}:{row.qb_iteration}"
         if previous_key and previous_key != key:
@@ -858,20 +873,20 @@ def check_for_overlaps(qbt_rows, cli_presentation=False):
         return True
 
 
-def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
+def update_users_QBT(user_id, research_study_id):
     """Populate the QBT rows for given user, research_study
 
     :param user: the user to add QBT rows for
     :param research_study_id: the research study being processed
-    :param invalidate_existing: set true to wipe any current rows first
 
     A user may be eligible for any number of research studies.  QBT treats
     each (user, research_study) independently, as should clients.
 
     """
-    def attempt_update(user_id, research_study_id, invalidate_existing):
+    def attempt_update(user_id, research_study_id):
         """Updates user's QBT or raises if lock is unattainable"""
         from .qb_status import patient_research_study_status
+        from ..tasks import LOW_PRIORITY, cache_single_patient_adherence_data
 
         # acquire a multiprocessing lock to prevent multiple requests
         # from duplicating rows during this slow process
@@ -880,10 +895,6 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
             user_id, research_study_id)
 
         with TimeoutLock(key=key, timeout=timeout):
-            if invalidate_existing:
-                QBT.query.filter(QBT.user_id == user_id).filter(
-                    QBT.research_study_id == research_study_id).delete()
-
             # if any rows are found, assume this user/study is current
             if QBT.query.filter(QBT.user_id == user_id).filter(
                     QBT.research_study_id == research_study_id).count():
@@ -911,7 +922,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                 trace(f"user determined ineligible for {research_study_id}")
                 return
 
-            # Create time line for user, from initial trigger date
+            # Create time-line for user, from initial trigger date
             qb_generator = ordered_qbs(user, research_study_id)
             user_qnrs = QNR_results(user, research_study_id)
 
@@ -957,7 +968,7 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                             # QBs - one needing to be removed (say the old
                             # month 36) in favor of the skipped new (say
                             # month 33), and the last legit old one (say
-                            # month 30) needing it's endpoint adjusted
+                            # month 30) needing its endpoint adjusted
                             # further below.
                             remove_qb_id = pending_qbts[i].qb_id
                             remove_iteration = pending_qbts[i].qb_iteration
@@ -966,11 +977,9 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                                 if (
                                         pending_qbts[j].qb_id != remove_qb_id or
                                         pending_qbts[j].qb_iteration != remove_iteration):
-                                    # To qualify for this special case,
-                                    # having worked back to previous QB, if
-                                    # at > start, take action
-                                    if pending_qbts[j].at > start:
-                                        unwanted_count = len(pending_qbts)-j-1
+                                    # unwanted_count represents all rows from
+                                    # overlapped, unwanted visit
+                                    unwanted_count = len(pending_qbts)-j-1
                                     break
 
                                 # keep a lookout for work done in old RP
@@ -1032,19 +1041,21 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                                 "Problematic qbd: %s", user_id, str(qbd))
                             continue
 
-                    # Must double check overlap; may no longer be true, if
+                    # Must double-check overlap; may no longer be true, if
                     # last_posted_index was one before...
                     if pending_qbts[last_posted_index].at > start:
                         # For questionnaires with common instrument names that
                         # happen to fit in both QBs, need to now reassign the
                         # QB associations as the second is getting tossed
+                        use_qb_id = pending_qbts[last_posted_index].qb_id
+                        use_qb_iter = pending_qbts[last_posted_index].qb_iteration
                         changed = user_qnrs.reassign_qb_association(
                             existing={
                                 'qb_id': qbd.qb_id,
                                 'iteration': qbd.iteration},
                             desired={
-                                'qb_id': pending_qbts[last_posted_index].qb_id,
-                                'iteration': pending_qbts[last_posted_index].qb_iteration})
+                                'qb_id': use_qb_id,
+                                'iteration': use_qb_iter})
 
                         # IF the reassignment caused a change, AND the previous
                         # visit was in a partially_completed state AND the change
@@ -1053,11 +1064,30 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                                 changed and
                                 pending_qbts[-1].status == 'partially_completed'):
                             complete_date = user_qnrs.completed_date(
-                                pending_qbts[-1].qb_id,
-                                pending_qbts[-1].qb_iteration)
+                                use_qb_id,
+                                use_qb_iter)
                             if complete_date:
                                 pending_qbts[-1].at = complete_date
                                 pending_qbts[-1].status = 'completed'
+
+                        # IF the reassignment caused a change, the persisted
+                        # time from the first QB submission may be incorrect
+                        # as the questionnaire that uniquely identifies the
+                        # RP may have not been the first submission.
+                        if changed:
+                            # look back while still on correct visit for
+                            # an in_progress, fix time if necessary
+                            i = len(pending_qbts) - 1
+                            while i > 0:
+                                if not (
+                                        pending_qbts[i].qb_id == use_qb_id and
+                                        pending_qbts[i].qb_iteration == use_qb_iter):
+                                    break
+                                if pending_qbts[i].status == 'in_progress':
+                                    pending_qbts[i].at = user_qnrs.earliest_result(
+                                        use_qb_id, use_qb_iter)
+                                    break
+                                i -= 1
 
                         continue  # effectively removes the unwanted visit
                     else:
@@ -1127,25 +1157,27 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     pending_qbts.append(QBT(
                         at=expired_date, status='expired', **kwargs))
 
-            # If user withdrew from study - remove any rows post withdrawal
+            # If user withdrew from study, add a row marking the withdrawal
+            # to the user's timeline, at the proper sequence.
             num_stored = 0
             _, withdrawal_date = consent_withdrawal_dates(
                 user, research_study_id=research_study_id)
             if withdrawal_date:
                 trace("withdrawn as of {}".format(withdrawal_date))
-                store_rows = [
-                    qbt for qbt in pending_qbts if qbt.at < withdrawal_date]
-                if store_rows:
-                    # To satisfy the `Withdrawn sanity check` in qb_status
-                    # the withdrawn row needs to match the last valid qb
-                    kwargs['qb_id'] = store_rows[-1].qb_id
-                    kwargs['qb_iteration'] = store_rows[-1].qb_iteration
-                    kwargs['qb_recur_id'] = store_rows[-1].qb_recur_id
-
-                store_rows.append(QBT(
-                    at=withdrawal_date,
-                    status='withdrawn',
-                    **kwargs))
+                j = 0
+                for qbt in pending_qbts:
+                    if qbt.at > withdrawal_date:
+                        break
+                    j += 1
+                if j > 0:
+                    # include visit in withdrawn for qb_status functionality
+                    kwargs['qb_id'] = pending_qbts[j-1].qb_id
+                    kwargs['qb_iteration'] = pending_qbts[j-1].qb_iteration
+                    kwargs['qb_recur_id'] = pending_qbts[j-1].qb_recur_id
+                store_rows = (
+                    pending_qbts[0:j] +
+                    [QBT(at=withdrawal_date, status='withdrawn', **kwargs)] +
+                    pending_qbts[j:])
                 check_for_overlaps(store_rows)
                 db.session.add_all(store_rows)
                 num_stored = len(store_rows)
@@ -1160,13 +1192,18 @@ def update_users_QBT(user_id, research_study_id, invalidate_existing=False):
                     user_id=user_id, subject_id=user_id, context="assessment")
             db.session.commit()
 
+            # With fresh calculation of a user's timeline, queue update of
+            # user's adherence data as celery job
+            kwargs = {
+                'patient_id': user_id,
+                'research_study_id': research_study_id}
+            cache_single_patient_adherence_data.apply_async(
+                kwargs=kwargs, queue=LOW_PRIORITY, retry=False)
+
     success = False
     for attempt in range(1, 6):
         try:
-            attempt_update(
-                user_id=user_id,
-                research_study_id=research_study_id,
-                invalidate_existing=invalidate_existing)
+            attempt_update(user_id=user_id, research_study_id=research_study_id)
             success = True
             break
         except ConnectionError as ce:
@@ -1204,8 +1241,7 @@ class QB_StatusCacheKey(object):
         # Lookup the configured expiration of the matching cache
         # container ("DOGPILE_CACHE_REGIONS" -> "assessment_cache_region")
         if self.redis is None:
-            self.redis = redis.StrictRedis.from_url(
-                current_app.config['REDIS_URL'])
+            self.redis = create_redis(current_app.config['REDIS_URL'])
         regions = current_app.config['DOGPILE_CACHE_REGIONS']
         for region_name, duration in regions:
             if region_name == self.region_name:
@@ -1280,8 +1316,8 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
 
     :returns: dictionary with key/values for:
       status: string like 'expired'
-      visit_name: for the period, i.e. '3 months'
-      action_state: 'not applicable', or status of follow up action
+      visit_name: for the period, i.e. '3 months'. ALWAYS in english, clients must translate
+      action_state: 'not applicable', or status of follow-up action
 
     """
     from .research_study import EMPRO_RS_ID
@@ -1309,6 +1345,15 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
         QBT.at <= as_of_date).order_by(
         QBT.at.desc(), QBT.id.desc()).first()
     if qbt:
+        # now that timelines are built beyond withdrawal, check for a
+        # withdrawal row before the one found above
+        withdrawn_qbt = (QBT.query.filter(QBT.user_id == user_id).filter(
+            QBT.research_study_id == research_study_id).filter(
+            QBT.at <= qbt.at).filter(
+            QBT.status == OverallStatus.withdrawn)).first()
+        if withdrawn_qbt:
+            qbt = withdrawn_qbt
+
         results['status'] = qbt.status
         results['visit_name'] = visit_name(qbt.qbd())
 

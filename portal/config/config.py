@@ -1,8 +1,7 @@
 """Configuration"""
 import os
 
-import redis
-
+from portal.factories.redis import create_redis
 from portal.models.role import ROLE
 
 SITE_CFG = 'site.cfg'
@@ -118,6 +117,8 @@ class BaseConfig(object):
     TOKEN_LIFE_IN_DAYS = 30  # Used for emailed URL tokens
     MULTIPROCESS_LOCK_TIMEOUT = 30  # Lock on QB timeline generation
 
+    OPT_OUT_DISABLED_ORG_IDS = os.environ.get('OPT_OUT_DISABLED_ORG_IDS', [])
+
     # Medidata integration configuration
     # disable creation and editing of patients when active
     PROTECTED_ORG = os.environ.get('PROTECTED_ORG')  # use organization name
@@ -152,7 +153,7 @@ class BaseConfig(object):
         REDIS_URL
     )
 
-    SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
+    SESSION_REDIS = create_redis(SESSION_REDIS_URL)
 
     UPDATE_PATIENT_TASK_BATCH_SIZE = int(
         os.environ.get('UPDATE_PATIENT_TASK_BATCH_SIZE', 16)

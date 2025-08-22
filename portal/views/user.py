@@ -1,5 +1,5 @@
 """User API view functions"""
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask import (
@@ -33,6 +33,7 @@ from ..models.group import Group
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization
+from ..models.patient_list import patient_list_update_patient
 from ..models.questionnaire_bank import trigger_date
 from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.questionnaire_response import QuestionnaireResponse
@@ -50,7 +51,7 @@ from ..models.user import (
     permanently_delete_user,
     validate_email,
 )
-from ..models.user_consent import UserConsent
+from ..models.user_consent import UserConsent, consent_withdrawal_dates
 from ..models.user_document import UserDocument
 from ..type_tools import check_int
 from .auth import logout
@@ -99,8 +100,12 @@ def me():
 
     """
     user = current_user()
-    if user.current_encounter().auth_method == 'url_authenticated':
+
+    # only return user id, if auth came from a URL such as embedded within an email
+    encounter = user.current_encounter(generate_failsafe_if_missing=False)
+    if encounter and encounter.auth_method == 'url_authenticated':
         return jsonify(id=user.id)
+
     return jsonify(
         id=user.id, username=user.username, email=user.email)
 
@@ -353,6 +358,8 @@ def delete_user(user_id):
     user = get_user(user_id, 'edit')
     try:
         user.delete_user(acting_user=current_user())
+        # update patient list given change in patient status
+        patient_list_update_patient(patient_id=user.id, research_study_id=None)
     except ValueError as v:
         return jsonify(message=str(v))
     return jsonify(message="deleted")
@@ -745,6 +752,12 @@ def set_user_consents(user_id):
         # status - invalidate this user's data at this time.
         invalidate_users_QBT(
             user_id=user.id, research_study_id=consent.research_study_id)
+
+        # If user has submitted EMPRO - those must also be recalculated
+        if consent.research_study_id == EMPRO_RS_ID:
+            from ..trigger_states.models import rebuild_trigger_states
+            rebuild_trigger_states(user)
+
     except ValueError as e:
         abort(400, str(e))
 
@@ -761,7 +774,9 @@ def withdraw_user_consent(user_id):
     Used to withdraw a consent agreements between a user and an organization.
     If a consent exists for the given user/org, the consent will be marked
     deleted, and a matching consent (with new status/option values) will be
-    created in its place.
+    created in its place.  If the user was already withdrawn, a new row will
+    be created also with status `suspended`, the prior will retain its
+    `suspended` status and marked deleted.
 
     NB Invalid to request a withdrawal date prior to current consent.
 
@@ -842,7 +857,7 @@ def withdraw_user_consent(user_id):
     org_id = request.json.get('organization_id')
     if not org_id:
         abort(400, "missing required organization ID")
-    research_study_id = request.json.get('research_study_id', 0)
+    research_study_id = int(request.json.get('research_study_id', 0))
     acceptance_date = None
     if 'acceptance_date' in request.json:
         acceptance_date = FHIR_datetime.parse(request.json['acceptance_date'])
@@ -862,13 +877,48 @@ def withdraw_consent(
     uc = UserConsent.query.filter_by(
         user_id=user.id, organization_id=org_id, status='consented',
         research_study_id=research_study_id).first()
-
-    if not uc:
-        abort(
-            404,
-            "no UserConsent found for user ID {}, org ID {}, research study "
-            "ID {}".format(user.id, org_id, research_study_id))
     try:
+        if not uc:
+            # Possible replacement of existing withdrawal
+            wc = UserConsent.query.filter_by(
+                user_id=user.id, organization_id=org_id, status='suspended',
+                research_study_id=research_study_id).first()
+
+            if not wc:
+                abort(
+                    404,
+                    "no UserConsent found for user ID {}, org ID {}, research study "
+                    "ID {}".format(user.id, org_id, research_study_id))
+
+            # replace with requested time, provided it's in a valid window
+            prior_consent, prior_withdrawal = consent_withdrawal_dates(user, research_study_id)
+            if prior_withdrawal and acceptance_date == prior_withdrawal:
+                # valid nop, leave.
+                return jsonify(wc.as_json())
+            if prior_consent and acceptance_date < prior_consent:
+                raise ValueError(
+                    f"Can't suspend with acceptance date {acceptance_date} "
+                    f"prior to last valid consent {prior_consent}")
+            if acceptance_date > datetime.utcnow() + timedelta(days=1):
+                raise ValueError(
+                    "Can't suspend with acceptance date in the future")
+            prior_withdrawal_date = wc.acceptance_date
+            wc.acceptance_date = acceptance_date
+            db.session.commit()
+            # Audit the change
+            auditable_event(
+                f"Consent agreement {wc.id} updated from {prior_withdrawal_date} "
+                f"to {acceptance_date}",
+                user_id=current_user().id,
+                subject_id=user.id,
+                context="consent"
+            )
+
+            # As withdrawal time just changed, force recalculation
+            invalidate_users_QBT(
+                user_id=user.id, research_study_id=research_study_id)
+            return jsonify(wc.as_json())
+
         if not acceptance_date:
             acceptance_date = datetime.utcnow()
         if acceptance_date <= uc.acceptance_date:

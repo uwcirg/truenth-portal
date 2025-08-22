@@ -8,8 +8,8 @@ import json
 from flask import current_app, has_request_context, url_for
 from flask_swagger import swagger
 import jsonschema
-from sqlalchemy import or_
-from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy import Enum, or_
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from ..database import db
@@ -29,10 +29,11 @@ from .questionnaire_bank import (
     QuestionnaireBank,
     QuestionnaireBankQuestionnaire,
     trigger_date,
+    translate_visit_name,
     visit_name,
 )
-from .research_study import research_study_id_from_questionnaire
-from .reference import Reference
+from .research_data import ResearchData
+from .research_study import EMPRO_RS_ID, research_study_id_from_questionnaire
 from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
 
@@ -49,11 +50,12 @@ class QuestionnaireResponse(db.Model):
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
-    subject_id = db.Column(db.ForeignKey('users.id'), nullable=False)
+    subject_id = db.Column(db.ForeignKey('users.id'), index=True, nullable=False)
     subject = db.relationship("User", back_populates="questionnaire_responses")
     document = db.Column(JSONB)
     encounter_id = db.Column(
         db.ForeignKey('encounters.id', name='qr_encounter_id_fk'),
+        index=True,
         nullable=False)
     questionnaire_bank_id = db.Column(
         db.ForeignKey('questionnaire_banks.id'), nullable=True)
@@ -64,7 +66,7 @@ class QuestionnaireResponse(db.Model):
 
     # Fields derived from document content
     status = db.Column(
-        ENUM(
+        Enum(
             'in-progress',
             'completed',
             name='questionnaire_response_statuses'
@@ -104,11 +106,13 @@ class QuestionnaireResponse(db.Model):
         qn_ref = self.document.get("questionnaire").get("reference")
         qn_name = qn_ref.split("/")[-1] if qn_ref else None
         qn = Questionnaire.find_by_name(name=qn_name)
+        research_study_id = None
 
         if qn_name == 'ironman_ss_post_tx':
             # special case for the EMPRO Staff QB
             from ..trigger_states.empro_states import empro_staff_qbd_accessor
             qbd_accessor = empro_staff_qbd_accessor(self)
+            research_study_id = EMPRO_RS_ID
         elif qbd_accessor is None:
             from .qb_status import QB_Status  # avoid cycle
             if self.questionnaire_bank is not None:
@@ -180,6 +184,30 @@ class QuestionnaireResponse(db.Model):
                 subject_id=self.subject_id, user_id=acting_user_id,
                 context='assessment', comment=msg)
             db.session.add(audit)
+            # TN-3140 multiple QNRs found for visit/questionnaire dyad
+            # Generate an error for alerts, should this look to be a fresh
+            # duplicate.  Ignore if we don't have a valid questionnaire bank
+            if self.questionnaire_bank_id > 0:
+                query = db.session.query(QuestionnaireResponse).filter(
+                    QuestionnaireResponse.subject_id == self.subject_id).filter(
+                    QuestionnaireResponse.questionnaire_bank_id ==
+                    self.questionnaire_bank_id).filter(
+                    QuestionnaireResponse.document[
+                        ("questionnaire", "reference")
+                    ].astext == self.document['questionnaire']['reference']
+                )
+                if self.qb_iteration is None:
+                    query = query.filter(QuestionnaireResponse.qb_iteration.is_(None))
+                else:
+                    query = query.filter(QuestionnaireResponse.qb_iteration == self.qb_iteration)
+
+                if query.count() != 1:
+                    current_app.logger.error(
+                        "Second submission for an existing QNR dyad received."
+                        f" Patient: {self.subject_id}, QNR {self.id}"
+                    )
+        # avoid lengthy lookup in caller
+        return research_study_id
 
     @staticmethod
     def purge_qb_relationship(
@@ -254,12 +282,15 @@ class QuestionnaireResponse(db.Model):
             QuestionnaireResponse.subject_id == user_id).with_entities(
             QuestionnaireResponse.id,
             QuestionnaireResponse.questionnaire_bank_id,
-            QuestionnaireResponse.qb_iteration)
+            QuestionnaireResponse.qb_iteration,
+            QuestionnaireResponse.document)
 
         return {
             f"qnr {qnr.id}":
-                [name_map[qnr.questionnaire_bank_id], qnr.qb_iteration] for
-            qnr in qnrs}
+                [name_map[qnr.questionnaire_bank_id],
+                 qnr.qb_iteration,
+                 qnr.document["questionnaire"]["reference"].split("/")[-1]]
+            for qnr in qnrs}
 
     @property
     def document_identifier(self):
@@ -326,8 +357,7 @@ class QuestionnaireResponse(db.Model):
         questionnaire_map = questionnaire.questionnaire_code_map()
 
         for question in document.get('group', {}).get('question', ()):
-
-            combined_answers = consolidate_answer_pairs(question['answer'])
+            combined_answers = consolidate_answer_pairs(question.get('answer', ()))
 
             # Separate out text and coded answer, then override text
             text_and_coded_answers = []
@@ -342,7 +372,8 @@ class QuestionnaireResponse(db.Model):
                         answer['valueCoding'].get('text')
                     )
 
-                    text_and_coded_answers.append({'valueString': text_answer})
+                    if text_answer is not None:
+                        text_and_coded_answers.append({'valueString': text_answer})
                 elif 'valueString' in answer and '"' in answer['valueString']:
                     answer['valueString'] = quote_double_quote(answer['valueString'])
 
@@ -372,7 +403,7 @@ class QuestionnaireResponse(db.Model):
                 relative_start=None, iteration=self.qb_iteration,
                 recur_id=recur_id, qb_id=self.questionnaire_bank_id)
             results.append({
-                'visit_name': visit_name(qbd),
+                'visit_name': translate_visit_name(visit_name(qbd)),
                 'url': TRUENTH_VISIT_NAME_EXTENSION})
 
             expires_at = expires(self.subject_id, qbd)
@@ -384,6 +415,36 @@ class QuestionnaireResponse(db.Model):
                 })
 
         return results
+
+    def link_id(self, link_id):
+        """Return linkId JSON as defined in QuestionnaireResponse
+
+        :param link_id: i.e. irondemog_v3.10
+        :return: JSON for requested linkId
+        """
+        for question in self.document["group"]["question"]:
+            if question["linkId"] == link_id:
+                return question
+
+    def replace_link_id(self, link_id, replacement):
+        """Return modified questions for linkId with given JSON
+
+        NB the changes returned here must be assigned to a *copy* of
+        self.document["group"]["question"] in order to persist.  This
+        method does NOT modify the QNR.
+
+        :param link_id: i.e. irondemog_v3.10
+        :return: modified self.document["group"]["question"], with requested
+         replacement in place of existing for given linkId
+        """
+        questions = []
+        for question in self.document["group"]["question"]:
+            if question["linkId"] == link_id:
+                questions.append(replacement)
+                continue
+            questions.append(question)
+        assert len(questions) == len(self.document["group"]["question"])
+        return questions
 
     def as_sdc_fhir(self):
         """
@@ -523,10 +584,14 @@ class QNR_results(object):
             match, laps = None, 0
             for qbd in container:
                 if match:
-                    # once a match is found, only look ahead a
-                    # single QB for a second, overlapping match
+                    # due to the introduction of additional visits
+                    # from protocol changes, i.e. month 33 and 39 in v5
+                    # once a match is found allow look ahead for 3 QBs,
+                    # looking for a subsequent overlapping match.
+                    # such a protocol change generates the ordered array
+                    # [..., month36-v3, month33-v5, month36-v5, ...]
                     laps += 1
-                    if laps > 1:
+                    if laps > 3:
                         return match
                 qb_start = calc_and_adjust_start(
                     user=self.user,
@@ -708,6 +773,11 @@ class QNR_indef_results(QNR_results):
     """
 
     def __init__(self, user, research_study_id, qb_id):
+        # define unused attributes from base class:
+        self.qb_ids = None
+        self.qb_iteration = None
+        self.ignore_iteration = None
+
         self.user = user
         self.research_study_id = research_study_id
         # qb_id is the current indef qb - irrelevant if done in previous
@@ -775,7 +845,7 @@ class QNR_indef_results(QNR_results):
 
 def aggregate_responses(
         instrument_ids, current_user, research_study_id, patch_dstu2=False,
-        celery_task=None):
+        celery_task=None, patient_ids=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
@@ -784,85 +854,45 @@ def aggregate_responses(
     :param research_study_id: study being processed
     :param patch_dstu2: set to make bundle DSTU2 compliant
     :param celery_task: if defined, send occasional progress updates
+    :param patient_ids: if defined, limit result set to given patient list
 
+    NB: research_study_id not used to filter / restrict query set, but rather
+    for lookup of visit name.  Use instrument_ids to restrict query set.
     """
     from .qb_timeline import qb_status_visit_name  # avoid cycle
 
+    if celery_task:
+        celery_task.update_state(
+            state='PROGRESS',
+            meta={'current': 1, 'total': 100})
+
     # Gather up the patient IDs for whom current user has 'view' permission
     user_ids = patients_query(
-        current_user, include_test_role=False).with_entities(User.id)
+        current_user,
+        include_test_role=False,
+        filter_by_ids=patient_ids,
+    ).with_entities(User.id)
 
-    annotated_questionnaire_responses = []
-    questionnaire_responses = QuestionnaireResponse.query.filter(
-        QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
-        QuestionnaireResponse.document['authored'].desc())
+
+    if celery_task:
+        celery_task.update_state(
+            state='PROGRESS',
+            meta={'current': 10, 'total': 100})
+
+    query = ResearchData.query.filter(
+        ResearchData.subject_id.in_(user_ids)).order_by(
+        ResearchData.authored.desc(), ResearchData.subject_id).with_entities(
+        ResearchData.data)
 
     if instrument_ids:
-        instrument_filters = (
-            QuestionnaireResponse.document[
-                ("questionnaire", "reference")
-            ].astext.endswith(instrument_id)
-            for instrument_id in instrument_ids
-        )
-        questionnaire_responses = questionnaire_responses.filter(
-            or_(*instrument_filters))
-
-    patient_fields = ("careProvider", "identifier")
-    system_filter = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
+        query = query.filter(ResearchData.instrument.in_(tuple(instrument_ids)))
     if celery_task:
-        current, total = 0, questionnaire_responses.count()
-
-    for questionnaire_response in questionnaire_responses:
-        document = questionnaire_response.document_answered.copy()
-        subject = questionnaire_response.subject
-        encounter = questionnaire_response.encounter
-        encounter_fhir = encounter.as_fhir()
-        document["encounter"] = encounter_fhir
-
-        document["subject"] = {
-            k: v for k, v in subject.as_fhir().items() if k in patient_fields
-        }
-
-        if subject.organizations:
-            providers = []
-            for org in subject.organizations:
-                org_ref = Reference.organization(org.id).as_fhir()
-                identifiers = [i.as_fhir() for i in org.identifiers if
-                               i.system in system_filter]
-                if identifiers:
-                    org_ref['identifier'] = identifiers
-                providers.append(org_ref)
-            document["subject"]["careProvider"] = providers
-
-        qb_status = qb_status_visit_name(
-            subject.id,
-            research_study_id,
-            FHIR_datetime.parse(questionnaire_response.document['authored']))
-        document["timepoint"] = qb_status['visit_name']
-
-        # Hack: add missing "resource" wrapper for DTSU2 compliance
-        # Remove when all interventions compliant
-        if patch_dstu2:
-            document = {
-                'resource': document,
-                # Todo: return URL to individual QuestionnaireResponse resource
-                'fullUrl': url_for(
-                    '.assessment',
-                    patient_id=subject.id,
-                    _external=True,
-                ),
-            }
-
-        annotated_questionnaire_responses.append(document)
-
-        if celery_task:
-            current += 1
-            if current % 25 == 0:
-                celery_task.update_state(
-                    state='PROGRESS',
-                    meta={'current': current, 'total': total})
-
-    return bundle_results(elements=annotated_questionnaire_responses)
+        # the delay is now a single big query, and then bundling - mark near done
+        celery_task.update_state(
+            state='PROGRESS',
+            meta={'current': 70, 'total': 100})
+    elements = [i.data for i in query.all()]
+    return bundle_results(elements=elements)
 
 
 def qnr_document_id(
@@ -881,11 +911,16 @@ def qnr_document_id(
         QuestionnaireResponse.subject_id == subject_id).filter(
         QuestionnaireResponse.document[
             ('questionnaire', 'reference')
-        ].astext.endswith(questionnaire_name)).filter(
-        QuestionnaireResponse.questionnaire_bank_id ==
-        questionnaire_bank_id).with_entities(
+        ].astext.endswith(questionnaire_name)).with_entities(
         QuestionnaireResponse.document[(
             'identifier', 'value')])
+    if questionnaire_name != 'irondemog_v3':
+        # Another special indefinite workaround. irondemog_v3 happens to live
+        # in multiple questionnaire banks, thus the lookup will fail when
+        # restricted by QB.id, should the org have transitioned since the user
+        # left work incomplete from the previous protocol (TN-2747)
+        qnr = qnr.filter(QuestionnaireResponse.questionnaire_bank_id == questionnaire_bank_id)
+
     if iteration is not None:
         qnr = qnr.filter(QuestionnaireResponse.qb_iteration == iteration)
     else:
@@ -1138,3 +1173,76 @@ def first_last_like_qnr(qnr):
             continue
         last = q
     return initial, last
+
+
+def capture_patient_state(patient_id):
+    """Call to capture QBT and QNR state for patient, used for before/after"""
+    from .qb_timeline import QBT
+    qnrs = QuestionnaireResponse.qnr_state(patient_id)
+    tl = QBT.timeline_state(patient_id)
+    return {'qnrs': qnrs, 'timeline': tl}
+
+
+def present_before_after_state(user_id, external_study_id, before_state):
+    from .qb_timeline import QBT
+    from ..dict_tools import dict_compare
+    after_qnrs = QuestionnaireResponse.qnr_state(user_id)
+    after_timeline = QBT.timeline_state(user_id)
+    qnrs_lost_reference = []
+    any_change_noted = False
+
+    def visit_from_timeline(qb_name, qb_iteration, timeline_results):
+        """timeline results have computed visit name - quick lookup"""
+        for visit, name, iteration in timeline_results.values():
+            if qb_name == name and qb_iteration == iteration:
+                return visit
+        raise ValueError(f"no visit found for {qb_name}, {qb_iteration}")
+
+    # Compare results
+    added_q, removed_q, modified_q, same = dict_compare(
+        after_qnrs, before_state['qnrs'])
+    assert not added_q
+    assert not removed_q
+
+    added_t, removed_t, modified_t, same = dict_compare(
+        after_timeline, before_state['timeline'])
+
+    if any((added_t, removed_t, modified_t, modified_q)):
+        any_change_noted = True
+        print(f"\nPatient {user_id} ({external_study_id}):")
+    if modified_q:
+        any_change_noted = True
+        print("\tModified QNRs (old, new)")
+        for mod in sorted(modified_q):
+            print(f"\t\t{mod} {modified_q[mod][1]} ==>"
+                  f" {modified_q[mod][0]}")
+            # If the QNR previously had a reference QB and since
+            # lost it, capture for reporting.
+            if (
+                    modified_q[mod][1][0] != "none of the above" and
+                    modified_q[mod][0][0] == "none of the above"):
+                visit_name = visit_from_timeline(
+                    modified_q[mod][1][0],
+                    modified_q[mod][1][1],
+                    before_state["timeline"])
+                qnrs_lost_reference.append((visit_name, modified_q[mod][1][2]))
+    if added_t:
+        any_change_noted = True
+        print("\tAdditional timeline rows:")
+        for item in sorted(added_t):
+            print(f"\t\t{item} {after_timeline[item]}")
+    if removed_t:
+        any_change_noted = True
+        print("\tRemoved timeline rows:")
+        for item in sorted(removed_t):
+            print(
+                f"\t\t{item} "
+                f"{before_state['timeline'][item]}")
+    if modified_t:
+        any_change_noted = True
+        print(f"\tModified timeline rows: (old, new)")
+        for item in sorted(modified_t):
+            print(f"\t\t{item}")
+            print(f"\t\t\t{modified_t[item][1]} ==> {modified_t[item][0]}")
+
+    return after_qnrs, after_timeline, qnrs_lost_reference, any_change_noted

@@ -1,4 +1,4 @@
-{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due, empro_completed, completed_cards -%}
+{%- from "eproms/assessment_engine/ae_macros.html" import render_header, render_greeting, render_card_content, render_call_to_button, due_card, completed_card, empro_due, empro_completed, empro_expired, completed_cards -%}
 {% extends "eproms/assessment_engine/ae_base.html" %}
 <!-- User completed baseline, but has outstanding indefinite work -->
 {% block head %}
@@ -18,16 +18,23 @@
     <!-- main study due card -->
     {{due_card(assessment_status=assessment_status, button_label=button_label, title_text=due_title_text)}}
     {%- if enrolled_in_substudy -%}
-        <!-- substudy due card, NOTE if global study work is still due, this tile will be disabled -->
-        {{empro_due(
-            substudy_assessment_is_due=substudy_assessment_is_due,
-            assessment_status=assessment_status,
-            OverallStatus=OverallStatus,
-            substudy_assessment_status=substudy_assessment_status,
-            substudy_due_date=substudy_due_date,
-            enrolled_in_substudy=enrolled_in_substudy,
-            substudy_assessment_is_ready=substudy_assessment_is_ready
-        )}}
+        {%- if substudy_assessment_status.overall_status == OverallStatus.expired -%}
+            {{empro_expired(
+                user=user,
+                substudy_assessment_status=substudy_assessment_status
+            )}}
+        {%- else -%}
+            <!-- substudy due card, NOTE if global study work is still due, this tile will be disabled -->
+            {{empro_due(
+                substudy_assessment_is_due=substudy_assessment_is_due,
+                assessment_status=assessment_status,
+                OverallStatus=OverallStatus,
+                substudy_assessment_status=substudy_assessment_status,
+                substudy_due_date=substudy_due_date,
+                enrolled_in_substudy=enrolled_in_substudy,
+                substudy_assessment_is_ready=substudy_assessment_is_ready
+            )}}
+        {%- endif %}
          <!-- main study and/or substudy completed cards if either main study is completed or sub-study is completed -->
         {{completed_cards(
             user=user,

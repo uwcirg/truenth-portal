@@ -63,6 +63,7 @@ DEFAULT_PASSWORD = 'fakePa$$'
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
+TEST_BIRTHDAY = '1999-12-31'
 FIRST_NAME = '✓'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
@@ -159,6 +160,7 @@ class TestCase(Base):
             test_user = self.add_user(
                 username=TEST_USERNAME, first_name=FIRST_NAME,
                 last_name=LAST_NAME, image_url=IMAGE_URL)
+            test_user.birthdate = TEST_BIRTHDAY
         except IntegrityError:
             db.session.rollback()
             test_user = User.query.filter_by(username=TEST_USERNAME).one()
@@ -209,6 +211,17 @@ class TestCase(Base):
             Role.name == role_name).first()[0]
         with SessionScope(db):
             db.session.add(UserRoles(user_id=user.id, role_id=role_id))
+            db.session.commit()
+
+    def set_user_locale(self, user=None, locale=None):
+        """Bless a user with locale needed for a test"""
+        if not user:
+            user = self.test_user
+        if not locale:
+            locale = ('en_AU', "Australian English")
+        user = db.session.merge(user)
+        user.locale = locale
+        with SessionScope(db):
             db.session.commit()
 
     def login(
@@ -294,8 +307,10 @@ class TestCase(Base):
     def add_system_user(self, sponsor=None):
         """create and return system user expected for some tasks """
         sysusername = '__system__'
-        if not User.query.filter_by(username=sysusername).first():
-            sys_user = self.add_user(sysusername, 'System', 'Admin')
+        sys_user = User.query.filter_by(username=sysusername).first()
+        if sys_user:
+            return sys_user
+        sys_user = self.add_user(sysusername, 'System', 'Admin')
         self.promote_user(sys_user, ROLE.ADMIN.value)
         return sys_user
 
@@ -585,7 +600,9 @@ class TestCase(Base):
                 break
             sleep(1)
 
-        assert response.json['state'] == 'SUCCESS'
+        if response.json['state'] != 'SUCCESS':
+            print(response.json)
+            raise RuntimeError(response.json)
 
         # done, now pull result (chop /status from status url for task result)
         task_path = status_url[:-len('/status')]

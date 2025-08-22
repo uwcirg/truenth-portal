@@ -101,7 +101,8 @@ def generate_overdue_table_html(overdue_stats, user, top_org):
             continue
 
         # For each org, generate a row with org name in position 0
-        rows.append((org_name, org_id, '', '', '', ''))
+        sitecode = Organization.query.get(org_id).sitecode
+        rows.append((org_name, org_id, sitecode, '', '', '', ''))
 
         # Prepend each patient row to line up with header
         site_spacer = ''

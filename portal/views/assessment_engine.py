@@ -28,6 +28,7 @@ from ..models.encounter import EC
 from ..models.fhir import bundle_results
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
+from ..models.overall_status import OverallStatus
 from ..models.qb_timeline import invalidate_users_QBT
 from ..models.questionnaire import Questionnaire
 from ..models.questionnaire_response import (
@@ -927,6 +928,10 @@ def assessment_update(patient_id):
       - ServiceToken: []
 
     """
+    from ..models.research_data import (
+        add_questionnaire_response,
+        invalidate_qnr_research_data,
+    )
 
     if not hasattr(request, 'json') or not request.json:
         return jsonify(message='Invalid request - requires JSON'), 400
@@ -986,11 +991,22 @@ def assessment_update(patient_id):
 
     response.update({'message': 'previous questionnaire response found'})
     existing_qnr = existing_qnr.first()
+
+    # remove this QNR from the report data cache, so it can be subsequently updated
+    invalidate_qnr_research_data(existing_qnr)
+
+    # TN-3184, report any in-process QNRs attempting to change authored dates
+    date_change_snippet = ""
+    if FHIR_datetime.parse(existing_qnr.document["authored"]) != FHIR_datetime.parse(updated_qnr["authored"]):
+        date_change_snippet = f" UNEXPECTED authored change; was previously {existing_qnr.document['authored']}"
+        current_app.logger.warning(date_change_snippet)
+
     existing_qnr.status = updated_qnr["status"]
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
     db.session.commit()
-    existing_qnr.assign_qb_relationship(acting_user_id=current_user().id)
+    research_study_id = existing_qnr.assign_qb_relationship(
+        acting_user_id=current_user().id)
 
     # TODO: only extract QuestionnaireResponses where the corresponding Questionnaire has the SDC extension
     qn_name = existing_qnr.document.get("questionnaire").get("reference", '').split('/')[-1]
@@ -1000,13 +1016,15 @@ def assessment_update(patient_id):
             kwargs={'questionnaire_response_id': existing_qnr.id}
         )
     auditable_event(
-        "updated {}".format(existing_qnr),
+        f"updated {existing_qnr}{date_change_snippet}",
         user_id=current_user().id,
         subject_id=patient.id,
         context='assessment',
     )
     response.update({'message': 'questionnaire response updated successfully'})
-    invalidate_users_QBT(patient.id, research_study_id='all')
+    if research_study_id is not None:
+        invalidate_users_QBT(patient.id, research_study_id=research_study_id)
+    add_questionnaire_response(existing_qnr, research_study_id=research_study_id)
     return jsonify(response)
 
 
@@ -1623,6 +1641,8 @@ def assessment_add(patient_id):
       - ServiceToken: []
 
     """
+    from ..models.research_data import add_questionnaire_response
+
     if not hasattr(request, 'json') or not request.json:
         return jsonify(message='Invalid request - requires JSON'), 400
 
@@ -1704,7 +1724,7 @@ def assessment_add(patient_id):
 
     db.session.add(questionnaire_response)
     db.session.commit()
-    questionnaire_response.assign_qb_relationship(
+    research_study_id = questionnaire_response.assign_qb_relationship(
         acting_user_id=current_user().id)
 
 
@@ -1721,7 +1741,9 @@ def assessment_add(patient_id):
                     context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
 
-    invalidate_users_QBT(patient.id, research_study_id='all')
+    if research_study_id is not None:
+        invalidate_users_QBT(patient.id, research_study_id=research_study_id)
+    add_questionnaire_response(questionnaire_response, research_study_id)
     return jsonify(response)
 
 
@@ -1762,8 +1784,12 @@ def present_needed():
     for rs in ResearchStudy.assigned_to(subject):
         assessment_status = QB_Status(
             subject, research_study_id=rs, as_of_date=as_of_date)
-        if assessment_status.overall_status == 'Withdrawn':
-            abort(400, 'Withdrawn; no pending work found')
+        if assessment_status.overall_status == OverallStatus.withdrawn:
+            # As it's possible a user withdrew, then followed an old email
+            # link back in to take the assessment, log this fact and redirect
+            current_app.logger.warning(
+                f'{subject_id} is Withdrawn, no pending work found; redirect home')
+            return redirect('/')
 
         args = dict(request.args.items())
         args['instrument_id'] = (

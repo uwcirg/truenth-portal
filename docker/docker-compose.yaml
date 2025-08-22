@@ -42,20 +42,26 @@ services:
 
   celeryworker:
     <<: *service_base
-    command:
-      celery worker
+    command: sh -c '
+      flask generate-site-cfg &&
+      celery
         --app portal.celery_worker.celery
+      worker
         --loglevel debug
+      '
     depends_on:
       - redis
 
   celeryworkerslow:
     <<: *service_base
-    command:
-      celery worker
+    command: sh -c '
+      flask generate-site-cfg &&
+      celery
         --app portal.celery_worker.celery
-        --queue low_priority
+      worker
+        --queues low_priority
         --loglevel debug
+      '
     depends_on:
       - redis
 
@@ -64,8 +70,9 @@ services:
     command: bash -c '
       (wait-for-it --host=redis --port=6379 --strict -- flask set-celery-beat-healthy) &
       wait-for-it --timeout=120 --host=web --port=$$PORT --strict --
-        celery beat
+        celery
           --app portal.celery_worker.celery
+        beat
           --loglevel debug
           --schedule /tmp/celerybeat-schedule.db
           --pidfile /tmp/celerybeat.pid
@@ -81,7 +88,7 @@ services:
     image: redis
 
   db:
-    image: postgres:${POSTGRES_VERSION:-13}
+    image: postgres:${POSTGRES_VERSION:-16}
     environment:
       # use generic postgres env vars to configure env vars specific to dockerized postgres
       POSTGRES_DB: ${PGDATABASE:-portaldb}

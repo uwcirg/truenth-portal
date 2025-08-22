@@ -2,15 +2,18 @@
 
 from datetime import datetime
 from flask import current_app
+from smtplib import SMTPRecipientsRefused
 from sqlalchemy.ext.hybrid import hybrid_property
 from textwrap import fill
 
 from flask_mail import Message, email_dispatched
 
+from .app_text import MailResource, app_text
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import mail
-from .user import INVITE_PREFIX, User
+from .organization import OrgTree
+from .user import INVITE_PREFIX, User, patients_query
 
 
 def log_message(message, app):
@@ -95,7 +98,7 @@ class EmailMessage(db.Model):
     __tablename__ = 'email_messages'
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(255), nullable=False)
-    _recipients = db.Column("recipients", db.Text, nullable=False)
+    _recipients = db.Column("recipients", db.Text, index=True, nullable=False)
     sender = db.Column(db.String(255), nullable=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     body = db.Column(db.Text, nullable=False)
@@ -112,6 +115,11 @@ class EmailMessage(db.Model):
     @recipients.setter
     def recipients(self, value):
         """Set recipients_id if a user is found w/ matching email"""
+
+        if value is None:
+            self._recipients = None
+            self.recipient_id = None
+            return
 
         # As the schema only tracks a single recipient_id, capture abuse;
         # don't allow comma in recipients till schema can capture
@@ -149,6 +157,10 @@ class EmailMessage(db.Model):
         NB the cc isn't persisted with the rest of the record.
 
         """
+        if not self.recipients:
+            current_app.logger.error(
+                "can't email w/o recipients.  failed to send "
+                f"'{self.subject}' to user {self.recipient_id}")
         message = Message(
             subject=self.subject,
             extra_headers=extra_headers(),
@@ -198,3 +210,46 @@ class EmailMessage(db.Model):
             'body': self.body, 'sent_at': self.sent_at,
             'user_id': self.user_id}
         return d
+
+
+class Newsletter(object):
+    """Manages compiling newsletter content and sending out.
+    """
+
+    def __init__(self, org_id, research_study_id, content_key):
+        self.org_id = org_id
+        self.research_study_id = research_study_id
+        self.content_key = content_key
+
+    def transmit(self):
+        acting_user = User.query.filter_by(email='__system__').one()
+        resource_url = app_text(self.content_key)
+        requested_orgs = (
+            OrgTree().here_and_below_id(organization_id=self.org_id) if self.org_id
+            else None)
+        error_emails = []
+        for patient in patients_query(
+                acting_user=acting_user,
+                research_study_id=self.research_study_id,
+                requested_orgs=requested_orgs):
+            if not patient.email_ready()[0]:
+                continue
+            item = MailResource(resource_url, patient.locale_code)
+            msg = EmailMessage(
+                subject=item.subject,
+                body=item.body,
+                recipients=patient.email,
+                sender=current_app.config['MAIL_DEFAULT_SENDER'],
+                user_id=acting_user.id,
+                recipient_id=patient.id)
+            try:
+                msg.send_message()
+            except SMTPRecipientsRefused as exc:
+                current_app.logger.error(
+                    f"Error sending %s to %s: %s",
+                    self.content_key, patient.email, exc)
+                error_emails.append(patient.email)
+            db.session.add(msg)
+
+        db.session.commit()
+        return error_emails

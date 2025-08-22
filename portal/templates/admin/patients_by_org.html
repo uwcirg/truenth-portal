@@ -18,26 +18,18 @@
    <div id="adminTableContainer" class="patient-view admin-table table-responsive medium-text" data-export-prefix="{{_('PatientList_')}}">
       <div id="adminTableToolbar" class="admin-toolbar">
         {{orgsSelector()}}
-        {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-          <div id="cacheResetContainer">
-            <form id="cacheResetForm" method="POST" action="{{url_for('patients.patients_root')}}">
-              <input type="hidden" name="reset_cache" id="reset_cache" value="True"/>
-              <input id="csrf_token" name="csrf_token" type="hidden" value="{{csrf_token()}}">
-              <button type="submit" class="button btn btn-default">{{_("Refresh Patient List")}} <span class="glyphicon glyphicon-refresh text-muted" arial-hidden="true"></span></button>
-              <span class="smaller-text byline-text text-muted">{{_("Last updated %(minutes)d minutes ago", minutes=qb_status_cache_age)}}</span> <!-- qb_status_cache_age should be calculated via view-->
-            </form>
-          </div>
-        {% endif %}
         {% if account_deactivation_enabled %}
           {{deletedUsersFilter()}}
         {% endif %}
       </div>
+      {# variable for checking if user is a researcher #}
+      {% set isResearcher = user.has_role(ROLE.RESEARCHER.value) and not(user.has_role(ROLE.ADMIN.value)) %}
       <table id="adminTable"
              data-table-id="adminTable"
              class="tnth-admin-table"
              data-classes="table table-hover table-condensed table-striped table-responsive"
              data-toggle="table"
-             data-search="true"
+             data-search="false"
              data-pagination="true"
              data-page-size="10"
              data-page-list="[10, 20, 30]"
@@ -45,123 +37,39 @@
              data-show-toggle="true"
              data-show-columns="true"
              data-smart-display="true"
-             data-unique-id="id"
-             data-id-field="id"
+             data-unique-id="userid"
+             data-id-field="userid"
              data-filter-control="true"
-             data-show-export="true"
+             data-side-pagination="server"
+             data-ajax="patientDataAjaxRequest"
+             data-cache="false"
+             {%- if not isResearcher -%} data-show-export="true" {%- endif -%}
              data-export-data-type="all"
              >
             {{testUsersCheckbox(postUrl=url_for('patients.patients_root'))}}
           <thead>
               <tr>
-                  <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
-                  <!-- need to hide the ID column specifically for EPROMs -->
-                  <th data-field="userid" data-sortable="true" data-class="id-field" data-width="1%" {%if config.HIDE_TRUENTH_ID_FIELD%}data-visible="false"{%endif%}>{{_("TrueNTH ID")}}</th>
-                  <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
+                  <th data-field="userid" data-id-field="true" data-sortable="true" data-class="id-field" data-width="1%" data-filter-control="input">{{_("TrueNTH ID")}}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field" data-filter-control="input">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field" data-filter-control="input">{{ _("Last Name") }}</th>
-                  <th data-field="birthdate" data-sortable="true" data-class="birthdate-field" data-filter-control="input">{{ _("Date of Birth") }}</th>
+                  <th data-field="birthdate" data-sortable="true" data-class="birthdate-field">{{ _("Date of Birth") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field" data-filter-control="input">{{ _("Email") }}</th>
-                  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center" data-filter-control="input">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                  <th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true">{{ _("Questionnaire Status") }}</th>
-                  <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="input">{{ _("Visit") }}</th>
+                  <th data-field="questionnaire_status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field" data-filter-control="select" data-filter-strict-search="true" data-filter-data="var:qStatusFilterOptions">{{ _("Questionnaire Status") }}</th>
+                  <th data-field="visit" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="visit-field" data-filter-control="select" data-filter-data="var:visitOptions">{{ _("Visit") }}</th>
                   {% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field" data-filter-control="input" data-sorter="tnthTables.alphanumericSorter" data-width="5%">{{ _("Study ID") }}</th>{% endif %}
-                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center" data-filter-control="input">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
-                  <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
-                  {%- if user.has_role(ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) -%}
-                    <th data-field="interventions" data-sortable="true" data-class="interventions-field" data-filter-control="input">{{ _("Interventions") }}</th>
-                  {%- endif -%}
-                  {% if account_deactivation_enabled %}
-                    <th class="text-center" data-field="deactivate" data-sortable="true" data-sorter="tnthTables.alphanumericSorter" data-searchable="false" data-card-visible="false" data-detail-view="false" data-class="always-visible">{{ _("Deactivate") }}</th>
-                  {% endif %}
-                  <th data-field="activationstatus" data-visible="false">{{_("activation status")}}</th>
-              </tr>
+                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-sorter="tnthTables.dateSorter" data-searchable="true" data-class="consentdate-field text-center">{{ _("Study Consent Date") }}</th>
+                  <th data-field="org_name" data-sortable="true" data-class="organization-field">{{ _("Site") }}</th>
+                </tr>
           </thead>
-          <tbody id="admin-table-body" class="data-link">
-               {% for patient in patients_list | sort(attribute='id')%}
-                  <tr id="data_row_{{patient.id}}" data-link="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" {%if patient.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if patient.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}> <!-- setting css class for test patient rows, allow distinction from others -->
-                      <td>{{patient.id}}</td>
-                      <td>{{ patient.id }}</td>
-                      <td id="{{patient.id}}_username">{{ patient.username if patient.username}}</td>
-                      <td>{{ patient.first_name if patient.first_name }}</td>
-                      <td>{{ patient.last_name if patient.last_name }}</td>
-                      <td>{{ patient.birthdate.strftime('%-d %b %Y') if patient.birthdate }}</td>
-                      <td>{{ patient.email if patient.email }}</td>
-                      {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td class="rowlink-skip text-center reports-field {%if patient.staff_html() %}staff-html{% endif %}">{%-if patient.staff_html() -%}<div class="btn btn-tnth-primary staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}
-                            {% if not patient.deleted and patient.documents %}
-                              <div class="intervention-btn-container">
-                                {% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | selectattr('intervention_id') | sort(attribute='intervention_id') %}{% if doc.intervention %}<a class="btn btn-tnth-primary btn-report btn-report-{{loop.index}}" data-patient-id="{{patient.id}}" data-document-type="{{doc.intervention.description}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{_('ST')}}{% else %}{{ _('DS')}}{% endif %}</a>{% endif %}{% endfor %}
-                              </div>
-                            {% endif %}
-                        </td>
-                      {% endif %}
-                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                      <td>{{patient.assessment_status if patient.assessment_status}}</td>
-                      <td>{{patient.current_qb if patient.current_qb}}</td>
-                      {% endif %}
-                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
-                      {% endif %}
-                      <td>{%- if patient.valid_consents -%}
-                        {%-for consent in patient.valid_consents -%}
-                            {%- if consent.research_study_id == 0 -%}
-                            {{consent.acceptance_date.strftime('%-d %b %Y')}}<br/>
-                            {%- endif -%}
-                        {%-endfor-%}
-                      {%-endif-%}
-                      </td>
-                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="medium-text" data-org-id="{{org.id}}">{{org.name}}</span><br/>{% endfor %}</td>
-                      {%- if user.has_role(ROLE.ADMIN.value, ROLE.INTERVENTION_STAFF.value) -%}
-                        <td>{% for intervention in patient.interventions | sort(attribute='description') %}{{intervention.description}}<br/>{% endfor %}</td>
-                      {%- endif -%}
-                      {% if account_deactivation_enabled %}{{deletedUserCell(patient, allowReactivate=True)}}{% endif %}
-                      <td>{% if patient.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
-                  </tr>
-               {% endfor %}
-          </tbody>
       </table>
-      {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-        <div class="modal fade" id="patientReportModal" tabindex="-1" role="dialog" aria-labelledby="patientReportModal">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-label="{{_('Close')}}"><span aria-hidden="true">&times;</span></button>
-                      <h4 class="modal-title">{{ _("Patient Report") }}</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div id="patientReportLoader" v-show="patientReports.loading">
-                          <div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
-                        </div>
-                        <div id="patientReportContent" v-show="patientReports.data.length > 0">
-                          <table class="table-bordered table-condensed table-responsive tnth-table">
-                            <THEAD>
-                              <TH>{{_("Type")}}</TH><TH>{{_("Report Name")}}</TH><TH>{{_("Generated (GMT)")}}</TH><TH>{{_("Downloaded")}}</TH>
-                            </THEAD>
-                            <TBODY>
-                                {% raw %}
-                                  <TR v-for="item in patientReports.data"><TD>{{item.contributor}}</TD><TD>{{item.fileName}}</TD><TD>{{item.date}}</TD><TD v-html="item.download" class="text-center"></TD></TR>
-                                {% endraw %}
-                            </TBODY>
-                          </table>
-                          <br/>
-                          <a class="btn btn-tnth-primary btn-sm btn-all">{{_("View All")}}</a>
-                        </div>
-                        {% raw %}
-                          <div id="patientReportMessage" class="error-message">{{patientReports.message}}</div>
-                        {% endraw %}
-                    </div>
-                    <div class="modal-footer" >
-                        <button type="button" class="btn btn-default btn-consent-close" data-dismiss="modal" aria-label="{{_('Close')}}">{{ _("Close") }}</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-      {% endif %}
   </div>
-  <div id="admin-table-error-message" class="text-danger smaller-text"></div>
+  <br/>
+  <div id="admin-table-error-message" class="text-danger"></div>
   {{ExportPopover()}}
 </div>
+{{ajaxDataScript(research_study_id=0)}}
+{{filterOptionsVar()}}
 {% endblock %}
 {% block footer %}{{footer(user=user)}}{% endblock %}

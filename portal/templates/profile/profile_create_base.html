@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {%- from "flask_user/_macros.html" import back_btn, footer -%}
-{%- from "profile/profile_macros.html" import profileName, profileBirthDate, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, profileConsentDate, profileProcedures, profileSaveBtn -%}
+{%- from "profile/profile_macros.html" import profileName, profileBirthDate, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, profileConsentDate, profileProcedures, profileSaveBtn, saveLoaderDiv -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 {% macro addClinics() -%}
   <div class="form-group profile-section" id="userOrgs">

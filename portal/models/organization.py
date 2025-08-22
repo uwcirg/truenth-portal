@@ -43,6 +43,9 @@ INDIGENOUS_CODINGS_MASK = 0b1000
 @cache.memoize(timeout=FIVE_MINS)
 def org_country(org_id):
     """Cache enabled country lookup for given organization ID"""
+    if org_id == 0:  # None of the above, happens on testing
+        return None
+
     ot = OrgTree()
     org_ids = ot.at_and_above_ids(org_id)
     for org in Organization.query.filter(
@@ -208,6 +211,23 @@ class Organization(db.Model):
                     "pre-existing values in the {system} system".format(
                         value=value, system=IETF_LANGUAGE_TAG))
             self.default_locale_id = coding.id
+
+    @property
+    def sitecode(self):
+        """Return site code identifier if found, else empty string"""
+        system = current_app.config.get('REPORTING_IDENTIFIER_SYSTEMS')
+        if not system:
+            return "REPORTING_IDENTIFIER_SYSTEMS not defined"
+        if isinstance(system, (list, tuple)):
+            # catch need to support more than one
+            assert len(system) == 1
+            system = system[0]
+        sitecodes = [
+            id for id in self.identifiers if id.system == system]
+        if len(sitecodes) > 1:
+            raise ValueError(
+                "multiple site code identifiers for {}".format(self))
+        return sitecodes[0].value if sitecodes else ""
 
     @property
     def shortname(self):
@@ -818,7 +838,7 @@ class OrgTree(object):
     def __init__(self):
         # Maintain a singleton root object and lookup_table
         try:
-            with TimeoutLock(key=ORG_TREE_LOCK_KEY, expires=300):
+            with TimeoutLock(key=ORG_TREE_LOCK_KEY, expires=300, timeout=300):
                 if not OrgTree.root:
                     self.__reset_cache()
         except LockTimeout:

@@ -29,11 +29,14 @@ services:
     # Set lower CPU priority to prevent blocking web service
     cap_add:
       - SYS_NICE
-    command:
+    command: sh -c '
+      flask generate-site-cfg &&
       nice
-        celery worker
+        celery
           --app portal.celery_worker.celery
+        worker
           --loglevel debug
+      '
 
   celeryworkerslow:
     restart: unless-stopped
@@ -44,15 +47,25 @@ services:
     # Set lower CPU priority to prevent blocking web service
     cap_add:
       - SYS_NICE
-    command:
+    command: sh -c '
+      flask generate-site-cfg &&
       nice -n 15
-        celery worker
+        celery
           --app portal.celery_worker.celery
-          --queue low_priority
+        worker
+          --queues low_priority
           --loglevel debug
+      '
 
   celerybeat:
     restart: unless-stopped
+
+  sdc:
+    restart: unless-stopped
+    healthcheck:
+      test:
+        wget --spider --quiet
+          http://localhost:5000
 
   redis:
     restart: unless-stopped

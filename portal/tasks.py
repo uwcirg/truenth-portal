@@ -14,23 +14,27 @@ from traceback import format_exc
 
 from celery.utils.log import get_task_logger
 from flask import current_app
-import redis
 from requests import Request, Session
 from requests.exceptions import RequestException
 from sqlalchemy import and_
 
 from .database import db
 from .factories.app import create_app
+from .factories.redis import create_redis
 from .factories.celery import create_celery
 from .models.communication import Communication
 from .models.communication_request import queue_outstanding_messages
+from .models.message import Newsletter
 from .models.qb_status import QB_Status
 from .models.qb_timeline import invalidate_users_QBT, update_users_QBT
 from .models.reporting import (
     adherence_report,
+    cache_adherence_data,
     generate_and_send_summaries,
     research_report,
+    single_patient_adherence_data,
 )
+from .models.research_data import cache_research_data
 from .models.research_study import ResearchStudy
 from .models.role import ROLE, Role
 from .models.scheduled_job import check_active, update_job_status
@@ -93,6 +97,13 @@ def add(x, y):
     return x + y
 
 
+@celery.task(name="tasks.settings")
+def settings():
+    """similar to /settings view, but from job queue"""
+    config = current_app.config
+    return [f"{k}: {v}" for k, v in config.items()]
+
+
 @celery.task(name="tasks.info", queue=LOW_PRIORITY)
 def info():
     return "BROKER_URL: {} <br/> SERVER_NAME: {}".format(
@@ -100,11 +111,32 @@ def info():
         current_app.config.get('SERVER_NAME'))
 
 
+@celery.task(
+    queue=LOW_PRIORITY)
+@scheduled_task
+def cache_adherence_data_task(**kwargs):
+    """Queues up all patients needing a cache refresh"""
+    return cache_adherence_data(**kwargs)
+
+
+@celery.task(queue=LOW_PRIORITY, ignore_results=True)
+def cache_single_patient_adherence_data(**kwargs):
+    """Populates adherence data for a single patient"""
+    return single_patient_adherence_data(**kwargs)
+
+
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
 def adherence_report_task(self, **kwargs):
     current_app.logger.debug("launch adherence report task: %s", self.request.id)
     kwargs['celery_task'] = self
     return adherence_report(**kwargs)
+
+
+@celery.task(queue=LOW_PRIORITY)
+@scheduled_task
+def cache_research_data_task(**kwargs):
+    """Queues up all patients needing a cache refresh"""
+    return cache_research_data(**kwargs)
 
 
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
@@ -170,6 +202,27 @@ def cache_assessment_status(**kwargs):
     update_patient_loop(update_cache=True, queue_messages=False, as_task=True)
 
 
+@celery.task()
+@scheduled_task
+def cache_patient_list(**kwargs):
+    """Populate patient list cache
+
+    Patient list is a cached table, enabling quick pagination on the /patients
+    view functions.  Kept up to date on changes with qb_status as part of
+    the adherence cache chain.  This task is NOT scheduled but can be run on
+    new deploys to pick up all the deleted patients, that are otherwise missed
+    but do need to be in the patient list for proper function.
+    """
+    from portal.models.patient_list import patient_list_update_patient
+    patient_role_id = Role.query.filter(
+        Role.name == ROLE.PATIENT.value).with_entities(Role.id).first()[0]
+    all_patients = User.query.join(UserRoles).filter(and_(
+        User.id == UserRoles.user_id,
+        UserRoles.role_id == patient_role_id)).with_entities(User.id)
+    for patient_id in all_patients:
+        patient_list_update_patient(patient_id[0])
+
+
 @celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def prepare_communications(**kwargs):
@@ -225,6 +278,9 @@ def update_patients(patient_list, update_cache, queue_messages):
                 update_users_QBT(user_id, research_study_id)
             if queue_messages:
                 qbstatus = QB_Status(user, research_study_id, now)
+                if qbstatus.withdrawn_by(now):
+                    # NEVER notify withdrawn patients
+                    continue
                 qbd = qbstatus.current_qbd()
                 if qbd:
                     queue_outstanding_messages(
@@ -233,6 +289,22 @@ def update_patients(patient_list, update_cache, queue_messages):
                         iteration_count=qbd.iteration)
 
             db.session.commit()
+
+
+@celery.task(queue=LOW_PRIORITY)
+@scheduled_task
+def send_newsletter(**kwargs):
+    """Construct newsletter content and email out"""
+    org_id = kwargs['org_id']
+    research_study_id = kwargs['research_study_id']
+    nl = Newsletter(
+        org_id=kwargs['org_id'],
+        research_study_id=kwargs['research_study_id'],
+        content_key=kwargs['newsletter'])
+    error_emails = nl.transmit()
+    if error_emails:
+        return ('\nUnable to reach recipient(s): '
+                '{}'.format(', '.join(error_emails)))
 
 
 @celery.task(queue=LOW_PRIORITY)
@@ -290,10 +362,14 @@ def send_user_messages(user, force_update=False):
     if force_update:
         for rs_id in users_rs_ids:
             invalidate_users_QBT(user_id=user.id, research_study_id=rs_id)
-            qbd = QB_Status(
+            qbstatus = QB_Status(
                 user=user,
                 research_study_id=rs_id,
-                as_of_date=datetime.utcnow()).current_qbd()
+                as_of_date=datetime.utcnow())
+            if qbstatus.withdrawn_by(datetime.utcnow()):
+                # NEVER notify withdrawn patients
+                continue
+            qbd = qbstatus.current_qbd()
             if qbd:
                 queue_outstanding_messages(
                     user=user,
@@ -318,6 +394,16 @@ def send_questionnaire_summary(**kwargs):
     """Generate and send a summary of overdue patients to all Staff in org"""
     org_id = kwargs['org_id']
     research_study_id = kwargs['research_study_id']
+    run_dates = kwargs.get('run_dates')
+    if run_dates:
+        # Workaround to run only on certain dates, where cron syntax fails,
+        # such as "every 3rd monday".  Set crontab schedule to run every
+        # monday and restrict run_dates to 15..21
+        today = datetime.utcnow().day
+        if today not in run_dates:
+            # wrong week - skip out
+            return "run_dates suggest NOP this week"
+
     error_emails = generate_and_send_summaries(org_id, research_study_id)
     if error_emails:
         return ('\nUnable to reach recipient(s): '
@@ -351,7 +437,7 @@ def token_watchdog(**kwargs):
 def celery_beat_health_check(**kwargs):
     """Refreshes self-expiring redis value for /healthcheck of celerybeat"""
 
-    rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
+    rs = create_redis(current_app.config['REDIS_URL'])
     return rs.setex(
         name='last_celery_beat_ping',
         time=current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
@@ -364,7 +450,7 @@ def celery_beat_health_check(**kwargs):
 def celery_beat_health_check_low_priority_queue(**kwargs):
     """Refreshes self-expiring redis value for /healthcheck of celerybeat"""
 
-    rs = redis.StrictRedis.from_url(current_app.config['REDIS_URL'])
+    rs = create_redis(current_app.config['REDIS_URL'])
     return rs.setex(
         name='last_celery_beat_ping_low_priority_queue',
         time=10*current_app.config['LAST_CELERY_BEAT_PING_EXPIRATION_TIME'],
@@ -386,3 +472,14 @@ def process_triggers_task(**kwargs):
     # Include within function as not all applications include the blueprint
     from portal.trigger_states.empro_states import fire_trigger_events
     fire_trigger_events()
+
+
+@celery.task()
+@scheduled_task
+def raise_background_exception_task(**kwargs):
+    """Manually trigger to verify job raised exceptions are caught"""
+    if kwargs.get("exception_type") == "RuntimeError":
+        raise RuntimeError("intentional RuntimeError raised from task")
+    if kwargs.get("exception_type") == "ValueError":
+        raise ValueError("intentional ValueError raised from task")
+    raise Exception("intentional Exception raised from task")

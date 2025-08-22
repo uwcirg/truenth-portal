@@ -159,7 +159,7 @@ class TestExclusionPersistence(TestCase):
         # Modify/delete some internal db values and confirm reapplication of
         # persistence restores desired values
         owner = db.session.merge(owner)
-        owner.email = str(owner_id)
+        owner.email = f"{owner_id}@example.com"
 
         # just expecting the one service token.  purge it and the
         # owner (the service user) and the owner's auth_provider

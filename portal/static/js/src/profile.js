@@ -6,14 +6,18 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
-import {sortArrayByField} from "./modules/Utility.js";
+import {sortArrayByField, getUrlParameter} from "./modules/Utility.js";
 import {
-    EPROMS_SUBSTUDY_ID,
-    EPROMS_SUBSTUDY_TITLE,
-    EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
-    EPROMS_SUBSTUDY_SHORT_TITLE,
-    EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
-    EMPRO_TRIGGER_UNPROCCESSED_STATES
+  EPROMS_SUBSTUDY_ID,
+  EPROMS_SUBSTUDY_TITLE,
+  EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
+  EPROMS_SUBSTUDY_SHORT_TITLE,
+  EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
+  EMPRO_TRIGGER_STATE_OPTOUT_KEY,
+  EMPRO_TRIGGER_UNPROCCESSED_STATES,
+  EMPRO_TRIGGER_WITHDRAWN_STATE,
+  REQUIRED_PI_ROLES,
+  REQUIRED_PI_ROLES_WARNING_MESSAGE,
 } from "./data/common/consts.js";
 
 /*
@@ -199,6 +203,7 @@ export default (function() {
              */
             subStudyTriggers: {
                 domains: [],
+                optout_domains: [],
                 date: "",
                 state: "",
                 data: {}
@@ -261,6 +266,9 @@ export default (function() {
             },
             computedSubStudyTriggers: function() {
                 return this.subStudyTriggers.domains;
+            },
+            computedSubStudyOptOutDomains: function() {
+                return this.subStudyTriggers.optout_domains;
             },
             computedSubStudyAssessmentData: function() {
                 return this.subStudyAssessment.data;
@@ -1408,6 +1416,7 @@ export default (function() {
                                 return;
                             }
                             let domains = new Array();
+                            let arrOptOut = new Array();
                             let lastTriggerItem = null;
                             for (var index = data.length-1; index >= 0; index--) {
                                if (EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(String(data[index].state).toLowerCase()) === -1) {
@@ -1423,6 +1432,10 @@ export default (function() {
                                 if (!Object.keys(lastTriggerItem.triggers.domain[topic]).length) {
                                     continue;
                                 }
+                                if (lastTriggerItem.triggers.domain[topic][EMPRO_TRIGGER_STATE_OPTOUT_KEY]) {
+                                    arrOptOut.push(topic);
+                                    continue;
+                                }
                                 for (let q in lastTriggerItem.triggers.domain[topic]) {
                                     /*
                                      * HARD triggers ONLY
@@ -1435,14 +1448,17 @@ export default (function() {
                             }
                             let completedDate = lastTriggerItem.triggers.source && lastTriggerItem.triggers.source.authored ? lastTriggerItem.triggers.source.authored : lastTriggerItem.timestamp;
                             completedDate = new Date(completedDate); //convert to local date/time
+                            console.log("Last trigger item ", lastTriggerItem);
                             [
                                 this.subStudyTriggers.domains,
+                                this.subStudyTriggers.optout_domains,
                                 this.subStudyTriggers.date,
                                 this.subStudyTriggers.displaydate,
                                 this.subStudyTriggers.state,
                                 this.subStudyTriggers.data
                             ] = [
                                 domains,
+                                arrOptOut,
                                 completedDate,
                                 i18next.t(
                                     this.modules.tnthDates.formatDateString(completedDate, "d M y hh:mm")+" <span class='small muted'>({timezone})</span>"
@@ -1456,8 +1472,19 @@ export default (function() {
             hasSubStudyTriggers: function() {
                 return this.computedSubStudyTriggers.length;
             },
+            hasSubStudyOptOutDomains: function() {
+                return this.computedSubStudyOptOutDomains.length > 0;
+            },
             hasPrevSubStudyPostTx: function() {
                 return this.computedSubStudyPostTxResponses.length;
+            },
+            getSubStudyOptoutDomainsDisplay: function() {
+                if (!this.hasSubStudyOptOutDomains()) return "";
+                const arrOptoutDomains = this.subStudyTriggers.optout_domains;
+                if (!arrOptoutDomains || !arrOptoutDomains.length) return "";
+                return arrOptoutDomains.map(
+                    (item) => item.replace(/_/g, " ")
+                ).join(", ");
             },
             setPrevPostTxResponses: function(qnrId) {
                 if (!qnrId) {
@@ -1526,6 +1553,7 @@ export default (function() {
             shouldDisableSubstudyPostTx: function() {
                 return (
                   !this.isPostTxQuestionnaireEligible() ||
+                  this.isPostTxActionNotApplicable() ||
                   this.isSubStudyTriggersResolved()
                 );
             },
@@ -1540,25 +1568,48 @@ export default (function() {
                 this.hasSubStudyStatusErrors()
               );
             },
+            shouldShowPostTxError: function() {
+                return this.shouldDisableSubstudyPostTx() && this.hasPostTxQuestionnaireErrors();
+            },
             getPostTxActionStatus: function() {
                 if (!this.subStudyTriggers.data || !this.subStudyTriggers.data.action_state) {
                     return "";
                 }
-                return String(this.subStudyTriggers.data.action_state).toLowerCase();
+                const paramActionState = getUrlParameter("trigger_action_state");
+                // for debugging
+                if (paramActionState) return paramActionState.toLowerCase();
+                const actionState = this.subStudyTriggers.data.action_state;
+                if (!actionState &&
+                    !this.shouldDisableSubstudyPostTx() &&
+                    this.hasSubStudyTriggers()
+                ) return "required";
+                return String(actionState).toLowerCase();
             },
             hasMissedPostTxAction: function() {
                 return this.hasSubStudyTriggers() && this.getPostTxActionStatus() === "missed";
             },
             isPostTxActionRequired: function() {
+                const actionStatus = this.getPostTxActionStatus();
                 return this.subStudyTriggers.data &&
-                (["due", "overdue", "required"].indexOf(this.getPostTxActionStatus()) !== -1
+                (["due", "overdue", "required"].indexOf(actionStatus) !== -1
                 );
+            },
+            isPostTxActionNotApplicable: function() {
+                if (!this.subStudyTriggers.data) {
+                    return true;
+                }
+                return this.getPostTxActionStatus() === "not applicable";
             },
             isSubStudyTriggersResolved: function() {
                 if (!this.subStudyTriggers.data) {
                     return true;
                 }
+                if (this.getPostTxActionStatus() === EMPRO_TRIGGER_WITHDRAWN_STATE) return true; // subject withdrawn
                 return this.getPostTxActionStatus() === "completed" || this.subStudyTriggers.data.resolution;
+            },
+            getDataRequiredAttribute:function(element) {
+                if (!element) return null;
+                return element.hasOwnProperty("required") ? String(element.required) : "true";
             },
             onResponseChangeFieldEvent: function(event) {
                 let targetElement = $(event.target);
@@ -1588,7 +1639,8 @@ export default (function() {
                 }
                 let answeredNum = 0;
                 $(`${containerIdentifier} .question`).each(function() {
-                    if ($(this).find("[answered]").length) {
+                    // count not required towards total
+                    if ($(this).find("[answered]").length || $(this).find("[dataRequired='false']").length) {
                         answeredNum++;
                     }
                 });
@@ -1625,11 +1677,20 @@ export default (function() {
                             return;
                         }
                         this.postTxQuestionnaire.questions = data.item;
+                        this.postTxQuestionnaire.questions.forEach(question => {
+                            const numId = (question.linkId).split(".").slice(1).join(".");
+                            // id like 2.1, 3.1 as opposed to 2, 3,
+                            if (parseFloat(numId) % 1 !== 0) {
+                                question.partOf = true;
+                            }
+                            return question;
+                        });
                         Vue.nextTick(function() {
                             /*
                              *  if the triggers are considered proccessed. check to see if they have been resolved
                              */
                             if (
+                                self.subStudyTriggers.data &&
                                 self.subStudyTriggers.data.resolution &&
                                 self.subStudyTriggers.data.resolution.qnr_id
                             ){
@@ -1755,6 +1816,10 @@ export default (function() {
                         $(`${containerElementIdentifier} .error-message`).html(i18next.t("Error occurred submitting data, try again"));
                         return;
                     }
+                    // disabled questions section to prevent user from submitting it again
+                    // the disabled class with zIndex = -1 will prevent user from clicking on the submit button
+                    $(`${containerElementIdentifier} #questionsSection`).addClass("disabled");
+
                     setTimeout(function() {
                         location.reload();
                     }.bind(this), 2000);
@@ -2017,7 +2082,8 @@ export default (function() {
                             resetBtn(true);
                         });
                     }).fail(function(xhr) { //report error
-                        self.messages.userInviteEmailErrorMessage = i18next.t("Error occurred retreving email content via API.");
+                        const message = `${i18next.t("Error occurred retreving email content via API.")} ${xhr && xhr.responseText ? xhr.responseText: ""}`;
+                        self.messages.userInviteEmailErrorMessage = message;
                         resetBtn();
                         self.modules.tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
                     });
@@ -2350,6 +2416,9 @@ export default (function() {
             initAssessmentListSection: function() {
                 var self = this;
                 $("#assessmentListMessage").text(i18next.t("No questionnaire data found."));
+                //test/debug feature to allow time warping patient data
+                //non-production environment ONLY
+                self.initTimeWarpUI();
                 self.modules.tnthAjax.assessmentList(self.subjectId, {useWorker: true}, function(data) {
                     if (data.error) {
                         self.assessment.assessmentListError = i18next.t("Problem retrieving session data from server.");
@@ -2361,9 +2430,6 @@ export default (function() {
                     if (!entries || entries.length === 0) {
                         return false;
                     }
-                    //test/debug feature to allow time warping patient data
-                    //non-production environment ONLY
-                    self.initTimeWarpUI();
                     entries.forEach(function(entry, index) {
                         var reference = entry.questionnaire.reference;
                         if ((new RegExp(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {
@@ -2914,55 +2980,114 @@ export default (function() {
                 });
             },
             updateRolesData: function(event) {
-                var visibleRoles = $("#rolesGroup input:checkbox:checked:visible");
-                /*
-                 * check if a role is selected
-                 */
-                if (!visibleRoles.length) {
-                    //make sure at least one role among role elements that are visible is selected
-                    //admin, staff admin functionality
-                    $(".put-roles-error").html("A role must be selected.");
-                    return false;
+              // check required roles for PI role
+              var piRoleChecked = $(
+                "#rolesGroup [value='primary_investigator']"
+              ).is(":checked");
+              var requiredRolesChecked =
+                REQUIRED_PI_ROLES.filter((role) =>
+                  $("#rolesGroup [value='" + role + "']").is(":checked")
+                ).length > 0;
+              if (
+                $(event.target).is(":checked") ||
+                !piRoleChecked ||
+                requiredRolesChecked ||
+                REQUIRED_PI_ROLES.indexOf($(event.target).val()) === -1
+              ) {
+                $(".delete-roles-error").html("");
+              } else {
+                // not allow to continue if the PI role is checked but the other required roles, e.g. staff, aren't
+                $(".delete-roles-error").html(
+                  REQUIRED_PI_ROLES_WARNING_MESSAGE
+                );
+                $(event.target).prop("checked", true);
+                return;
+              }
+              var visibleRoles = $(
+                "#rolesGroup input:checkbox:checked:visible"
+              );
+              /*
+               * check if a role is selected
+               */
+              if (!visibleRoles.length) {
+                //make sure at least one role among role elements that are visible is selected
+                //admin, staff admin functionality
+                $(".put-roles-error").html("A role must be selected.");
+                // prevent the last role from being un-checked until user selects another
+                $(event.target).prop("checked", true);
+                return false;
+              }
+
+              // if primary investigator is checked and all other roles are un-checked
+              if (
+                $("#rolesGroup [value='primary_investigator']").is(":checked")
+              ) {
+                if (piRoleChecked && !requiredRolesChecked) {
+                  // display warning if the PI role is checked but the other required roles, e.g. staff, aren't
+                  $(".delete-roles-error").html(
+                    REQUIRED_PI_ROLES_WARNING_MESSAGE
+                  );
+                  $("#rolesGroup [value='primary_investigator']").prop("checked", false);
+                  return;
                 }
-                var isChecked = $(event.target).is(":checked");
-                var changedRole = event.target.value;
-                var roles = [];
-                var self = this;
-                $(".put-roles-error").html("");
-                $("#rolesGroup").addClass("loading");
-                this.modules.tnthAjax.getRoles(this.subjectId, function(data) {
-                    var dataRoles = [];
-                    if (data.roles) {
-                        dataRoles = data.roles.map(function(role) {
-                            return role.name;
-                        });
-                        if (!isChecked) {
-                            //removed from existing role list
-                            dataRoles = dataRoles.filter(function(role){
-                                return role !== changedRole;
-                            });
-                        } else {
-                            //combine checked role with existing roles
-                            dataRoles = [...dataRoles, changedRole];
-                            //remove duplicate role(s)
-                            dataRoles = dataRoles.filter(function(value, index) {
-                                return dataRoles.indexOf(value) === index;
-                            });
-                        }
+              }
+
+              var isChecked = $(event.target).is(":checked");
+              var changedRole = event.target.value;
+              var roles = [];
+              var self = this;
+              $(".put-roles-error").html("");
+              $("#rolesGroup").addClass("loading");
+              this.modules.tnthAjax.getRoles(
+                this.subjectId,
+                function (data) {
+                  var dataRoles = [];
+                  if (data.roles) {
+                    dataRoles = data.roles.map(function (role) {
+                      return role.name;
+                    });
+                    if (!isChecked) {
+                      //removed from existing role list
+                      dataRoles = dataRoles.filter(function (role) {
+                        return role !== changedRole;
+                      });
+                    } else {
+                      //combine checked role with existing roles
+                      dataRoles = [...dataRoles, changedRole];
+                      //remove duplicate role(s)
+                      dataRoles = dataRoles.filter(function (value, index) {
+                        return dataRoles.indexOf(value) === index;
+                      });
                     }
-                    roles = dataRoles.map(function(role) {
-                        return {
-                            "name": role
-                        }
-                    });
-                    self.modules.tnthAjax.putRoles(self.subjectId, {"roles": roles}, $(event.target), function() {
-                        $("#rolesGroup").removeClass("loading");
-                         /*
-                        * refresh user roles list since it has been uploaded
-                        */
-                        self.initUserRoles({clearCache: true});
-                    });
-                }, {"clearCache": true});
+                  }
+                  roles = dataRoles.map(function (role) {
+                    return {
+                      name: role,
+                    };
+                  });
+                  $("#rolesGroup [type='checkbox']").attr("disabled", true);
+                  self.modules.tnthAjax.putRoles(
+                    self.subjectId,
+                    { roles: roles },
+                    $(event.target),
+                    function () {
+                      $("#rolesGroup").removeClass("loading");
+                      setTimeout(function () {
+                        $("#rolesGroup [type='checkbox']").attr(
+                          "disabled",
+                          false
+                        );
+                      }, 250);
+
+                      /*
+                       * refresh user roles list since it has been uploaded
+                       */
+                      self.initUserRoles({ clearCache: true });
+                    }
+                  );
+                },
+                { clearCache: true }
+              );
             },
             updateRolesUI: function(roles) {
                 if (!roles) return;
@@ -3495,6 +3620,9 @@ export default (function() {
                     }[a];
                 });
             }
+        },
+        refresh: function() {
+            window.location.reload();
         }
     });
     return ProfileObj;

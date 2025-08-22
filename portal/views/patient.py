@@ -4,18 +4,20 @@ NB - this is not to be confused with 'patients', which defines views
 for staff
 
 """
+from collections import defaultdict
 from datetime import datetime
 import json
 
-from flask import Blueprint, abort, current_app, jsonify, request
+from flask import Blueprint, Response, abort, current_app, jsonify, request
 from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..cache import cache
 from ..database import db
-from ..date_tools import FHIR_datetime
+from ..date_tools import FHIR_datetime, as_fhir
 from ..extensions import oauth
+from ..models.adherence_data import sorted_adherence_data
 from ..models.communication import Communication
 from ..models.fhir import bundle_results
 from ..models.identifier import (
@@ -29,9 +31,14 @@ from ..models.qb_timeline import QBT, invalidate_users_QBT, update_users_QBT
 from ..models.questionnaire_bank import QuestionnaireBank, trigger_date
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.reference import Reference
-from ..models.research_study import ResearchStudy
+from ..models.research_study import (
+    ResearchStudy,
+    research_study_id_from_questionnaire
+)
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
+from ..models.user_consent import consent_withdrawal_dates
+from ..timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 from .crossdomain import crossdomain
 from .demographics import demographics
 
@@ -311,6 +318,8 @@ def patient_timeline(patient_id):
     :param research_study_id: set to alternative research study ID - default 0
     :param trace: set 'true' to view detailed logs generated, works best in
       concert with purge
+    :param only: set to filter all results but top level attribute given
+    :param pretty: set to generate a pretty-printed JSON result
 
     """
     from ..date_tools import FHIR_datetime, RelativeDelta
@@ -320,8 +329,10 @@ def patient_timeline(patient_id):
     )
     from ..models.qbd import QBD
     from ..models.qb_status import QB_Status
-    from ..models.questionnaire_bank import visit_name
+    from ..models.questionnaire_bank import translate_visit_name, visit_name
+    from ..models.questionnaire_response import aggregate_responses
     from ..models.research_protocol import ResearchProtocol
+    from ..tasks import cache_single_patient_adherence_data
     from ..trace import dump_trace, establish_trace
 
     user = get_user(patient_id, permission='view')
@@ -336,21 +347,31 @@ def patient_timeline(patient_id):
     purge = request.args.get('purge', False)
     try:
         # If purge was given special 'all' value, also wipe out associated
-        # questionnaire_response : qb relationships.
+        # questionnaire_response : qb relationships and remove cache lock
+        # on adherence data.
         if purge == 'all':
+            # remove adherence cache key to allow fresh run
+            cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
+                patient_id=patient_id,
+                research_study_id=research_study_id))
+            cache_moderation.reset()
+
             QuestionnaireResponse.purge_qb_relationship(
                 subject_id=patient_id,
                 research_study_id=research_study_id,
                 acting_user_id=current_user().id)
 
         cache.delete_memoized(trigger_date)
-        update_users_QBT(
-            patient_id,
-            research_study_id=research_study_id,
-            invalidate_existing=purge)
+        if purge:
+            invalidate_users_QBT(user_id=patient_id, research_study_id=research_study_id)
+        update_users_QBT(user_id=patient_id, research_study_id=research_study_id)
     except ValueError as ve:
         abort(500, str(ve))
 
+    consents = [
+        {"research_study_id": c.research_study_id,
+         "acceptance_date": c.acceptance_date,
+         "status": c.status} for c in user.valid_consents]
     results = []
     # We order by at (to get the latest status for a given QB) and
     # secondly by id, as on rare occasions, the time (`at`) of
@@ -372,7 +393,7 @@ def patient_timeline(patient_id):
                 'at': FHIR_datetime.as_fhir(qbt.at),
                 'qb (id, iteration)': "{} ({}, {})".format(
                     qbd.questionnaire_bank.name, qbd.qb_id, qbd.iteration),
-                'visit': visit_name(qbd)}
+                'visit': translate_visit_name(visit_name(qbd))}
             if qbt.status == OverallStatus.due:
                 data['questionnaires'] = ','.join(
                     [q.name for q in qbd.questionnaire_bank.questionnaires])
@@ -446,14 +467,80 @@ def patient_timeline(patient_id):
         status['indefinite QBD'] = indef_qbd.as_json()
         status['indefinite status'] = indef_status
 
+    adherence_data = sorted_adherence_data(patient_id, research_study_id)
+    if not adherence_data:
+        # immediately following a cache purge, adherence data is gone and
+        # needs to be recreated.
+        kwargs = {
+            "patient_id": user.id,
+            "research_study_id": research_study_id,
+        }
+        cache_single_patient_adherence_data(**kwargs)
+        adherence_data = sorted_adherence_data(patient_id, research_study_id)
+
+    agg_args = {
+        'instrument_ids': None,
+        'current_user': current_user(),
+        'research_study_id': research_study_id,
+        'patch_dstu2': True,
+        'patient_ids': [patient_id],
+    }
+    qnr_responses = aggregate_responses(**agg_args)
+
+    if qnr_responses['total'] == 0:
+        from ..models.research_data import update_single_patient_research_data
+        update_single_patient_research_data(patient_id)
+        qnr_responses = aggregate_responses(**agg_args)
+
+    # filter qnr data to a manageable result data set
+    qnr_data = []
+    for row in qnr_responses['entry']:
+        i = {}
+        i['questionnaire'] = row['questionnaire']['reference'].split('/')[-1]
+
+        # qnr_responses return all.  filter to requested research_study
+        study_id = research_study_id_from_questionnaire(i['questionnaire'])
+        if study_id != research_study_id:
+            continue
+
+        i['auth_method'] = row['encounter']['auth_method']
+        i['encounter_period'] = row['encounter']['period']
+        i['document_authored'] = row['authored']
+        try:
+            i['ae_session'] = row['identifier']['value']
+        except KeyError:
+            # happens with sub-study follow up, skip ae_session
+            pass
+        i['status'] = row['status']
+        i['org'] = ': '.join((
+            row['subject']['careProvider'][0]['identifier'][0]['value'],
+            row['subject']['careProvider'][0]['display']))
+        i['visit'] = row['timepoint']
+        qnr_data.append(i)
+
+    consent_date, withdrawal_date = consent_withdrawal_dates(user, research_study_id)
+    consents = {"consent_date": consent_date, "withdrawal_date": withdrawal_date}
+    kwargs = {
+        "consents": consents,
+        "rps": rps,
+        "status": status,
+        "posted": posted,
+        "timeline": results,
+        "adherence_data": adherence_data,
+        "qnr_data": qnr_data
+    }
     if trace:
-        return jsonify(
-            rps=rps,
-            status=status,
-            posted=posted,
-            timeline=results,
-            trace=dump_trace("END time line lookup"))
-    return jsonify(rps=rps, status=status, posted=posted, timeline=results)
+        kwargs["trace"] = dump_trace("END time line lookup")
+
+    only = request.args.get('only', False)
+    if only:
+        if only not in kwargs:
+            raise ValueError(f"{only} not in {kwargs.keys()}")
+        return jsonify(only, kwargs[only])
+    if request.args.get("pretty"):
+        pretty_json = json.dumps(kwargs, indent=2, default=as_fhir)
+        return Response(pretty_json, mimetype='Application/json')
+    return jsonify(**kwargs)
 
 
 @patient_api.route('/api/patient/<int:patient_id>/timewarp/<int:days>')
@@ -471,7 +558,41 @@ def patient_timewarp(patient_id, days):
     from copy import deepcopy
     from portal.models.questionnaire_response import QuestionnaireResponse
     from portal.models.user_consent import UserConsent
+    from ..trigger_states.models import TriggerState
 
+    def sanity_check():
+        """confirm user state before / after timewarp"""
+        # User should have one valid consent
+        patient = get_user(patient_id, 'view')
+        consents = patient.valid_consents
+        rps = [c for c in consents if c.research_study_id == 0]
+        assert len(rps) == 1
+
+        rp1s = [c for c in consents if c.research_study_id == 1]
+        if not len(rp1s):
+            return
+        assert len(rp1s) == 1
+
+        # Confirm valid trigger_states.  No data prior to consent.
+        ts = TriggerState.query.filter(
+            TriggerState.user_id == patient_id,
+            TriggerState.timestamp < rp1s[0].acceptance_date).count()
+        assert ts == 0
+
+        # should never be more than a single row for any given state
+        ts = TriggerState.query.filter(
+            TriggerState.user_id == patient_id
+        )
+        data = defaultdict(int)
+        for row in ts:
+            key = f"{row.visit_month}:{row.state}"
+            data[key] += 1
+        for k, v in data.items():
+            if v > 1:
+                raise RuntimeError(
+                    f"Unique visit_month:state {k} broken in trigger_states for {patient}")
+
+    sanity_check()
     if current_app.config['SYSTEM_TYPE'] == "production":
         abort(404)
 
@@ -497,7 +618,6 @@ def patient_timewarp(patient_id, days):
 
     # trigger_state
     if current_app.config['GIL'] is None:
-        from ..trigger_states.models import TriggerState
         for ts in TriggerState.query.filter(
                 TriggerState.user_id == user.id):
             changed.append(f"trigger_state {ts.id}")
@@ -531,6 +651,7 @@ def patient_timewarp(patient_id, days):
         ar.timestamp = ar.timestamp - delta
 
     db.session.commit()
+    sanity_check()
 
     # Recalculate users timeline & qnr associations
     cache.delete_memoized(trigger_date)
@@ -540,10 +661,8 @@ def patient_timewarp(patient_id, days):
             research_study_id=research_study_id,
             acting_user_id=current_user().id)
 
-        update_users_QBT(
-            patient_id,
-            research_study_id=research_study_id,
-            invalidate_existing=True)
+        invalidate_users_QBT(user_id=patient_id, research_study_id=research_study_id)
+        update_users_QBT(user_id=patient_id, research_study_id=research_study_id)
 
     auditable_event(
         message=f"TIME WARPED existing data back {days} days.",

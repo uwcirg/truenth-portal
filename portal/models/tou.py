@@ -1,5 +1,5 @@
 """ToU (Terms of Use)  module"""
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Enum
 
 from ..database import db
 from ..date_tools import FHIR_datetime
@@ -7,7 +7,7 @@ from .notification import Notification, UserNotification
 from .organization import Organization, OrgTree
 from .role import ROLE, Role
 from .user import User
-tou_types = ENUM('website terms of use', 'subject website consent',
+tou_types = Enum('website terms of use', 'subject website consent',
                  'stored website consent form', 'privacy policy',
                  'EMPRO website terms of use',
                  name='tou_types', create_type=False)
@@ -19,7 +19,7 @@ class ToU(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     agreement_url = db.Column(
         db.Text, server_default='predates agreement_url', nullable=False)
-    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
+    audit_id = db.Column(db.ForeignKey('audit.id'), index=True, nullable=False)
     organization_id = db.Column(db.ForeignKey('organizations.id'))
     type = db.Column('type', tou_types, nullable=False)
     active = db.Column(db.Boolean(), nullable=False, server_default='1')

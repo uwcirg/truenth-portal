@@ -12,4 +12,3 @@ $(document).on("ready", function() {
         });
     }
 });
-

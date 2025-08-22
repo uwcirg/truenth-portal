@@ -4,6 +4,7 @@
 <h1 class="tnth-headline">{{ _("Email Invite") }}</h1>
 <p>{{ _("Send a TrueNTH email invite by filling in the form below.") }}</p>
 <form action="/invite" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <div class="form-group">
         <label for="recipients">{{ _("To (separate multiple addresses with white space)") }}</label>
         <input type="text" class="form-control" name="recipients" id="recipients" size='79' placeholder="user@example.com">
