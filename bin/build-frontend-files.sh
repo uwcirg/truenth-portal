@@ -22,7 +22,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 PATH="${PATH}:${repo_root}/bin"
-GULPFILE="${repo_root}/portal/development_gulpfile.js"
+GULPFILE="${repo_root}/portal/development_gulpfile.mjs"
 
 
 echo "Building front-end files..."
