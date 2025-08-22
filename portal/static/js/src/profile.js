@@ -2082,7 +2082,8 @@ export default (function() {
                             resetBtn(true);
                         });
                     }).fail(function(xhr) { //report error
-                        self.messages.userInviteEmailErrorMessage = i18next.t("Error occurred retreving email content via API.");
+                        const message = `${i18next.t("Error occurred retreving email content via API.")} ${xhr && xhr.responseText ? xhr.responseText: ""}`;
+                        self.messages.userInviteEmailErrorMessage = message;
                         resetBtn();
                         self.modules.tnthAjax.reportError(self.subjectId, emailUrl, xhr.responseText);
                     });

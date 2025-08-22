@@ -213,6 +213,17 @@ class TestCase(Base):
             db.session.add(UserRoles(user_id=user.id, role_id=role_id))
             db.session.commit()
 
+    def set_user_locale(self, user=None, locale=None):
+        """Bless a user with locale needed for a test"""
+        if not user:
+            user = self.test_user
+        if not locale:
+            locale = ('en_AU', "Australian English")
+        user = db.session.merge(user)
+        user.locale = locale
+        with SessionScope(db):
+            db.session.commit()
+
     def login(
         self,
         user_id=TEST_USER_ID,

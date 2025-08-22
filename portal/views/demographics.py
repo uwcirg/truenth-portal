@@ -7,7 +7,9 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
 from ..models.reference import MissingReference
+from ..models.reporting import update_patient_adherence_data
 from ..models.user import current_user, get_user
+from ..models.role import ROLE
 from .crossdomain import crossdomain
 
 demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
@@ -176,7 +178,9 @@ def demographics_set(patient_id):
         patient_id, json.dumps(request.json)), user_id=current_user().id,
         subject_id=patient_id, context='user')
 
-    # update the patient_table cache with any change from above
-    patient_list_update_patient(patient_id)
+    # update the respective cache tables with any change from above
+    if patient.has_role(ROLE.PATIENT.value):
+        patient_list_update_patient(patient_id)
+        update_patient_adherence_data(patient_id)
 
     return jsonify(patient.as_fhir(include_empties=False))

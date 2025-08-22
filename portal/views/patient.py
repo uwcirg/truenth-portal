@@ -8,14 +8,14 @@ from collections import defaultdict
 from datetime import datetime
 import json
 
-from flask import Blueprint, abort, current_app, jsonify, request
+from flask import Blueprint, Response, abort, current_app, jsonify, request
 from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..cache import cache
 from ..database import db
-from ..date_tools import FHIR_datetime
+from ..date_tools import FHIR_datetime, as_fhir
 from ..extensions import oauth
 from ..models.adherence_data import sorted_adherence_data
 from ..models.communication import Communication
@@ -319,6 +319,7 @@ def patient_timeline(patient_id):
     :param trace: set 'true' to view detailed logs generated, works best in
       concert with purge
     :param only: set to filter all results but top level attribute given
+    :param pretty: set to generate a pretty-printed JSON result
 
     """
     from ..date_tools import FHIR_datetime, RelativeDelta
@@ -328,7 +329,7 @@ def patient_timeline(patient_id):
     )
     from ..models.qbd import QBD
     from ..models.qb_status import QB_Status
-    from ..models.questionnaire_bank import visit_name
+    from ..models.questionnaire_bank import translate_visit_name, visit_name
     from ..models.questionnaire_response import aggregate_responses
     from ..models.research_protocol import ResearchProtocol
     from ..tasks import cache_single_patient_adherence_data
@@ -392,7 +393,7 @@ def patient_timeline(patient_id):
                 'at': FHIR_datetime.as_fhir(qbt.at),
                 'qb (id, iteration)': "{} ({}, {})".format(
                     qbd.questionnaire_bank.name, qbd.qb_id, qbd.iteration),
-                'visit': visit_name(qbd)}
+                'visit': translate_visit_name(visit_name(qbd))}
             if qbt.status == OverallStatus.due:
                 data['questionnaires'] = ','.join(
                     [q.name for q in qbd.questionnaire_bank.questionnaires])
@@ -536,6 +537,9 @@ def patient_timeline(patient_id):
         if only not in kwargs:
             raise ValueError(f"{only} not in {kwargs.keys()}")
         return jsonify(only, kwargs[only])
+    if request.args.get("pretty"):
+        pretty_json = json.dumps(kwargs, indent=2, default=as_fhir)
+        return Response(pretty_json, mimetype='Application/json')
     return jsonify(**kwargs)
 
 
