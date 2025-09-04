@@ -5,7 +5,11 @@ import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
 import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_UNPROCCESSED_STATES} from "../data/common/consts.js";
-const MAX_ATTEMPTS = 3
+const MAX_ATTEMPTS = 3;
+// track error reporting per key
+let errorReportedByKey = new Map();
+// track request per key
+let inflightRequestByKey = new Map();
 export default { /*global $ */
     "beforeSend": function() {
         $.ajaxSetup({
@@ -20,119 +24,239 @@ export default { /*global $ */
             }
         });
     },
-    "sendRequest": function(url, method, userId, params, callback) {
-        if (!url) { return false; }
-        var REQUEST_TIMEOUT_INTERVAL = 5000; // default timed out at 5 seconds
-        var defaultParams = {type: method ? method : "GET", url: url, attempts: 0, max_attempts: params && params.max_attempts ? params.max_attempts : MAX_ATTEMPTS, contentType: "application/json; charset=utf-8", dataType: "json", sync: false, timeout: REQUEST_TIMEOUT_INTERVAL, data: null, useWorker: false, async: true};
-        params = params || defaultParams;
-        params = $.extend({}, defaultParams, params);
-        params.timeout = params.timeout || REQUEST_TIMEOUT_INTERVAL;
-        params.async = params.sync ? false: params.async;
+    "sendRequest": function (url, method, userId, params, callback) {
+        if (!url) return false;
+
+        var REQUEST_TIMEOUT_INTERVAL = 5000;
+        var DEFAULT_MAX = (typeof MAX_ATTEMPTS !== "undefined" ? MAX_ATTEMPTS : 3);
+
+        var defaultParams = {
+            type: method ? method : "GET",
+            url: url,
+            attempts: 0,
+            max_attempts: DEFAULT_MAX,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            sync: false,
+            timeout: REQUEST_TIMEOUT_INTERVAL,
+            data: null,
+            useWorker: false,
+            async: true,
+            cache: false
+        };
+
+        // Preserve any prior state across merges
+        var __state = params && params.__state ? params.__state : null;
+        params = $.extend({}, defaultParams, (params || {}));
+        if (__state) params.__state = __state;
+
+        // Normalize async/sync
+        params.async = params.sync ? false : params.async;
+
+        // Normalize max attempts
+        var max = Number(params.max_attempts);
+        if (!Number.isFinite(max) || max <= 0) max = DEFAULT_MAX;
+
+        // Create per-chain state if missing
+        params.__state = params.__state || { sent: 0, lastError: null, max: max };
+        params.__state.max = max; // keep synced if caller changed it
+        params.__state.terminated = !!params.__state.terminated;
+        params.__state.errorRecorded = !!params.__state.errorRecorded;
+        params.__state.chainTimerId = params.__state.chainTimerId || null;
+
+        callback = callback || function(){};
+
         var self = this;
         var fieldHelper = this.FieldLoaderHelper, targetField = params.targetField || null;
-        callback = callback || function() {};
-        params.attempts++;
-        params.checkAuth = ["post", "put", "delete"].indexOf(String(method).toLowerCase()) !== -1;
-        fieldHelper.showLoader(targetField);
-        if (params.useWorker && window.Worker && !Utility.isTouchDevice()) { /*global isTouchDevice()*/
-            Utility.initWorker(url, params, function(result) { /*global initWorker*/
-                var data;
-                try {
-                    data = JSON.parse(result);
-                } catch(e) {
-                    callback({error: "Error occurred parsing data for " + url});
-                    return false;
-                }
-                if (!data) {
-                    callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": "no data returned"});
-                    fieldHelper.showError(targetField);
-                } else if (data.error) {
-                    callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": data});
-                    self.sendError(data, url, userId, params);
-                    fieldHelper.showError(targetField);
-                } else {
-                    callback(data);
-                    fieldHelper.showUpdate(targetField);
-                }
-            });
+
+        var methodUpper = String(params.type || method || "GET").toUpperCase();
+        var dataKey;
+        try { 
+            dataKey = JSON.stringify(params.data || null); 
+        }
+        catch(e) {
+            dataKey = String(params.data);
+        }
+        // Build a stable key for error reporting
+        const errorReportKey = [String(params.type||method||"GET").toUpperCase(), url, dataKey].join("|");
+
+        // short-circuit if a stale timer re-enters after terminal fail
+        if (params.__state.terminated) return false;
+
+        const requestKey = [
+            (params.type || method || "GET").toUpperCase(),
+            url,
+            JSON.stringify(params.data || null)
+            ].join("|");
+
+        // If there's already a request for this key, just queue the callback and bail.
+        if (inflightRequestByKey.has(requestKey)) {
+            inflightRequestByKey.get(requestKey).push(callback || function(){});
             return true;
         }
-        if (!params.cache) {
-            params.headers = {
-                "cache-control": "no-cache, must-revalidate, private",
-                "expires": "-1",
-                "pragma": "no-cache"
-            };
+
+        // First caller: create the queue with our callback.
+        inflightRequestByKey.set(requestKey, [callback || function(){}]);
+
+        const _flush = (payload, isError) => {
+            const cbs = inflightRequestByKey.get(requestKey) || [];
+            inflightRequestByKey.delete(requestKey);
+            cbs.forEach(cb => {
+                try {
+                if (isError) cb({ error: DEFAULT_SERVER_DATA_ERROR, data: payload });
+                else cb(payload);
+                } catch(e) { /* swallow */ }
+            });
+        };
+
+        const clearChainTimer = () => {
+            if (params.__state.chainTimerId) {
+                clearTimeout(params.__state.chainTimerId);
+                params.__state.chainTimerId = null;
+            }
+        };
+
+        const canSend = () => {
+            return params.__state.sent < params.__state.max;
         }
-        var ajaxCall = () => $.ajax(params).done(function(data) {
-                            params.attempts = 0;
-                            if (data) {
-                                fieldHelper.showUpdate(targetField);
-                                callback(data);
-                            } else {
-                                fieldHelper.showError(targetField);
-                                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": false});
-                            }
-                        }).fail(function(xhr) {
-                            // catch auth error, e.g. unaunthorized or stale CSRF session token error before re-trying
-                            const doomedStatus = parseInt(xhr.status) === 400 || parseInt(xhr.status) === 401;
-                            const xhrResponseText = xhr.responseText ? String(xhr.responseText).toLowerCase() : "";
-                            if (
-                              doomedStatus &&
-                              (xhrResponseText.includes("csrf token") ||
-                                xhrResponseText.includes("unauthorize"))
-                            ) {
-                              console.log("Request error ", xhrResponseText);
-                              if (callback) {
-                                callback({ error: DEFAULT_SERVER_DATA_ERROR });
-                                fieldHelper.showError(targetField);
-                              }
-                              return false;
-                            }
-                            if (params.attempts < params.max_attempts) {
-                                (function(self, url, method, userId, params, callback) {
-                                    setTimeout(function () {
-                                    self.sendRequest(url, method, userId, params, callback);
-                                    }, REQUEST_TIMEOUT_INTERVAL); //retry after 5 seconds
-                                })(self, url, method, userId, params, callback);
-                            } else {
-                                fieldHelper.showError(targetField);
-                                callback({"error": DEFAULT_SERVER_DATA_ERROR, "data": xhr});
-                                self.sendError(xhr, url, userId, params);
-                                //reset attempts after reporting error so we know how many attempts have been made
-                                //multiple attempts can signify server not being responsive or busy network
-                                params.attempts = 0;
-                            }
-                        });
-        if (params.checkAuth && params.attempts <= 1) {
-            $.ajax("/api/me").done(
-                function() {
-                    console.log("user authorized");
-                    if ((typeof CsrfTokenChecker !== "undefined") && 
-                        !CsrfTokenChecker.checkTokenValidity()) {
-                        //if CSRF Token not valid, return error
-                        if (callback) {
-                            callback({"error": DEFAULT_SERVER_DATA_ERROR});
-                            fieldHelper.showError(targetField);
-                        }
-                        return;
-                    }
-                     
-                    ajaxCall();
+        const markSent = () => {
+            params.__state.sent += 1;
+            params.attempts = params.__state.sent;
+        }
+        const terminalFail = (extra) => {
+            if (params.__state.terminated) return; 
+            params.__state.terminated = true;
+            clearChainTimer();
+            const oError = params.__state.lastError || extra;
+            fieldHelper.showError(targetField);
+            if (!params.__state.errorRecorded) {
+                params.__state.errorRecorded = true;
+                if (!errorReportedByKey.get(errorReportKey)) {
+                    errorReportedByKey.set(errorReportKey, Date.now());
+                    self.sendError(oError, url, userId, params);
+                    // expire after 30s
+                    setTimeout(() => errorReportedByKey.delete(errorReportKey), 30000);
                 }
-            ).fail(function() {
-                if (callback) {
-                    callback({"error": DEFAULT_SERVER_DATA_ERROR});
-                    fieldHelper.showError(targetField);
+                _flush (extra?.error ? extra : { error: DEFAULT_SERVER_DATA_ERROR }, true);
+            }
+        }
+        const scheduleRetry = () => {
+            // if we've already terminated, do nothing
+            if (params.__state.terminated) return;
+
+            if (!canSend()) { 
+                terminalFail(); 
+                return;
+            }
+            // avoid stacking multiple timers
+            clearChainTimer();
+            console.log(`[tnthAjax] ${methodUpper} ${url} try ${params.__state.sent+1}/${params.__state.max}`);
+            params.__state.chainTimerId = setTimeout(() => {
+                if (params.__state.terminated) return;    // stale timer guard
+                attempt();  
+            }, REQUEST_TIMEOUT_INTERVAL);
+        }
+
+        var methodLower = methodUpper.toLowerCase();
+        var checkAuth = ["post", "put", "delete"].indexOf(methodLower) !== -1;
+
+        const handleAuthThen = (sendFn) => {
+            if (!(checkAuth && params.__state.sent === 0)) { 
+                sendFn();
+                return;
+            }
+            // Only preflight auth on the very first *send*
+            $.ajax("/api/me").done(function () {
+                if ((typeof CsrfTokenChecker !== "undefined") && !CsrfTokenChecker.checkTokenValidity()) {
+                    terminalFail();
+                    return;
+                }
+                sendFn();
+            }).fail(function (xhr) {
+                terminalFail(xhr);
+            });
+        }
+
+        const sendWithWorker = () => {
+            if (!canSend() || params.__state.terminated) {
+                return;
+            }
+            markSent();
+            fieldHelper.showLoader(targetField);
+            Utility.initWorker(url, params, function (result) {
+                var data;
+                try { 
+                    data = JSON.parse(result);
+                }
+                catch (e) {
+                    terminalFail({ message : DEFAULT_SERVER_DATA_ERROR, raw: result });
+                    return;
+                }
+                if (data.error) {
+                    params.__state.lastError = data;
+                    terminalFail(data);
+                } else if (!data) {
+                    terminalFail();
+                } else {
+                    fieldHelper.showUpdate(targetField);
+                    _flush(data, false);
                 }
             });
-            return;
         }
-        ajaxCall();
+
+        const sendWithAjax = () => {
+            if (!canSend() || params.__state.terminated) return;
+
+            // no-cache headers unless caller opts in
+            if (!params.cache) {
+                params.headers = {
+                    "cache-control": "no-cache, must-revalidate, private",
+                    "expires": "-1",
+                    "pragma": "no-cache"
+                };
+            }
+
+            markSent();
+            fieldHelper.showLoader(targetField);
+
+            $.ajax(params).done(function (data) {
+                if (data) {
+                    fieldHelper.showUpdate(targetField);
+                    _flush(data, false);
+                } else {
+                    scheduleRetry();
+                }
+            }).fail(function (xhr) {
+                var status = parseInt(xhr && xhr.status, 10);
+                var text = (xhr && xhr.responseText ? String(xhr.responseText) : "").toLowerCase();
+                // hard-stop on auth/CSRF problems
+                if ((status === 400 || status === 401) &&
+                    (text.includes("csrf token") || text.includes("unauthorize"))) {
+                    terminalFail(xhr);
+                    return;
+                }
+                params.__state.lastError = xhr;
+                scheduleRetry();
+            });
+        }
+
+        const attempt = () => {
+            if (!canSend() || params.__state.terminated) return;    // safety
+            handleAuthThen(() => {
+                if (params.useWorker && window.Worker && !Utility.isTouchDevice()) {
+                sendWithWorker();
+                } else {
+                sendWithAjax();
+                }
+            });
+        };
+
+        attempt();
+        return true;
     },
     "sendError": function(xhr, url, userId, params) {
         if (!xhr) { return false; }
-        var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) === 0 ? "request timed out/network error" : xhr.status) + ", response text - " + (xhr.responseText ? xhr.responseText : "no response text returned from server");
+        var errorMessage = "[Error occurred processing request]  status - " + (parseInt(xhr.status) === 0 ? "request timed out/network error" : (xhr.status?xhr.status:"unspecified")) + ", response text - " + (xhr.responseText ? xhr.responseText : (xhr.message ? xhr.message : "no response text returned from server"));
         if (params) {
             try {
                 errorMessage += " [data sent]: " + JSON.stringify(params); //error can happen if for some reason the params are malformed

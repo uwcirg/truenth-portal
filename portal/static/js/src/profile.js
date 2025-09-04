@@ -3153,8 +3153,6 @@ export default (function() {
                     if (errorMessage) {
                         $("#profileAuditLogTable").html("");
                         $("#profileAuditLogErrorMessage").text(errorMessage);
-                        //report error if loading audit log results in error
-                        self.modules.tnthAjax.reportError(self.subjectId, "/api/user/" + self.subjectId + "/audit", errorMessage);
                         return false;
                     }
                     var ww = $(window).width(), fData = [], len = ((ww < 650) ? 20 : (ww < 800 ? 40 : 80)), errorMessage="";
