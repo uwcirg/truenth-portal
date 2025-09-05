@@ -151,10 +151,14 @@ export default { /*global $ */
             // avoid stacking multiple timers
             clearChainTimer();
             console.log(`[tnthAjax] ${methodUpper} ${url} try ${params.__state.sent+1}/${params.__state.max}`);
+            // https://www.pullrequest.com/blog/retrying-and-exponential-backoff-smart-strategies-for-robust-software/
+            const backoff = REQUEST_TIMEOUT_INTERVAL * Math.pow(2, Math.max(0, params.__state.sent - 1));
+            const jitter = Math.floor(Math.random() * 400);
+            const delay = Math.min(backoff + jitter, 30000);
             params.__state.chainTimerId = setTimeout(() => {
                 if (params.__state.terminated) return;    // stale timer guard
                 attempt();  
-            }, REQUEST_TIMEOUT_INTERVAL);
+            }, delay);
         }
 
         var methodLower = methodUpper.toLowerCase();
@@ -244,9 +248,9 @@ export default { /*global $ */
             if (!canSend() || params.__state.terminated) return;    // safety
             handleAuthThen(() => {
                 if (params.useWorker && window.Worker && !Utility.isTouchDevice()) {
-                sendWithWorker();
+                    sendWithWorker();
                 } else {
-                sendWithAjax();
+                    sendWithAjax();
                 }
             });
         };
