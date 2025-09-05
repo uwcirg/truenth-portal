@@ -117,7 +117,7 @@ export default { /*global $ */
         };
 
         const canSend = () => {
-            return params.__state.sent < params.__state.max;
+            return params.__state.sent <= params.__state.max;
         }
         const markSent = () => {
             params.__state.sent += 1;
