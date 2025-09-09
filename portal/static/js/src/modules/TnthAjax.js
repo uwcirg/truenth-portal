@@ -42,7 +42,6 @@ export default { /*global $ */
             data: null,
             useWorker: false,
             async: true,
-            cache: false
         };
 
         // Preserve any prior state across merges
