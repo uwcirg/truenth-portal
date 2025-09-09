@@ -193,7 +193,6 @@ let requestTimerId = 0;
       getRemotePatientListData: function (params) {
         if (this.accessed) {
           var self = this;
-          this.accessed = true;
           this.setTablePreference(
             this.userId,
             this.tableIdentifier,
@@ -229,11 +228,13 @@ let requestTimerId = 0;
             if (!self.accessed && results && results.options) {
               self.filterOptionsList = results.options;
             }
+            self.accessed = true;
             params.success(results);
           })
           .fail(function (xhr, status) {
             console.log("Error ", xhr);
             console.log("status", status);
+            self.accessed = true;
             self.setError("Error occurred loading data.");
             params.success([]);
           });
