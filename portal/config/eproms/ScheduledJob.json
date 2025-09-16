@@ -101,6 +101,13 @@
     },
     {
       "active": true,
+      "name": "Adherence and Research Data Cache watchdog",
+      "resourceType": "ScheduledJob",
+      "schedule": "r 3 * * *",
+      "task": "correct_cached_data"
+    },
+    {
+      "active": true,
       "name": "Service Token Watchdog",
       "resourceType": "ScheduledJob",
       "schedule": "r 2 * * *",
