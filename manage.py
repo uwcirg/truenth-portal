@@ -108,10 +108,30 @@ def upgrade_db():
 @click.option(
     '--reprocess', '-r', is_flag=True,
     help='Reprocess adherence cache for patients showing issues')
+@click.option(
+    '--research_study_id', '-s',
+    type=click.IntRange(0,1), default=0,
+    help='Research study id of interest; default 0 (Global)')
 @app.cli.command()
-def adherence_cache_test(reprocess=False):
+def adherence_cache_test(research_study_id=0, reprocess=False):
     """Compare current adherence cache to trigger states, generate report"""
-    from portal.trigger_states.adherence_cache_validation import validate
+    from portal.models.adherence_cache_timeline_validation import validate as timeline_validate
+    from portal.trigger_states.adherence_cache_validation import validate as ts_validate
+
+    if research_study_id == 1:
+        ts_validate(reprocess)
+
+    timeline_validate(research_study_id, reprocess)
+
+
+@click.option(
+    '--reprocess', '-r', is_flag=True,
+    help='Reprocess research data cache for patients showing issues')
+@app.cli.command()
+def research_data_cache_test(reprocess=False):
+    """Compare current research-data cache to questionnaire responses, generate report"""
+    from portal.models.research_data import validate
+
     validate(reprocess)
 
 

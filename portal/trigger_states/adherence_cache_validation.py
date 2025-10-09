@@ -1,7 +1,7 @@
 """Mechanism to validate the adherence cache matches the trigger state tables"""
-from datetime import datetime, timedelta
+from datetime import timedelta
 import re
-from sqlalchemy import text
+from sqlalchemy import and_, delete, text
 
 from portal.database import db
 from portal.models.adherence_data import AdherenceData
@@ -156,17 +156,18 @@ def validate(reprocess):
                 reprocess_ids.append(pat_id)
 
     patient_loop()
-    now = datetime.utcnow()
     if not reprocess:
         return
 
-    for pat_id in reprocess_ids[0:0]:
+    for pat_id in reprocess_ids:
         # force a rebuild of adherence data on all patients found to have problems
         cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
             patient_id=pat_id,
             research_study_id=EMPRO_RS_ID))
         cache_moderation.reset()
-        valid = (now + timedelta(hours=1))
-        AdherenceData.query.filter(AdherenceData.valid_till < valid).delete()
+        stmt = delete(AdherenceData).where(and_(
+            AdherenceData.patient_id == pat_id,
+            AdherenceData.rs_id_visit.like(f"%1:%")))
+        db.session.execute(stmt)
         db.session.commit()
         single_patient_adherence_data(patient_id=pat_id, research_study_id=EMPRO_RS_ID)
