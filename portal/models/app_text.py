@@ -20,7 +20,6 @@ from flask_babel import gettext
 import requests
 from requests.exceptions import ConnectionError, InvalidURL, MissingSchema
 
-from ..cache import FIVE_MINS, cache
 from ..database import db
 
 
@@ -706,7 +705,6 @@ class UndefinedAppText(Exception):
     pass
 
 
-@cache.memoize(timeout=FIVE_MINS)
 def app_text(name, *args):
     """Look up and return customized application text string
 
