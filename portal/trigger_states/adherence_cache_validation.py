@@ -1,4 +1,5 @@
 """Mechanism to validate the adherence cache matches the trigger state tables"""
+from celery.utils.log import get_task_logger
 from datetime import timedelta
 import re
 from sqlalchemy import and_, delete, text
@@ -12,6 +13,7 @@ from portal.models.user import unchecked_get_user
 from portal.models.user_consent import consent_withdrawal_dates
 from portal.timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
 
+task_logger = get_task_logger(__name__)
 
 state_map = {
     "inprocess": "inprocess",
@@ -93,8 +95,8 @@ class CombinedData:
     def report(self, message):
         if not self.report_called:
             self.report_called = True
-            print(f"Differences for {self.patient_id} adherence | trigger states")
-        print(message)
+            task_logger.debug(f"Differences for {self.patient_id} adherence | trigger states")
+        task_logger.debug(message)
 
     def show_differences(self):
         if self.adherence_data is None and self.ts_data is None:
@@ -159,6 +161,8 @@ def validate(reprocess):
     if not reprocess:
         return
 
+    task_logger.info(
+        f"reprocessing {len(reprocess_ids)} patients out of sync with cached adherence_data table")
     for pat_id in reprocess_ids:
         # force a rebuild of adherence data on all patients found to have problems
         cache_moderation = CacheModeration(key=ADHERENCE_DATA_KEY.format(
