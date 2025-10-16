@@ -1,4 +1,5 @@
 """ model data for questionnaire response 'research data' reports """
+from celery.utils.log import get_task_logger
 from flask import current_app
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import text
@@ -9,6 +10,8 @@ from .reference import Reference
 from .research_study import research_study_id_from_questionnaire
 from .user import User, unchecked_get_user
 from .role import ROLE
+
+task_logger = get_task_logger(__name__)
 
 
 class ResearchData(db.Model):
@@ -171,11 +174,12 @@ def validate(reprocess=False):
             " subject_id = :subject_id)")
         patient_missing_qnr_ids = [
             row.id for row in db.engine.execute(missing_research_data, {'subject_id': pat_id})]
-        print(f"Missing {len(patient_missing_qnr_ids)} research data rows for {pat_id}")
+        task_logger.debug(f"Missing {len(patient_missing_qnr_ids)} research_data rows for {pat_id}")
         missing_qnr_ids.extend(patient_missing_qnr_ids)
 
     if reprocess:
+        task_logger.info(
+            f"reprocessing {len(missing_qnr_ids)} missing qnrs from research_data table")
         for qnr_id in missing_qnr_ids:
-            print(f"Reprocessing Questionnaire Response: {qnr_id}")
             qnr = QuestionnaireResponse.query.get(qnr_id)
             add_questionnaire_response(qnr, research_study_id=None)
