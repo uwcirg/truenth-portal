@@ -28,13 +28,7 @@
         }
       ],
       "name": "TrueNTH Global Registry",
-      "resourceType": "Organization",
-      "telecom": [
-        {
-          "system": "email",
-          "value": "contact.eproms@truenth.org"
-        }
-      ]
+      "resourceType": "Organization"
     },
     {
       "extension": [
