@@ -18,13 +18,13 @@ from functools import wraps
 # Flask-User
 from flask import abort, request
 from flask_babel import Babel
-from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
 from flask_recaptcha import ReCaptcha
 from flask_user import SQLAlchemyAdapter, UserManager
 
 from .csrf import csrf
 from .database import db
+from .mail import FallbackValidatingMail
 from .models.login import login_user
 from .models.user import User, current_user
 from .session import RedisSameSiteSession as Session
@@ -106,7 +106,7 @@ class OAuthOrAlternateAuth(OAuth2Provider):
 
 oauth = OAuthOrAlternateAuth()
 
-mail = Mail()
+mail = FallbackValidatingMail()
 
 session = Session()
 
