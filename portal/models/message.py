@@ -172,8 +172,11 @@ class EmailMessage(db.Model):
             body, width=280, break_long_words=False, break_on_hyphens=False)
         exc = None
         try:
+            current_app.logger.debug(f"sending message {self.subject}")
             mail.send(message)
+            current_app.logger.debug(f"sent message {self.subject}")
         except Exception as e:
+            current_app.logger.debug(f"exception sending message: {e}")
             exc = e
 
         user = User.query.filter_by(email='__system__').first()
