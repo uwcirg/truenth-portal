@@ -1,12 +1,12 @@
+from flask import current_app
 from flask_mail import Mail, Connection
 import smtplib
 import ssl
-import logging
 
-log = logging.getLogger(__name__)
 
 class FallbackValidatingConnection(Connection):
     def configure_host(self):
+        current_app.logger.debug("FallbackValidatingConnection.configure_host()")
         host = self.mail.server
         port = self.mail.port
 
@@ -26,10 +26,10 @@ class FallbackValidatingConnection(Connection):
             if self.mail.username and self.mail.password:
                 self.host.login(self.mail.username, self.mail.password)
 
-            log.debug("Email: connected with strict TLS certificate validation.")
+            current_app.logger.debug("Email: connected with strict TLS certificate validation.")
 
         except Exception as e:
-            log.error(f"Strict TLS failed ({e}); falling back to non-validated TLS.")
+            current_app.logger.error(f"Strict TLS failed ({e}); falling back to non-validated TLS.")
 
             # --- Fallback: start TLS without certificate validation ---
             insecure_context = ssl._create_unverified_context()
@@ -47,4 +47,5 @@ class FallbackValidatingConnection(Connection):
 
 class FallbackValidatingMail(Mail):
     def connect(self):
+        current_app.logger.debug("FallbackValidatingMail.connect()")
         return FallbackValidatingConnection(self)
