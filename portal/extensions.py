@@ -18,6 +18,7 @@ from functools import wraps
 # Flask-User
 from flask import abort, request
 from flask_babel import Babel
+from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
 from flask_recaptcha import ReCaptcha
 from flask_user import SQLAlchemyAdapter, UserManager
@@ -106,7 +107,8 @@ class OAuthOrAlternateAuth(OAuth2Provider):
 
 oauth = OAuthOrAlternateAuth()
 
-mail = FallbackValidatingMail()
+#mail = FallbackValidatingMail()
+mail = Mail()
 
 session = Session()
 
