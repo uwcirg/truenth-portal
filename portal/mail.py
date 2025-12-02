@@ -53,4 +53,6 @@ class FallbackValidatingConnection(Connection):
 class FallbackValidatingMail(Mail):
     def connect(self):
         current_app.logger.debug("FallbackValidatingMail.connect()")
+        current_app.logger.debug(f"server: {self.server}")
+        current_app.logger.debug(f"use_ssl: {self.use_ssl} , use_tls: {self.use_tls}")
         return FallbackValidatingConnection(self)
