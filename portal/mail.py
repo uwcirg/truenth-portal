@@ -52,6 +52,9 @@ class FallbackValidatingConnection(Connection):
 
 class FallbackValidatingMail(Mail):
     def connect(self):
+        if current_app.config.get("MAIL_SERVER") and self.server is None:
+            self.init_app(current_app)
+
         current_app.logger.debug("FallbackValidatingMail.connect()")
         current_app.logger.debug(f"server: {self.server}")
         current_app.logger.debug(f"use_ssl: {self.use_ssl} , use_tls: {self.use_tls}")
