@@ -7,6 +7,7 @@ import ssl
 class FallbackValidatingConnection(Connection):
     def configure_host(self):
         current_app.logger.debug("FallbackValidatingConnection.configure_host()")
+        current_app.logger.debug(f"use_ssl: {self.mail.use_ssl} , use_tls: {self.mail.use_tls}")
         host = self.mail.server
         port = self.mail.port
 
@@ -21,9 +22,11 @@ class FallbackValidatingConnection(Connection):
             else:
                 self.host = smtplib.SMTP(host, port)
                 if self.mail.use_tls:
+                    current_app.logger.debug("start TLS with secure context")
                     self.host.starttls(context=strict_context)
 
             if self.mail.username and self.mail.password:
+                current_app.logger.debug("login to mail host")
                 self.host.login(self.mail.username, self.mail.password)
 
             current_app.logger.debug("Email: connected with strict TLS certificate validation.")
@@ -39,9 +42,11 @@ class FallbackValidatingConnection(Connection):
             else:
                 self.host = smtplib.SMTP(host, port)
                 if self.mail.use_tls:
+                    current_app.logger.debug("start TLS with insecure context")
                     self.host.starttls(context=insecure_context)
 
             if self.mail.username and self.mail.password:
+                current_app.logger.debug("login to mail host")
                 self.host.login(self.mail.username, self.mail.password)
 
 
