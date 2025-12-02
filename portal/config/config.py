@@ -77,6 +77,7 @@ class BaseConfig(object):
     )
     REQUEST_CACHE_EXPIRE = 10
 
+    MAIL_DEBUG = os.environ.get('MAIL_DEBUG', 'false').lower() == 'true'
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'localhost')
     MAIL_PORT = int(os.environ.get('MAIL_PORT', 25))
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
