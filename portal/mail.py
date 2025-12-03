@@ -54,6 +54,14 @@ class FallbackValidatingMail(Mail):
     def __init__(self, app=None):
         super().__init__(app)
 
+    def init_app(self, app):
+        state = self.init_mail(app.config, app.debug, app.testing)
+
+        # register extension with app
+        app.extensions = getattr(app, 'extensions', {})
+        app.extensions['mail'] = state
+        return state
+
     def init_mail(self, config, debug=False, testing=False):
         mail = Mail.init_mail(self, config, debug, testing)
         mail.server = config.get('MAIL_SERVER', '127.0.0.1')
