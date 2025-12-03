@@ -51,23 +51,8 @@ class FallbackValidatingConnection(Connection):
 
 
 class FallbackValidatingMail(Mail):
-    def init_app(self, app):
-        return Mail.init_app(self, app)
-
-    def init_mail(self, config, debug=False, testing=False):
-        mail = Mail.init_mail(self, config, debug, testing)
-        mail.server = config.get('MAIL_SERVER', '127.0.0.1')
-        mail.username = config.get('MAIL_USERNAME')
-        mail.password = config.get('MAIL_PASSWORD')
-        mail.port = config.get('MAIL_PORT', 25)
-        mail.use_ssl = config.get('MAIL_USE_SSL', False)
-        mail.use_tls = config.get('MAIL_USE_TLS', False)
-        mail.default_sender = config.get('MAIL_DEFAULT_SENDER')
-        mail.debug = config.get('MAIL_DEBUG', debug)
-        mail.max_emails = config.get('MAIL_MAX_EMAILS')
-        mail.suppress = config.get('MAIL_SUPPRESS_SEND', testing)
-        mail.ascii_attachments = config.get('MAIL_ASCII_ATTACHMENTS', False)
-        return mail
+    def __init__(self, app=None):
+        super().__init__(app)
 
     def connect(self):
         if current_app.config.get("MAIL_SERVER") and self.server is None:
