@@ -51,6 +51,9 @@ class FallbackValidatingConnection(Connection):
 
 
 class FallbackValidatingMail(Mail):
+    def init_app(self, app):
+        return Mail.init_app(self, app)
+
     def connect(self):
         if current_app.config.get("MAIL_SERVER") and self.server is None:
             self.init_app(current_app)
