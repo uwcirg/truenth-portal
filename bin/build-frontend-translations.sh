@@ -27,11 +27,11 @@ PATH="${PATH}:${repo_root}/bin"
 echo "Converting translations from PO to JSON format"
 nodejs-wrapper.sh \
     gulp.js \
-        --gulpfile "${repo_root}/portal/i18next_gulpfile.js" \
+        --gulpfile "${repo_root}/portal/i18next_gulpfile.mjs" \
     i18nextConvertPOToJSON
 
 echo "Combining front-end and back-end translation files"
 nodejs-wrapper.sh \
     gulp.js \
-        --gulpfile "${repo_root}/portal/i18next_gulpfile.js" \
+        --gulpfile "${repo_root}/portal/i18next_gulpfile.mjs" \
     combineTranslationJsons

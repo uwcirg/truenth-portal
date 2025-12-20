@@ -1,0 +1,49 @@
+# continuous integration
+# run tests for repo
+---
+name: Test
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: python:3.9
+    # start tests after all services report healthy
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: portaldb
+          POSTGRES_PASSWORD: wplatrop
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        # create a job for every tox env
+        tox_env:
+          - py3
+          - docs
+          - celery_background
+    env:
+      TOXENV: ${{ matrix.tox_env }}
+      SECRET_KEY: static secret key
+      SQLALCHEMY_DATABASE_TEST_URI: postgresql://postgres:wplatrop@postgres/portaldb
+      REDIS_URL: redis://redis:6379/0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install test runner
+        run: python3 -m pip install tox
+
+      - name: Run tests
+        run: tox

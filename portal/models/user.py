@@ -16,8 +16,7 @@ from flask_babel import gettext as _
 from flask_login import current_user as flask_login_current_user
 from flask_user import UserMixin, _call_or_get
 from fuzzywuzzy import fuzz
-from sqlalchemy import UniqueConstraint, and_, func, or_
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import and_, func, Enum, or_, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import ColumnProperty, class_mapper, synonym
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
@@ -66,7 +65,7 @@ DELETED_PREFIX = "__deleted_{time}__"
 DELETED_REGEX = r"__deleted_\d+__(.*)"
 
 # https://www.hl7.org/fhir/valueset-administrative-gender.html
-gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
+gender_types = Enum('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
 
 internal_identifier_systems = (
@@ -262,13 +261,23 @@ def validate_email(email):
     This validation function is generally only used when an end user changing
     an address or another use requires validation.
 
-    Furthermore, due to the complexity of valid email addresses, just
-    look for some obvious signs - such as the '@' symbol and at least 6 chars.
-
     :raises :py:exc:`werkzeug.exceptions.BadRequest`: if obviously invalid
 
     """
-    if not email or '@' not in email or len(email) < 6:
+    # ignore the no email prefix
+    if email and email.startswith(NO_EMAIL_PREFIX):
+        return
+
+    # ignore service account patterns
+    if email and email.startswith('service account sponsored by '):
+        return
+
+    # ignore special __system__ account
+    if email and email == '__system__':
+        return
+
+    valid_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    if not email or not re.match(valid_pattern, email):
         raise BadRequest("requires a valid email address")
 
 
@@ -1738,6 +1747,10 @@ class User(db.Model, UserMixin):
                     ).count() > 0
                 ):
                     abort(400, "email address already in use")
+                try:
+                    self._email and validate_email(self._email)
+                except BadRequest:
+                    abort(400, "email address format invalid")
                 self.email = telecom.email
             telecom_cps = telecom.cp_dict()
             self.phone = (

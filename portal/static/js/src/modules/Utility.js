@@ -59,6 +59,8 @@ var Utility = (function() {
     UtilityObj.prototype.newHttpRequest = function(url, params, callBack) { /* note: this function supports older version of IE (version <= 9) - jquery ajax calls errored in older IE version*/
         this.requestAttempts++;
         var xmlhttp, self = this;
+        params = params || {};
+        var maxAttempts = !isNaN(params.max_attempts) ? params.max_attempts : 3;
         callBack = callBack || function() {};
         if (window.XDomainRequest) { /*global XDomainRequest */
             xmlhttp = new XDomainRequest();
@@ -77,7 +79,7 @@ var Utility = (function() {
                     self.requestAttempts = 0;
                     return;
                 }
-                if (self.requestAttempts < 3) {
+                if (self.requestAttempts < maxAttempts) {
                     setTimeout(function() {
                         self.newHttpRequest(url, params, callBack);
                     }, 3000);
@@ -88,7 +90,6 @@ var Utility = (function() {
                 }
             }
         };
-        params = params || {};
         xmlhttp.open("GET", url, true);
         for (var param in params) {
             if (params.hasOwnProperty(param)) {
@@ -117,13 +118,14 @@ var Utility = (function() {
         };
         params = params || defaults;
         params = $.extend({}, defaults, params);
+        var maxAttempts = !isNaN(params.max_attempts) ? params.max_attempts : 3;
         this.requestAttempts++;
         var uself = this;
         $.ajax(params).done(function(data) {
             callback(data);
             uself.requestAttempts = 0;
         }).fail(function() {
-            if (uself.requestAttempts <= 3) {
+            if (uself.requestAttempts <= maxAttempts) {
                 setTimeout(function() { uself.ajaxRequest(url, params, callback);}, 3000);
             } else {
                 callback({error: i18next.t("Error occurred processing request")}); /*global i18next */

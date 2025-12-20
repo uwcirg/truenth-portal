@@ -66,6 +66,8 @@ let requestTimerId = 0;
     },
     mixins: [CurrentUser],
     data: {
+      suppressColumnSwitch: false,
+      savePrefTimerId: 0,
       dataError: false,
       configured: false,
       initIntervalId: 0,
@@ -143,7 +145,7 @@ let requestTimerId = 0;
           errorElement.innerHTML = errorMessage;
         }
       },
-      clearError: function() {
+      clearError: function () {
         var errorElement = document.getElementById("admin-table-error-message");
         if (errorElement) {
           errorElement.innerHTML = "";
@@ -220,20 +222,22 @@ let requestTimerId = 0;
         console.log("param data ? ", params.data);
         var url = "/patients/page";
         var self = this;
-        $.get(url + "?" + $.param(params.data)).then(function (results) {
-          console.log("row results ", results);
-          if (!self.accessed && results && results.options) {
-            self.filterOptionsList = results.options;
-          }
-          self.accessed = true;
-          params.success(results);
-        }).fail(function(xhr, status) {
-          console.log("Error ", xhr);
-          console.log("status", status);
-          self.setError("Error occurred loading data.");
-          params.success([]);
-          self.accessed = true;
-        });
+        $.get(url + "?" + $.param(params.data))
+          .then(function (results) {
+            console.log("row results ", results);
+            if (!self.accessed && results && results.options) {
+              self.filterOptionsList = results.options;
+            }
+            self.accessed = true;
+            params.success(results);
+          })
+          .fail(function (xhr, status) {
+            console.log("Error ", xhr);
+            console.log("status", status);
+            self.accessed = true;
+            self.setError("Error occurred loading data.");
+            params.success([]);
+          });
       },
       handleCurrentUser: function () {
         var self = this;
@@ -744,7 +748,8 @@ let requestTimerId = 0;
         });
         if (this.sortFilterEnabled) {
           $("#adminTable").on("column-switch.bs.table", function () {
-            self.setTablePreference(self.userId);
+            if (this.suppressColumnSwitch) return; // ← guard
+            self.debouncedSaveTablePreference();
           });
         }
         $("#adminTableToolbar .orgs-filter-warning").popover();
@@ -1197,24 +1202,8 @@ let requestTimerId = 0;
         this.clearFilterButtons();
       },
       onOrgListSelectFilter: function () {
-        this.setTablePreference(
-          this.userId,
-          this.tableIdentifier,
-          null,
-          null,
-          null,
-          function () {
-            // callback from setting the filter preference
-            // this ensures that the table filter preference is saved before reloading the page
-            // so the backend can present patient list based on that saved preference
-            setTimeout(
-              function () {
-                $("#adminTable").bootstrapTable("refresh");
-              }.bind(this),
-              350
-            );
-          }.bind(this)
-        );
+        this.debouncedSaveTablePreference();
+        setTimeout(() => { $("#adminTable").bootstrapTable("refresh"); }, 350);
       },
       getDefaultTablePreference: function () {
         return {
@@ -1267,23 +1256,22 @@ let requestTimerId = 0;
         if (!this.sortFilterEnabled) {
           return false;
         }
-        var prefData = this.getTablePreference(
+        const prefData = this.getTablePreference(
           this.userId,
           this.tableIdentifier
         );
-        var hasColumnSelections =
+        const hasColumnSelections =
           prefData && prefData.filters && prefData.filters.column_selections;
         if (!hasColumnSelections) {
           return false;
         }
+        this.suppressColumnSwitch = true;
         var visibleColumns =
           $("#adminTable").bootstrapTable("getVisibleColumns");
         visibleColumns.forEach(function (c) {
-          //hide visible columns
-          if (String(c.class).toLowerCase() === "always-visible") {
-            return true;
+          if (String(c.class).toLowerCase() !== "always-visible") {
+            $("#adminTable").bootstrapTable("hideColumn", c.field);
           }
-          $("#adminTable").bootstrapTable("hideColumn", c.field);
         });
         prefData.filters.column_selections.forEach(function (column) {
           //show column(s) based on preference
@@ -1294,6 +1282,10 @@ let requestTimerId = 0;
           ).prop("checked", true);
           $("#adminTable").bootstrapTable("showColumn", column);
         });
+        // Give Bootstrap Table a tick to settle before re-enabling
+        setTimeout(() => {
+          this.suppressColumnSwitch = false;
+        }, 0);
       },
       setTableFilters: function (userId) {
         var prefData = this.currentTablePreference,
@@ -1329,6 +1321,19 @@ let requestTimerId = 0;
             }
           }
         }
+      },
+      preferencesEqual: (a, b) => {
+        try {
+          return JSON.stringify(a) === JSON.stringify(b);
+        } catch {
+          return false;
+        }
+      },
+      debouncedSaveTablePreference: function () {
+        clearTimeout(this.savePrefTimerId);
+        this.savePrefTimerId = setTimeout(() => {
+          this.setTablePreference(this.userId);
+        }, 300);
       },
       setTablePreference: function (
         userId,
@@ -1401,6 +1406,14 @@ let requestTimerId = 0;
           __filters["column_selections"].push($(this).attr("data-field"));
         });
         data["filters"] = __filters;
+
+        if (
+          this.currentTablePreference &&
+          this.preferencesEqual(this.currentTablePreference, data)
+        ) {
+          if (callback) callback(); // nothing changed, skip network call
+          return;
+        }
 
         if (Object.keys(data).length > 0) {
           var self = this;

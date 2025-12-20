@@ -1262,6 +1262,7 @@ class TestUser(TestCase):
 
     def test_password_reset(self):
         self.promote_user(role_name=ROLE.ADMIN.value)
+        self.set_user_locale()
         self.login()
 
         response = self.client.post('/api/user/{}/password_reset'.format(

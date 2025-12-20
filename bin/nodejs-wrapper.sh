@@ -55,8 +55,7 @@ setup_node_venv() {
     python3 -m pip install nodeenv
 
     echo "Creating new virtual environment for NodeJS: ${node_venv_path}"
-    # TODO fix issue with vinyl-fs and NodeJS 22.0
-    nodeenv --node=21.7.3 "${node_venv_path}"
+    nodeenv --node=22.18.0 "${node_venv_path}"
 
     deactivate
 }

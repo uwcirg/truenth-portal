@@ -474,6 +474,25 @@ def process_triggers_task(**kwargs):
     fire_trigger_events()
 
 
+@celery.task(queue=LOW_PRIORITY)
+@scheduled_task
+def correct_cached_data(**kwargs):
+    """Runs jobs to clean up stale adherence and research data caches"""
+    # Always "reprocess" - meaning patch any that are out of sync
+    reprocess = True
+    from portal.models.research_study import BASE_RS_ID, EMPRO_RS_ID
+    from portal.models.research_data import validate as validate_research_data
+    from portal.models.adherence_cache_timeline_validation import validate as timeline_validate
+    from portal.trigger_states.adherence_cache_validation import validate as ts_validate
+
+    validate_research_data(reprocess)
+    for research_study_id in (BASE_RS_ID, EMPRO_RS_ID):
+        if research_study_id == EMPRO_RS_ID:
+            ts_validate(reprocess)
+
+        timeline_validate(research_study_id, reprocess)
+
+
 @celery.task()
 @scheduled_task
 def raise_background_exception_task(**kwargs):
