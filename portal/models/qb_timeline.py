@@ -1197,6 +1197,7 @@ def update_users_QBT(user_id, research_study_id):
             kwargs = {
                 'patient_id': user_id,
                 'research_study_id': research_study_id}
+            current_app.logger.debug(f"adherence_cache debug {user_id}: queue cache_single_patient_adherence_data()")
             cache_single_patient_adherence_data.apply_async(
                 kwargs=kwargs, queue=LOW_PRIORITY, retry=False)
 
