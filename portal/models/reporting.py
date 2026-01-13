@@ -49,6 +49,7 @@ def update_patient_adherence_data(patient_id):
     """
     patient = User.query.get(patient_id)
     AdherenceData.query.filter(AdherenceData.patient_id==patient_id).delete()
+    debug_msg(patient_id, "deleted all adherence data for patient")
     for rs_id in ResearchStudy.assigned_to(patient):
         single_patient_adherence_data(patient_id=patient_id, research_study_id=rs_id)
 
@@ -190,6 +191,7 @@ def single_patient_adherence_data(patient_id, research_study_id):
     if last_viable:
         rs_visit = AdherenceData.rs_visit_string(
             research_study_id, visit_name(last_viable))
+        debug_msg(patient_id, f"last viable {rs_visit}")
         if AdherenceData.fetch(patient_id=patient.id, rs_id_visit=rs_visit):
             # latest already in cache, done with this patient
             debug_msg(patient_id, f"exit finding {rs_visit} as last viable")
@@ -228,6 +230,7 @@ def single_patient_adherence_data(patient_id, research_study_id):
             valid_for_days=valid_for,
             data=row)
         added_rows += 1
+        debug_msg(patient_id, f"added last viable {rs_visit} row")
 
         # if the last row was withdrawn, add any completed visits beyond
         # date of withdrawal
@@ -265,12 +268,12 @@ def single_patient_adherence_data(patient_id, research_study_id):
                     valid_for_days=30,
                     data=row)
                 added_rows += 1
+                debug_msg(patient_id, f"adding missing {rs_visit} row")
 
     # as we require a full history, continue to add rows for each previous
     for qbd, status in qb_stats.older_qbds(last_viable):
         rs_visit = AdherenceData.rs_visit_string(
             research_study_id, visit_name(qbd))
-        debug_msg(patient_id, f"adding historic {rs_visit} row")
 
         # once we find cached_data, the rest of the user's history is likely
         # good, but best to verify nothing is stale
@@ -288,6 +291,7 @@ def single_patient_adherence_data(patient_id, research_study_id):
             valid_for_days=30,
             data=historic)
         added_rows += 1
+        debug_msg(patient_id, f"adding historic {rs_visit} row")
 
     # if user is eligible for indefinite QB, add status
     qbd = None
@@ -321,6 +325,7 @@ def single_patient_adherence_data(patient_id, research_study_id):
                 valid_for_days=30,
                 data=indef)
             added_rows += 1
+            debug_msg(patient_id, f"adding indef {rs_visit} row")
 
     return added_rows
 
@@ -359,6 +364,7 @@ def cache_adherence_data(
     # Purge any rows that have or will soon expire
     valid = (as_of_date + timedelta(hours=1))
     AdherenceData.query.filter(AdherenceData.valid_till < valid).delete()
+    debug_msg(patient_id, "deleted expired rows")
     db.session.commit()
 
     def patient_generator():
@@ -381,6 +387,7 @@ def cache_adherence_data(
     added_rows = 0
     for patient in patient_generator():
         if limit and added_rows > limit:
+            debug_msg(patient_id, f"skipping out over {limit}")
             current_app.logger.info(
                 "pre-mature exit caching adherence data having hit limit")
             break
