@@ -775,7 +775,7 @@ def generate_and_send_summaries(org_id, research_study_id):
             continue
 
         args = load_template_args(user=staff_user)
-        with force_locale(staff_user.locale_code):
+        with force_locale(staff_user.locale_code or current_app.config['DEFAULT_LOCALE']):
             args['eproms_site_summary_table'] = html_generation_function(
                 overdue_stats=ostats,
                 user=staff_user,
