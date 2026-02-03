@@ -35,6 +35,11 @@ from .user import User, UserRoles, patients_query
 from .user_consent import consent_withdrawal_dates
 
 
+def debug_msg(patient_id, message):
+    """helper to generate common format debug message for challenging issue"""
+    current_app.logger.debug(f"adherence_cache debug {patient_id}: {message}")
+
+
 def update_patient_adherence_data(patient_id):
     """Cache invalidation and force rebuild for given patient's adherence data
 
@@ -66,6 +71,8 @@ def single_patient_adherence_data(patient_id, research_study_id):
     if not patient.has_role(ROLE.PATIENT.value):
         return
 
+    debug_msg(patient_id, "enter single_patient_adherence_data()")
+
     # keep patient list data in sync
     from .patient_list import patient_list_update_patient
     patient_list_update_patient(patient_id=patient_id, research_study_id=research_study_id)
@@ -75,6 +82,7 @@ def single_patient_adherence_data(patient_id, research_study_id):
         patient_id=patient_id,
         research_study_id=research_study_id))
     if cache_moderation.run_recently():
+        debug_msg(patient_id, "exit as run_recently()")
         return 0
     cache_moderation.run_now()
 
@@ -176,11 +184,15 @@ def single_patient_adherence_data(patient_id, research_study_id):
     # if no current, try previous (as current may be expired)
     last_viable = qb_stats.current_qbd(
         even_if_withdrawn=True) or qb_stats.prev_qbd
+    if not last_viable:
+        debug_msg(patient_id, "no last viable")
+
     if last_viable:
         rs_visit = AdherenceData.rs_visit_string(
             research_study_id, visit_name(last_viable))
         if AdherenceData.fetch(patient_id=patient.id, rs_id_visit=rs_visit):
             # latest already in cache, done with this patient
+            debug_msg(patient_id, f"exit finding {rs_visit} as last viable")
             return added_rows
 
     # build up data until we find valid cache for patient's history
@@ -258,9 +270,12 @@ def single_patient_adherence_data(patient_id, research_study_id):
     for qbd, status in qb_stats.older_qbds(last_viable):
         rs_visit = AdherenceData.rs_visit_string(
             research_study_id, visit_name(qbd))
+        debug_msg(patient_id, f"adding historic {rs_visit} row")
+
         # once we find cached_data, the rest of the user's history is likely
         # good, but best to verify nothing is stale
         if AdherenceData.fetch(patient_id=patient.id, rs_id_visit=rs_visit):
+            debug_msg(patient_id, f"skip as {rs_visit} found")
             continue
 
         historic = row.copy()
