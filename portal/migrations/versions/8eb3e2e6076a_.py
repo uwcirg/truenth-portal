@@ -18,9 +18,8 @@ down_revision = '71da0b18ec5f'
 def update_irondemog_codes(document: dict) -> dict:
     """
     Updates the valueCoding.code in the questionnaire_responses document.
+    Replace incorrect code for "Other" with correct code
 
-    - For linkId 'irondemog_v3.15', replace 'irondemog_v3.16.7' with 'irondemog_v3.15.7'.
-    - For linkId 'irondemog_v3.25', replace 'irondemog_v3.26.8' with 'irondemog_v3.15.7'.
     """
     doc = deepcopy(document)
     questions = doc.get("group", {}).get("question", [])
@@ -57,11 +56,9 @@ def upgrade():
         doc_id = row["id"]
         document = row["document"]
 
-        # Only proceed if document is not None
         if not document:
             continue
 
-        # Update document in Python
         updated_document = update_irondemog_codes(document)
 
         # Only update if changed
