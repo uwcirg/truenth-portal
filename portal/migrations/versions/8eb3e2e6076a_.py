@@ -11,8 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '8eb3e2e6076a'
-down_revision = ('71da0b18ec5f', 'cf586ed4f043')
-
+down_revision = '71da0b18ec5f'
 
 def update_irondemog_codes(document: dict) -> dict:
     """
