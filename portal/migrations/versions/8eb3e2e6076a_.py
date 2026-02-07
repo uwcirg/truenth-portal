@@ -49,7 +49,13 @@ def upgrade():
     conn = op.get_bind()
 
     # Load all questionnaire_responses
-    result = conn.execute(sa.text("SELECT id, document FROM questionnaire_responses"))
+    # Load only questionnaire_responses for irondemog questionnaires
+    result = conn.execute(sa.text("""
+        SELECT id, document
+        FROM questionnaire_responses
+        WHERE document->'questionnaire'->>'reference' ILIKE '%irondemog'
+           OR document->'questionnaire'->>'reference' ILIKE '%irondemog_v3'
+    """))
     rows = result.fetchall()
 
     for row in rows:
