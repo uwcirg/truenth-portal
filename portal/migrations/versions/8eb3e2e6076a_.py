@@ -75,6 +75,7 @@ def upgrade():
                 ),
                 {"document": json.dumps(updated_document), "id": doc_id},
             )
+            print("Updated QNR: ", doc_id)
 
 
 
