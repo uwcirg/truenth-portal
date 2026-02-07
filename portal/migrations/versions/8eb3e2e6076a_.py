@@ -34,8 +34,15 @@ def update_irondemog_codes(document: dict) -> dict:
                 if link_id == "irondemog_v3.15" and value_coding["code"] == "irondemog_v3.16.7":
                     value_coding["code"] = "irondemog_v3.15.7"
                 # Supplements question
-                elif link_id == "irondemog_v3.25" and value_coding["code"] == "irondemog_v3.26.8":
-                    value_coding["code"] = "irondemog_v3.15.7"
+                if link_id == "irondemog_v3.25" and value_coding["code"] == "irondemog_v3.26.8":
+                    value_coding["code"] = "irondemog_v3.25.12"
+
+                # Supplements question
+                if link_id == "irondemog.25" and value_coding["code"] == "irondemog.26.8":
+                    value_coding["code"] = "irondemog.25.12"
+                # Tobacco question
+                if link_id == "irondemog.13" and value_coding["code"] == "irondemog.26.8":
+                    value_coding["code"] = "irondemog.13.5"
     return doc
 
 
