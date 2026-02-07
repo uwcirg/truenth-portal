@@ -17,39 +17,79 @@ down_revision = '71da0b18ec5f'
 def upgrade():
     conn = op.get_bind()
 
-    # Fix incorrect valueCoding.code for the living arrangement question.
-    # For questions with linkId = 'irondemog_v3.15', replace
-    # 'irondemog_v3.16.7' with 'irondemog_v3.15.7'.
+    # Update the living arrangement question
     sql_living_arrangement = sa.sql.text("""
-        UPDATE questionnaire_responses
-        SET document = jsonb_path_replace(
+        UPDATE questionnaire_responses qr
+        SET document = jsonb_set(
             document,
-            '$.group.question[*] ? (@.linkId == "irondemog_v3.15").answer[*].valueCoding.code',
-            '"irondemog_v3.15.7"'
+            '{group,question}',
+            (
+                SELECT jsonb_agg(
+                    CASE
+                        WHEN q->>'linkId' = 'irondemog_v3.15' THEN
+                            jsonb_set(
+                                q,
+                                '{answer}',
+                                (
+                                    SELECT jsonb_agg(
+                                        CASE
+                                            WHEN a ? 'valueCoding' AND a->'valueCoding'->>'code' = 'irondemog_v3.16.7' THEN
+                                                jsonb_set(
+                                                    a,
+                                                    '{valueCoding,code}',
+                                                    '"irondemog_v3.15.7"'::jsonb
+                                                )
+                                            ELSE a
+                                        END
+                                    )
+                                    FROM jsonb_array_elements(q->'answer') a
+                                )
+                            )
+                        ELSE q
+                    END
+                )
+                FROM jsonb_array_elements(document->'group'->'question') q
+            )
         )
-        WHERE document @?
-            '$.group.question[*] ? (
-                @.linkId == "irondemog_v3.15"
-                && @.answer[*].valueCoding.code == "irondemog_v3.16.7"
-            )';
+        WHERE document->'group'->'question' @> '[{"linkId": "irondemog_v3.15"}]';
     """)
     conn.execute(sql_living_arrangement)
 
-    # Fix incorrect valueCoding.code for supplements question.
-    # For questions with linkId = 'irondemog_v3.25', replace
-    # 'irondemog_v3.26.8' with 'irondemog_v3.15.7'.
+    # Update the supplements question
     sql_supplements = sa.sql.text("""
-        UPDATE questionnaire_responses
-        SET document = jsonb_path_replace(
+        UPDATE questionnaire_responses qr
+        SET document = jsonb_set(
             document,
-            '$.group.question[*] ? (@.linkId == "irondemog_v3.25").answer[*].valueCoding.code',
-            '"irondemog_v3.15.7"'
+            '{group,question}',
+            (
+                SELECT jsonb_agg(
+                    CASE
+                        WHEN q->>'linkId' = 'irondemog_v3.25' THEN
+                            jsonb_set(
+                                q,
+                                '{answer}',
+                                (
+                                    SELECT jsonb_agg(
+                                        CASE
+                                            WHEN a ? 'valueCoding' AND a->'valueCoding'->>'code' = 'irondemog_v3.26.8' THEN
+                                                jsonb_set(
+                                                    a,
+                                                    '{valueCoding,code}',
+                                                    '"irondemog_v3.15.7"'::jsonb
+                                                )
+                                            ELSE a
+                                        END
+                                    )
+                                    FROM jsonb_array_elements(q->'answer') a
+                                )
+                            )
+                        ELSE q
+                    END
+                )
+                FROM jsonb_array_elements(document->'group'->'question') q
+            )
         )
-        WHERE document @?
-            '$.group.question[*] ? (
-                @.linkId == "irondemog_v3.25"
-                && @.answer[*].valueCoding.code == "irondemog_v3.26.8"
-            )';
+        WHERE document->'group'->'question' @> '[{"linkId": "irondemog_v3.25"}]';
     """)
     conn.execute(sql_supplements)
 
