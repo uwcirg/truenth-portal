@@ -14,84 +14,59 @@ revision = '8eb3e2e6076a'
 down_revision = '71da0b18ec5f'
 
 
+
+def update_irondemog_codes(document: dict) -> dict:
+    """
+    Updates the valueCoding.code in the questionnaire_responses document.
+
+    - For linkId 'irondemog_v3.15', replace 'irondemog_v3.16.7' with 'irondemog_v3.15.7'.
+    - For linkId 'irondemog_v3.25', replace 'irondemog_v3.26.8' with 'irondemog_v3.15.7'.
+    """
+    doc = deepcopy(document)
+    questions = doc.get("group", {}).get("question", [])
+    for q in questions:
+        link_id = q.get("linkId")
+        answers = q.get("answer", [])
+        for a in answers:
+            value_coding = a.get("valueCoding")
+            if value_coding and "code" in value_coding:
+                # Living arrangement question
+                if link_id == "irondemog_v3.15" and value_coding["code"] == "irondemog_v3.16.7":
+                    value_coding["code"] = "irondemog_v3.15.7"
+                # Supplements question
+                elif link_id == "irondemog_v3.25" and value_coding["code"] == "irondemog_v3.26.8":
+                    value_coding["code"] = "irondemog_v3.15.7"
+    return doc
+
+
 def upgrade():
     conn = op.get_bind()
 
-    # Update the living arrangement question
-    sql_living_arrangement = sa.sql.text("""
-        UPDATE questionnaire_responses qr
-        SET document = jsonb_set(
-            document,
-            '{group,question}',
-            (
-                SELECT jsonb_agg(
-                    CASE
-                        WHEN q->>'linkId' = 'irondemog_v3.15' THEN
-                            jsonb_set(
-                                q,
-                                '{answer}',
-                                (
-                                    SELECT jsonb_agg(
-                                        CASE
-                                            WHEN a ? 'valueCoding' AND a->'valueCoding'->>'code' = 'irondemog_v3.16.7' THEN
-                                                jsonb_set(
-                                                    a,
-                                                    '{valueCoding,code}',
-                                                    '"irondemog_v3.15.7"'::jsonb
-                                                )
-                                            ELSE a
-                                        END
-                                    )
-                                    FROM jsonb_array_elements(q->'answer') a
-                                )
-                            )
-                        ELSE q
-                    END
-                )
-                FROM jsonb_array_elements(document->'group'->'question') q
-            )
-        )
-        WHERE document->'group'->'question' @> '[{"linkId": "irondemog_v3.15"}]';
-    """)
-    conn.execute(sql_living_arrangement)
+    # Load all questionnaire_responses
+    result = conn.execute(sa.text("SELECT id, document FROM questionnaire_responses"))
+    rows = result.fetchall()
 
-    # Update the supplements question
-    sql_supplements = sa.sql.text("""
-        UPDATE questionnaire_responses qr
-        SET document = jsonb_set(
-            document,
-            '{group,question}',
-            (
-                SELECT jsonb_agg(
-                    CASE
-                        WHEN q->>'linkId' = 'irondemog_v3.25' THEN
-                            jsonb_set(
-                                q,
-                                '{answer}',
-                                (
-                                    SELECT jsonb_agg(
-                                        CASE
-                                            WHEN a ? 'valueCoding' AND a->'valueCoding'->>'code' = 'irondemog_v3.26.8' THEN
-                                                jsonb_set(
-                                                    a,
-                                                    '{valueCoding,code}',
-                                                    '"irondemog_v3.15.7"'::jsonb
-                                                )
-                                            ELSE a
-                                        END
-                                    )
-                                    FROM jsonb_array_elements(q->'answer') a
-                                )
-                            )
-                        ELSE q
-                    END
-                )
-                FROM jsonb_array_elements(document->'group'->'question') q
+    for row in rows:
+        doc_id = row["id"]
+        document = row["document"]
+
+        # Only proceed if document is not None
+        if not document:
+            continue
+
+        # Update document in Python
+        updated_document = update_irondemog_codes(document)
+
+        # Only update if changed
+        if updated_document != document:
+            conn.execute(
+                sa.text(
+                    "UPDATE questionnaire_responses SET document = :document WHERE id = :id"
+                ),
+                {"document": json.dumps(updated_document), "id": doc_id},
             )
-        )
-        WHERE document->'group'->'question' @> '[{"linkId": "irondemog_v3.25"}]';
-    """)
-    conn.execute(sql_supplements)
+
+
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
