@@ -322,7 +322,7 @@
       "kwargs": null,
       "name": "Cache Research Report Data",
       "resourceType": "ScheduledJob",
-      "schedule": "30 23 * * *",
+      "schedule": "55 * * * *",
       "task": "cache_research_data_task"
     }
   ],
