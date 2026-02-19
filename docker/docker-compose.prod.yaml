@@ -1,4 +1,4 @@
-# docker-compose production overrides
+# docker compose production overrides
 ---
 version: "3.4"
 services:
