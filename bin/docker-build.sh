@@ -37,4 +37,4 @@ default_portal_env="${PORTAL_ENV_FILE:-portal.env}"
 cp --no-clobber portal.env.default "$default_portal_env"
 
 echo "Building portal docker image..."
-docker-compose build web
+docker compose build web

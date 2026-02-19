@@ -1,4 +1,4 @@
-# docker-compose override to expose web container port (80) to local VM
+# docker compose override to expose web container port (80) to local VM
 # listens on the local VM at http://localhost:${EXTERNAL_PORT}
 ---
 version: "3.9"
