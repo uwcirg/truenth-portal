@@ -1,5 +1,3 @@
----
-version: "3.4"
 # Base service; for extension only, not for direct use
 x-service-base: &service_base
   image: "${DOCKER_REPOSITORY-ghcr.io/uwcirg/}${DOCKER_IMAGE_NAME:-truenth-portal}:${DOCKER_IMAGE_TAG:-develop}"

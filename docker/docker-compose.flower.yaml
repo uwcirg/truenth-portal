@@ -1,6 +1,4 @@
 # docker compose extension for flower, the celery task monitor
----
-version: "3.4"
 services:
   celeryflower:
     environment:
