@@ -2,12 +2,12 @@
 services:
   web:
     labels:
-      - "traefik.enable=true"
+      - traefik.enable=true
       # Traefik will route requests with Host matching the SERVER_NAME environment variable (see .env)
-      - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.rule=Host(`${SERVER_NAME}`)"
+      - traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.rule=Host(`${SERVER_NAME}`)
 
-      - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
-      - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt"
+      - traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+      - traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
     networks:
       - ingress
       # TODO rename to internal

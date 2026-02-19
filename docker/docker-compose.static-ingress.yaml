@@ -4,4 +4,4 @@ services:
   web:
     ports:
       # map container port 80 to host port configured by ${EXTERNAL_PORT}
-      - "127.0.0.1:${EXTERNAL_PORT:-8080}:8008"
+      - 127.0.0.1:${EXTERNAL_PORT:-8080}:8008
