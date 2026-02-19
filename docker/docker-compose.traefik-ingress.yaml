@@ -7,7 +7,6 @@ services:
       - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.rule=Host(`${SERVER_NAME}`)"
 
       - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
-      - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.tls=true"
       - "traefik.http.routers.portal-${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt"
     networks:
       - ingress
