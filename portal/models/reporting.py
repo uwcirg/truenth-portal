@@ -68,7 +68,7 @@ def single_patient_adherence_data(patient_id, research_study_id):
     """
     # ignore non-patient requests
     patient = User.query.get(patient_id)
-    if not patient.has_role(ROLE.PATIENT.value):
+    if not (patient and patient.has_role(ROLE.PATIENT.value)):
         return
 
     debug_msg(patient_id, "enter single_patient_adherence_data()")
