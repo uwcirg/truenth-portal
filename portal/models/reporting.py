@@ -519,13 +519,7 @@ def research_report(
 
     # Rather than call current_user.check_role() for every patient
     # in the bundle, delegate that responsibility to aggregate_responses()
-    bundle = aggregate_responses(
-        instrument_ids=instrument_ids,
-        research_study_id=research_study_id,
-        current_user=acting_user,
-        patch_dstu2=patch_dstu2,
-        celery_task=celery_task
-    )
+    bundle = aggregate_responses(instrument_ids=instrument_ids, current_user=acting_user, celery_task=celery_task)
     bundle.update({
         'link': {
             'rel': 'self',

@@ -843,24 +843,15 @@ class QNR_indef_results(QNR_results):
         return [q.name for q in qb.questionnaires]
 
 
-def aggregate_responses(
-        instrument_ids, current_user, research_study_id, patch_dstu2=False,
-        celery_task=None, patient_ids=None):
+def aggregate_responses(instrument_ids, current_user, celery_task=None, patient_ids=None):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
     :param current_user: user making request, necessary to restrict results
         to list of patients the current_user has permission to see
-    :param research_study_id: study being processed
-    :param patch_dstu2: set to make bundle DSTU2 compliant
     :param celery_task: if defined, send occasional progress updates
     :param patient_ids: if defined, limit result set to given patient list
-
-    NB: research_study_id not used to filter / restrict query set, but rather
-    for lookup of visit name.  Use instrument_ids to restrict query set.
     """
-    from .qb_timeline import qb_status_visit_name  # avoid cycle
-
     if celery_task:
         celery_task.update_state(
             state='PROGRESS',
@@ -872,7 +863,6 @@ def aggregate_responses(
         include_test_role=False,
         filter_by_ids=patient_ids,
     ).with_entities(User.id)
-
 
     if celery_task:
         celery_task.update_state(
