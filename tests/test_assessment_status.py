@@ -1,6 +1,7 @@
 """Module to test assessment_status"""
 
 from datetime import datetime
+import json
 from pytz import timezone, utc
 from random import choice
 from string import ascii_letters
@@ -13,6 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from portal.date_tools import FHIR_datetime, utcnow_sans_micro
 from portal.extensions import db
 from portal.models.encounter import Encounter
+from portal.models.fhir import bundle_header_footer
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization
 from portal.models.overall_status import OverallStatus
@@ -302,6 +304,13 @@ class TestAggregateResponses(TestQuestionnaireSetup):
             qr.qnrs
         assert "non UTC timezone" in str(e.value)
 
+    def test_header_footer(self):
+        h, f = bundle_header_footer()
+        assert h.endswith('entry": [')
+        assert f == ']}'
+        whole = h + f
+        json.loads(whole)
+
     def test_aggregate_response_timepoints(self):
         # generate a few mock qr's from various qb iterations, confirm
         # time points.
@@ -328,7 +337,12 @@ class TestAggregateResponses(TestQuestionnaireSetup):
         # only the latest to the research data cache.  flush and add all
         invalidate_patient_research_data(TEST_USER_ID, research_study_id=0)
         update_single_patient_research_data(TEST_USER_ID)
-        bundle = aggregate_responses(instrument_ids=[instrument_id], current_user=staff)
+        filename = aggregate_responses(
+            instrument_ids=[instrument_id],
+            current_user=staff,
+            bundle_format=True)
+        with open(filename, 'r') as f:
+            bundle = json.load(f)
         expected = {'Baseline', 'Month 3', 'Month 6', 'Month 9'}
         found = [i['timepoint'] for i in bundle['entry']]
         assert set(found) == expected
@@ -366,7 +380,10 @@ class TestAggregateResponses(TestQuestionnaireSetup):
                 Organization.name == 'metastatic').one())
         self.promote_user(staff, role_name=ROLE.STAFF.value)
         staff = db.session.merge(staff)
-        bundle = aggregate_responses(instrument_ids=[instrument_id], current_user=staff)
+        filepath = aggregate_responses(
+            instrument_ids=[instrument_id], current_user=staff, bundle_format=True)
+        with open(filepath, 'r') as f:
+            bundle = json.load(f)
         id1 = db.session.merge(id1)
         assert 1 == len(bundle['entry'])
         assert (1 ==

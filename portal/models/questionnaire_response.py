@@ -1,3 +1,4 @@
+import tempfile
 from collections import defaultdict, namedtuple
 import copy
 from datetime import datetime
@@ -21,7 +22,7 @@ from ..system_uri import (
 )
 from .audit import Audit
 from .encounter import Encounter
-from .fhir import bundle_results
+from .fhir import bundle_header_footer
 from .overall_status import OverallStatus
 from .qbd import QBD
 from .questionnaire import Questionnaire
@@ -843,14 +844,23 @@ class QNR_indef_results(QNR_results):
         return [q.name for q in qb.questionnaires]
 
 
-def aggregate_responses(instrument_ids, current_user, celery_task=None, patient_ids=None):
-    """Build a bundle of QuestionnaireResponses
+def row_by_format(data, bundle_format):
+    if bundle_format:
+        return json.dumps(data)
+
+    return [i for i in generate_qnr_csv({"entry":[data]})]
+
+def aggregate_responses(
+        instrument_ids, current_user, celery_task=None, patient_ids=None, bundle_format=False):
+    """Build a bundle of QuestionnaireResponses in a temporary file
 
     :param instrument_ids: list of instrument_ids to restrict results to
     :param current_user: user making request, necessary to restrict results
         to list of patients the current_user has permission to see
     :param celery_task: if defined, send occasional progress updates
     :param patient_ids: if defined, limit result set to given patient list
+    :param bundle_format: write results as a FHIR bundle when set, default to csv
+    :returns: filepath to temporary file containing aggregated results
     """
     if celery_task:
         celery_task.update_state(
@@ -874,15 +884,41 @@ def aggregate_responses(instrument_ids, current_user, celery_task=None, patient_
         ResearchData.authored.desc(), ResearchData.subject_id).with_entities(
         ResearchData.data)
 
+    total = query.count()
     if instrument_ids:
         query = query.filter(ResearchData.instrument.in_(tuple(instrument_ids)))
-    if celery_task:
-        # the delay is now a single big query, and then bundling - mark near done
-        celery_task.update_state(
-            state='PROGRESS',
-            meta={'current': 70, 'total': 100})
-    elements = [i.data for i in query.all()]
-    return bundle_results(elements=elements)
+
+    suffix = ".csv"
+    header = qnr_csv_column_headers
+    footer = ""
+    if bundle_format:
+        suffix = ".json"
+        header, footer = bundle_header_footer()
+
+    # avoid exhausting memory by writing directly to a file
+    tf = tempfile.NamedTemporaryFile(
+        mode="w",
+        newline="",
+        prefix="qnr-data",
+        suffix=suffix,
+        delete=False)
+    tf.write(str(header) + '\n')
+    rowcount = 0
+    for row in query:
+        if rowcount:
+            tf.write(", ")
+        rowcount += 1
+        tf.write(row_by_format(row.data, bundle_format) + '\n')
+        if celery_task and rowcount % (total // 10) == 0:
+            celery_task.update_state(
+                state='PROGRESS',
+                meta={'current': rowcount//total, 'total': 100})
+
+    tf.write(footer)
+    filepath = tf.name
+    tf.close()
+
+    return filepath
 
 
 def qnr_document_id(
@@ -1045,7 +1081,7 @@ def generate_qnr_csv(qnr_bundle):
         else:
             return 'enter manually - interview assisted'
 
-    def author_role(row_data, qnr_data):
+    def author_role(row_data):
         if row_data.get('truenth_subject_id') == row_data.get('author_id'):
             return 'Subject'
         else:
@@ -1077,7 +1113,7 @@ def generate_qnr_csv(qnr_bundle):
         }
         row_data.update({
             'entry_method': entry_method(row_data, qnr),
-            'author_role': author_role(row_data, qnr),
+            'author_role': author_role(row_data),
         })
         for question in qnr['group']['question']:
             row_data['question_code'] = question['linkId']

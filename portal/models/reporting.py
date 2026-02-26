@@ -496,8 +496,7 @@ def adherence_report(
 
 
 def research_report(
-        instrument_ids, research_study_id, acting_user_id, patch_dstu2,
-        request_url, response_format, lock_key, celery_task):
+        instrument_ids, acting_user_id, request_url, response_format, lock_key, celery_task):
     """Generates the research report
 
     Designed to be executed in a background task - all inputs and outputs are
@@ -505,8 +504,6 @@ def research_report(
 
     :param acting_user_id: id of user evoking request, for permission check
     :param instrument_ids: list of instruments to include
-    :param research_study_id: study id to report on
-    :param patch_dstu2: set to make bundle dstu2 compliant
     :param request_url: original request url, for inclusion in FHIR bundle
     :param response_format: 'json' or 'csv'
     :param lock_key: name of TimeoutLock key used to throttle requests
@@ -519,7 +516,8 @@ def research_report(
 
     # Rather than call current_user.check_role() for every patient
     # in the bundle, delegate that responsibility to aggregate_responses()
-    bundle = aggregate_responses(instrument_ids=instrument_ids, current_user=acting_user, celery_task=celery_task)
+    filepath = aggregate_responses(instrument_ids=instrument_ids, current_user=acting_user, celery_task=celery_task)
+    bundle = {'filepath': filepath}
     bundle.update({
         'link': {
             'rel': 'self',
@@ -529,14 +527,9 @@ def research_report(
 
     results = {
         'lock_key': lock_key,
+        'filepath': filepath,
         'response_format': response_format,
         'required_roles': [ROLE.RESEARCHER.value]}
-    if response_format == 'csv':
-        results['column_headers'] = qnr_csv_column_headers
-        results['data'] = [i for i in generate_qnr_csv(bundle)]
-        results['filename_prefix'] = 'qnr-data'
-    else:
-        results['data'] = bundle
 
     return results
 
