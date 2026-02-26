@@ -517,14 +517,6 @@ def research_report(
     # Rather than call current_user.check_role() for every patient
     # in the bundle, delegate that responsibility to aggregate_responses()
     filepath = aggregate_responses(instrument_ids=instrument_ids, current_user=acting_user, celery_task=celery_task)
-    bundle = {'filepath': filepath}
-    bundle.update({
-        'link': {
-            'rel': 'self',
-            'href': request_url,
-        },
-    })
-
     results = {
         'lock_key': lock_key,
         'filepath': filepath,
