@@ -905,7 +905,7 @@ def aggregate_responses(
     tf.write(str(header) + '\n')
     rowcount = 0
     for row in query:
-        if rowcount:
+        if rowcount and bundle_format:
             tf.write(", ")
         rowcount += 1
         tf.write(row_by_format(row.data, bundle_format) + '\n')
