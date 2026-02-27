@@ -366,7 +366,6 @@
             },
             setCacheExportedDataInfo: function(resultUrl) {
                 if (!resultUrl) return false;
-                if (!this.hasInstrumentsSelection()) return;
                 var o = {
                     ...this.getDefaultExportObj(),
                     url: resultUrl
@@ -395,6 +394,10 @@
                 this.exportHistory = o;
             },
             handleSetExportHistory: function() {
+                const cachedDataInfo = this.getCacheExportedDataInfo();
+                if (cachedDataInfo) {
+                    this.setExportHistory(cachedDataInfo);
+                }
                 const self = this;
                 this.getExportDataInfoFromTask(function(data) {
                     if (data && data.data) {
@@ -407,10 +410,6 @@
                             this.setInProgress(false);
                         }
                         return;
-                    }
-                    const cachedDataInfo = this.getCacheExportedDataInfo();
-                    if (cachedDataInfo) {
-                        this.setExportHistory(cachedDataInfo);
                     }
                 }.bind(this));
             }
