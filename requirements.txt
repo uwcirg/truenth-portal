@@ -125,7 +125,7 @@ jinja2==2.11.3
     #   portal (setup.cfg)
 json-logging==1.3.0
     # via portal (setup.cfg)
-jsonschema==3.0.2
+jsonschema==4.0.1
     # via
     #   portal (setup.cfg)
     #   swagger-spec-validator
