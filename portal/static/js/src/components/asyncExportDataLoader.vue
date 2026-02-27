@@ -199,7 +199,7 @@
                     self.updateProgressDisplay(exportStatus, percent, true);
                     if (self.arrIncompleteStatus.indexOf(exportStatus) === -1) {
                         if (self.isSuccessStatus(exportStatus)) {
-                            var resultUrl = statusUrl.replace("/status", "");
+                            var resultUrl = data && data.filename ? `/research/${data.filename}` : statusUrl.replace("/status", "");
                             self.$emit("doneExport", resultUrl);
                             setTimeout(function() {
                                 window.location.assign(resultUrl);

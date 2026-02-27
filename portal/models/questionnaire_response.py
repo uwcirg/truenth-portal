@@ -1,3 +1,5 @@
+import csv
+import tempfile
 from collections import defaultdict, namedtuple
 import copy
 from datetime import datetime
@@ -21,7 +23,7 @@ from ..system_uri import (
 )
 from .audit import Audit
 from .encounter import Encounter
-from .fhir import bundle_results
+from .fhir import bundle_header_footer
 from .overall_status import OverallStatus
 from .qbd import QBD
 from .questionnaire import Questionnaire
@@ -843,24 +845,25 @@ class QNR_indef_results(QNR_results):
         return [q.name for q in qb.questionnaires]
 
 
+def row_by_format(data, bundle_format):
+    if bundle_format:
+        yield json.dumps(data) + '\n'
+    else:
+        yield from generate_qnr_csv(data)
+
+
 def aggregate_responses(
-        instrument_ids, current_user, research_study_id, patch_dstu2=False,
-        celery_task=None, patient_ids=None):
-    """Build a bundle of QuestionnaireResponses
+        instrument_ids, current_user, celery_task=None, patient_ids=None, bundle_format=False):
+    """Build a bundle of QuestionnaireResponses in a temporary file
 
     :param instrument_ids: list of instrument_ids to restrict results to
     :param current_user: user making request, necessary to restrict results
         to list of patients the current_user has permission to see
-    :param research_study_id: study being processed
-    :param patch_dstu2: set to make bundle DSTU2 compliant
     :param celery_task: if defined, send occasional progress updates
     :param patient_ids: if defined, limit result set to given patient list
-
-    NB: research_study_id not used to filter / restrict query set, but rather
-    for lookup of visit name.  Use instrument_ids to restrict query set.
+    :param bundle_format: write results as a FHIR bundle when set, default to csv
+    :returns: filepath to temporary file containing aggregated results
     """
-    from .qb_timeline import qb_status_visit_name  # avoid cycle
-
     if celery_task:
         celery_task.update_state(
             state='PROGRESS',
@@ -873,7 +876,6 @@ def aggregate_responses(
         filter_by_ids=patient_ids,
     ).with_entities(User.id)
 
-
     if celery_task:
         celery_task.update_state(
             state='PROGRESS',
@@ -884,15 +886,50 @@ def aggregate_responses(
         ResearchData.authored.desc(), ResearchData.subject_id).with_entities(
         ResearchData.data)
 
+    total = query.count()
     if instrument_ids:
         query = query.filter(ResearchData.instrument.in_(tuple(instrument_ids)))
-    if celery_task:
-        # the delay is now a single big query, and then bundling - mark near done
-        celery_task.update_state(
-            state='PROGRESS',
-            meta={'current': 70, 'total': 100})
-    elements = [i.data for i in query.all()]
-    return bundle_results(elements=elements)
+
+    suffix = ".csv"
+    header = qnr_csv_column_headers
+    if bundle_format:
+        suffix = ".json"
+        header, footer = bundle_header_footer()
+
+    # avoid exhausting memory by writing directly to a file
+    tf = tempfile.NamedTemporaryFile(
+        dir=current_app.config['TMP_REPORT_DIR'],
+        mode="w",
+        newline="",
+        prefix="qnr-data",
+        suffix=suffix,
+        delete=False)
+    if bundle_format:
+        writerow = tf.write
+        writerow(str(header) + '\n')
+    else:
+        writer = csv.DictWriter(tf, fieldnames=header)
+        writer.writeheader()
+        writerow = writer.writerow
+
+    rowcount = 0
+    for row in query:
+        if rowcount and bundle_format:
+            writerow(", ")
+        rowcount += 1
+        for item in row_by_format(row.data, bundle_format):
+            writerow(item)
+        if celery_task and rowcount % (total // 10) == 0:
+            celery_task.update_state(
+                state='PROGRESS',
+                meta={'current': rowcount//total, 'total': 100})
+
+    if bundle_format:
+        writerow(footer)
+    filepath = tf.name
+    tf.close()
+
+    return filepath
 
 
 def qnr_document_id(
@@ -990,8 +1027,8 @@ qnr_csv_column_headers = (
 )
 
 
-def generate_qnr_csv(qnr_bundle):
-    """Generate a CSV from a bundle of QuestionnaireResponses"""
+def generate_qnr_csv(qnr):
+    """Generates CSV rows from a QuestionnaireResponse"""
 
     class HTMLStripper(HTMLParser):
         """Subclass of HTMLParser for stripping HTML tags"""
@@ -1055,64 +1092,63 @@ def generate_qnr_csv(qnr_bundle):
         else:
             return 'enter manually - interview assisted'
 
-    def author_role(row_data, qnr_data):
+    def author_role(row_data):
         if row_data.get('truenth_subject_id') == row_data.get('author_id'):
             return 'Subject'
         else:
             return 'Site Resource'
 
-    for qnr in qnr_bundle['entry']:
-        site_id, site_name = get_site(qnr)
-        row_data = {
-            'identifier': (
-                qnr['identifier']['value'] if 'identifier' in qnr else None),
-            'status': qnr['status'],
-            'truenth_subject_id': get_identifier(
-                qnr['subject']['identifier'],
-                use='official'
-            ),
-            'author_id': (
-                qnr['author']['reference'].split('/')[-1]
-                if 'author' in qnr else None),
-            'site_id': site_id,
-            'site_name': site_name,
-            # Todo: correctly pick external study of interest
-            'study_id': get_identifier(
-                qnr['subject']['identifier'],
-                system=TRUENTH_EXTERNAL_STUDY_SYSTEM
-            ),
-            'authored': qnr['authored'],
-            'timepoint': qnr['timepoint'],
-            'instrument': qnr['questionnaire']['reference'].split('/')[-1],
-        }
-        row_data.update({
-            'entry_method': entry_method(row_data, qnr),
-            'author_role': author_role(row_data, qnr),
-        })
-        for question in qnr['group']['question']:
-            row_data['question_code'] = question['linkId']
-            for answer in consolidate_answer_pairs(
-                    question['answer']) or ({},):
+    site_id, site_name = get_site(qnr)
+    row_data = {
+        'identifier': (
+            qnr['identifier']['value'] if 'identifier' in qnr else None),
+        'status': qnr['status'],
+        'truenth_subject_id': get_identifier(
+            qnr['subject']['identifier'],
+            use='official'
+        ),
+        'author_id': (
+            qnr['author']['reference'].split('/')[-1]
+            if 'author' in qnr else None),
+        'site_id': site_id,
+        'site_name': site_name,
+        # Todo: correctly pick external study of interest
+        'study_id': get_identifier(
+            qnr['subject']['identifier'],
+            system=TRUENTH_EXTERNAL_STUDY_SYSTEM
+        ),
+        'authored': qnr['authored'],
+        'timepoint': qnr['timepoint'],
+        'instrument': qnr['questionnaire']['reference'].split('/')[-1],
+    }
+    row_data.update({
+        'entry_method': entry_method(row_data, qnr),
+        'author_role': author_role(row_data),
+    })
+    for question in qnr['group']['question']:
+        row_data['question_code'] = question['linkId']
+        for answer in consolidate_answer_pairs(
+                question['answer']) or ({},):
 
-                # Clear keys potentially added on previous loop
-                row_data.pop('answer_code', None)
-                row_data.pop('option_text', None)
-                row_data.pop('other_text', None)
+            # Clear keys potentially added on previous loop
+            row_data.pop('answer_code', None)
+            row_data.pop('option_text', None)
+            row_data.pop('other_text', None)
 
-                if answer:
-                    # Use first value of answer (most are single-entry dicts)
-                    if list(answer.keys())[0] != 'valueCoding':
-                        row_data['other_text'] = list(answer.values())[0]
+            if answer:
+                # Use first value of answer (most are single-entry dicts)
+                if list(answer.keys())[0] != 'valueCoding':
+                    row_data['other_text'] = list(answer.values())[0]
 
-                    # ...unless nested code (ie valueCode)
-                    else:
-                        row_data['answer_code'] = answer['valueCoding']['code']
+                # ...unless nested code (ie valueCode)
+                else:
+                    row_data['answer_code'] = answer['valueCoding']['code']
 
-                        # Add supplementary text added earlier
-                        # Todo: lookup option text in stored Questionnaire
-                        row_data['option_text'] = strip_tags(
-                            answer['valueCoding'].get('text', None))
-                yield {k: v for k, v in row_data.items() if v is not None}
+                    # Add supplementary text added earlier
+                    # Todo: lookup option text in stored Questionnaire
+                    row_data['option_text'] = strip_tags(
+                        answer['valueCoding'].get('text', None))
+            yield {k: v for k, v in row_data.items() if v is not None}
 
 
 def first_last_like_qnr(qnr):

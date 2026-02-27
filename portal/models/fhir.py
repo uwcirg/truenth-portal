@@ -1,5 +1,6 @@
 """Model classes for retaining FHIR data"""
 from enum import Enum
+import json
 
 from flask import abort, current_app
 
@@ -9,6 +10,21 @@ BundleType = Enum(
     'BundleType',
     'document message transaction transaction-response batch batch-response '
     'history searchset collection')
+
+
+def bundle_header_footer():
+    """For building bundles in a sequential file format, return header/footer
+
+    To write a large bundle to a file without holding all elements in memory,
+    generate a header and footer split on the bundle's entry list, for
+    sequential writes of each entry.
+    """
+    bundle = bundle_results(elements=[])
+    bundle.pop("total")  # unknown in this context; not required
+    split_at = 'entry": ['
+    header, footer = json.dumps(bundle).split(split_at)
+    header += split_at
+    return header, footer
 
 
 def bundle_results(elements, bundle_type=BundleType.searchset, links=None):

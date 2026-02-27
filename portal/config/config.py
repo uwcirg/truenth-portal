@@ -180,6 +180,7 @@ class BaseConfig(object):
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
 
     DEFAULT_LOCALE = 'en_US'
+    TMP_REPORT_DIR = os.environ.get('TMP_REPORT_DIR', '/var/lib/portal/exports')
     FILE_UPLOAD_DIR = os.environ.get('FILE_UPLOAD_DIR', 'uploads')
 
     LR_ORIGIN = os.environ.get('LR_ORIGIN', 'https://cms-stage.us.truenth.org')
