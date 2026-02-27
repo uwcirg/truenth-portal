@@ -2,6 +2,7 @@
 import functools
 from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
+from os import path
 from smtplib import SMTPRecipientsRefused
 
 from flask import current_app
@@ -524,6 +525,7 @@ def research_report(
     results = {
         'lock_key': lock_key,
         'filepath': filepath,
+        'filename': path.basename(filepath),
         'response_format': response_format,
         'required_roles': [ROLE.RESEARCHER.value]}
 

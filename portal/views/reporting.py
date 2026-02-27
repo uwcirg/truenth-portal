@@ -5,10 +5,12 @@ from time import strftime
 
 from flask import (
     Blueprint,
+    current_app,
     jsonify,
     make_response,
     render_template,
     request,
+    send_from_directory,
     url_for,
 )
 from flask_user import roles_required
@@ -331,3 +333,12 @@ def questionnaire_status():
         response = make_response(msg, 502)
         response.mimetype = "text/plain"
         return response
+
+
+@reporting_api.route('/research/<filename>')
+@roles_required([ROLE.ADMIN.value, ROLE.ANALYST.value])
+@oauth.require_oauth()
+def expose_report_download(filename):
+    """Direct access to files generated via research_report_task"""
+    report_dir = current_app.config.get('TMP_REPORT_DIR')
+    return send_from_directory(report_dir, filename, as_attachment=True)
