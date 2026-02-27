@@ -92,7 +92,8 @@
                 mainStudyInstrumentsList:[],
                 subStudyInstrumentsList:[],
                 exportHistory: null,
-                currentTaskUrl: null
+                currentTaskUrl: null.
+                exportHistoryTitle: "Last data export"
             }};
         },
         mixins: [CurrentUser],
@@ -394,7 +395,7 @@
                 const exportHistory = this.getExportHistory();
                 return `
                      <div class="export__history">
-                        <div class="text-muted prompt">${exportHistoryTitle}</div>
+                        <div class="text-muted prompt">${this.exportHistoryTitle}</div>
                         <div>
                             <a href="${exportHistory.url}" target="_blank">
                                 <span>${(exportHistory.instruments || []).join(', ')}</span>
