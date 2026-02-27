@@ -398,7 +398,6 @@
                 const self = this;
                 this.getExportDataInfoFromTask(function(data) {
                     if (data && data.data) {
-                        this.setExportHistory(data.data);
                         const task = this.getCacheTask();
                       //  console.log("current task URL ", self.getFinishedStatusURL(self.currentTaskUrl));
                       //  console.log("cached task URL ", self.getFinishedStatusURL(task.url));
