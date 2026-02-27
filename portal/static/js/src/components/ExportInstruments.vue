@@ -61,7 +61,7 @@
                             v-on:doneExport="handleAfterExport"
                             v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
                         <!-- display link to the last export -->
-                       {{getExportHistoryHTMLSnippet()}}
+                       <div v-html="getExportHistoryHTMLSnippet()"></div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-default btn-emphasis" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
