@@ -337,7 +337,7 @@ sqlalchemy==1.3.24
     #   sqlalchemy-utils
 sqlalchemy-utils==0.41.2
     # via flask-dance
-swagger-spec-validator==2.7.3
+swagger-spec-validator==2.7.6
     # via portal (setup.cfg)
 toml==0.10.2
     # via tox
