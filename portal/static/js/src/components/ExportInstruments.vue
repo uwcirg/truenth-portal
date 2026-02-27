@@ -391,7 +391,7 @@
             },
             getExportHistoryHTMLSnippet: function() {
                 if (!this.hasExportHistory()) return null;
-                const exportHistory = getExportHistory();
+                const exportHistory = this.getExportHistory();
                 return `
                      <div class="export__history">
                         <div class="text-muted prompt">${exportHistoryTitle}</div>
