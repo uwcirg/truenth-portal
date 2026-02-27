@@ -408,9 +408,7 @@
             },
             handleSetExportHistory: function() {
                 const cachedDataInfo = this.getCacheExportedDataInfo();
-                if (cachedDataInfo) {
-                    this.setExportHistory(cachedDataInfo);
-                }
+                this.setExportHistory(cachedDataInfo ? cachedDataInfo : null);
                 if (!this.hasInstrumentsSelection()) return;
                 const self = this;
                 this.getExportDataInfoFromTask(function(data) {
