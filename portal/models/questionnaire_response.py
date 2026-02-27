@@ -898,6 +898,7 @@ def aggregate_responses(
 
     # avoid exhausting memory by writing directly to a file
     tf = tempfile.NamedTemporaryFile(
+        dir=current_app.config['TMP_REPORT_DIR'],
         mode="w",
         newline="",
         prefix="qnr-data",
