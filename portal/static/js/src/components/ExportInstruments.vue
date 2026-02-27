@@ -92,7 +92,7 @@
                 mainStudyInstrumentsList:[],
                 subStudyInstrumentsList:[],
                 exportHistory: null,
-                currentTaskUrl: null.
+                currentTaskUrl: null,
                 exportHistoryTitle: "Last data export"
             }};
         },
