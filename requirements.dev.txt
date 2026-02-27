@@ -158,6 +158,8 @@ idna==3.10
     #   trio
 imagesize==1.4.1
     # via sphinx
+importlib-metadata==8.7.1
+    # via sphinx
 importlib-resources==6.5.2
     # via swagger-spec-validator
 iniconfig==2.1.0
@@ -298,7 +300,7 @@ sortedcontainers==2.4.0
     # via trio
 soupsieve==2.7
     # via beautifulsoup4
-sphinx==3.3.1
+sphinx==4.5.0
     # via
     #   portal (setup.cfg)
     #   sphinx-rtd-theme
@@ -400,7 +402,9 @@ wtforms==2.2.1
 xvfbwrapper==0.2.13
     # via portal (setup.cfg)
 zipp==3.23.0
-    # via importlib-resources
+    # via
+    #   importlib-metadata
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
