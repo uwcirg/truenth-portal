@@ -37,6 +37,7 @@ blinker==1.9.0
     #   flask-webtest
 cachelib==0.13.0
     # via
+    #   flask-caching
     #   flask-oauthlib
     #   flask-session
 celery==5.3.1
@@ -106,7 +107,7 @@ flask==2.0.3
     #   pytest-flask
 flask-babel==1.0.0
     # via portal (setup.cfg)
-flask-caching==1.8.0
+flask-caching==2.3.1
     # via
     #   flask-sqlalchemy-caching
     #   portal (setup.cfg)
