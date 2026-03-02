@@ -1,15 +1,14 @@
 """Portal module"""
 
-import email.parser
 import json_logging
 import logging
 from logging import handlers
 import os
 import sys
+from importlib.metadata import PackageNotFoundError, metadata as _dist_metadata
 
 from flask import Flask
 from healthcheck import HealthCheck
-from pkg_resources import get_distribution
 import redis
 import requests_cache
 from werkzeug.middleware.profiler import ProfilerMiddleware
@@ -310,16 +309,22 @@ def configure_logging(app):  # pragma: no cover
 
 def configure_metadata(app):
     """Add distribution metadata for display in templates"""
-    distribution = get_distribution('portal')
-    metadata_str = distribution.get_metadata(distribution.PKG_INFO)
-    metadata = email.parser.Parser().parsestr(metadata_str)
+    try:
+        metadata = _dist_metadata("portal")
+    except PackageNotFoundError:
+        # Minimal static fallback when package metadata is unavailable
+        from .. import __version__
 
-    # Get git hash from version if present
-    # https://github.com/pypa/setuptools_scm#default-versioning-scheme
-    # Todo: extend Distribution base class instead of monkey patching
-    version = metadata.get('version')
-    if version and '+' in version:
-        metadata['git_hash'] = version.split('+')[-1].split('.')[0][1:]
+        metadata = {
+            "name": "portal",
+            "version": __version__,
+        }
+    else:
+        # Get git hash from version if present
+        # https://github.com/pypa/setuptools_scm#default-versioning-scheme
+        version = metadata.get("version")
+        if version and "+" in version:
+            metadata["git_hash"] = version.split("+")[-1].split(".")[0][1:]
 
     app.config.metadata = metadata
 
