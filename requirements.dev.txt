@@ -126,7 +126,7 @@ flask-recaptcha==0.4.2
     # via portal (setup.cfg)
 flask-session==0.4.1
     # via portal (setup.cfg)
-flask-sqlalchemy==2.4.1
+flask-sqlalchemy==2.5.1
     # via
     #   flask-migrate
     #   flask-sqlalchemy-caching
