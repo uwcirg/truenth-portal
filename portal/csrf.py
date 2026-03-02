@@ -1,7 +1,7 @@
 from builtins import str
 
-from flask import Blueprint, abort, current_app, request
-from flask_wtf.csrf import CSRFProtect
+from flask import Blueprint, abort, current_app, request, session
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 
 from .models.user import current_user
 
@@ -101,6 +101,10 @@ def csrf_protect():
                         request.method, request.path))
                 abort(401, "Local access and OAuth can not be mixed")
             return
+
+    # Ensure a CSRF token exists in the session before protection checks
+    if 'csrf_token' not in session:
+        generate_csrf()
 
     csrf.protect()
     return
