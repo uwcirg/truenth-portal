@@ -901,7 +901,7 @@ def aggregate_responses(
         dir=current_app.config['TMP_REPORT_DIR'],
         mode="w",
         newline="",
-        prefix="qnr-data",
+        prefix=f"qnr-data-{datetime.today().strftime('%Y-%m-%d')}-",
         suffix=suffix,
         delete=False)
     if bundle_format:
