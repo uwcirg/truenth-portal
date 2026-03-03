@@ -3,6 +3,7 @@ from flask import abort, current_app, request, session, url_for
 from flask_user.forms import LoginForm
 from flask_user.translations import lazy_gettext as _
 from flask_user.views import reset_password
+from flask_user import views as flask_user_views
 
 from ..audit import auditable_event
 from ..models.role import ROLE
@@ -89,3 +90,25 @@ class LockoutLoginForm(LoginForm):
             return False
 
         return success
+
+
+# Patch Flask-User's internal _do_login_user helper to be robust against
+# bytes-safe_next values under newer Werkzeug/Flask combinations. Some
+# dependency combinations cause the computed "safe_next" URL to be a
+# bytes object, which later breaks html.escape() inside redirect().
+_original_do_login_user = getattr(flask_user_views, "_do_login_user", None)
+
+
+def _patched_do_login_user(user, safe_next, remember_me=False):
+    if isinstance(safe_next, bytes):
+        safe_next = safe_next.decode("utf-8", errors="ignore")
+    if _original_do_login_user is None:
+        # Fallback: mimic original behavior by redirecting to root.
+        from flask import redirect
+
+        return redirect(safe_next or "/")
+    return _original_do_login_user(user, safe_next, remember_me)
+
+
+if _original_do_login_user is not None:
+    flask_user_views._do_login_user = _patched_do_login_user
