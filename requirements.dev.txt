@@ -190,6 +190,7 @@ markupsafe==3.0.3
     # via
     #   jinja2
     #   mako
+    #   wtforms
 mock==4.0.3
     # via portal (setup.cfg)
 oauthlib==2.1.0
@@ -392,7 +393,7 @@ werkzeug==2.0.3
     #   pytest-flask
 wsproto==1.2.0
     # via trio-websocket
-wtforms==2.2.1
+wtforms==3.0.1
     # via
     #   flask-wtf
     #   portal (setup.cfg)

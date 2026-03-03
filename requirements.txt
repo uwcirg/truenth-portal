@@ -140,6 +140,7 @@ markupsafe==3.0.3
     # via
     #   jinja2
     #   mako
+    #   wtforms
 oauthlib==2.1.0
     # via
     #   flask-dance
@@ -229,7 +230,7 @@ wcwidth==0.2.13
     # via prompt-toolkit
 werkzeug==2.0.3
     # via flask
-wtforms==2.2.1
+wtforms==3.0.1
     # via
     #   flask-wtf
     #   portal (setup.cfg)
