@@ -11,7 +11,6 @@ from flask import (
     url_for,
 )
 from flask_user import roles_required
-from flask_wtf import FlaskForm
 from validators import url as url_validation
 from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
@@ -27,6 +26,7 @@ from wtforms import (
 )
 
 from ..audit import auditable_event
+from ..forms import FlaskForm
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth

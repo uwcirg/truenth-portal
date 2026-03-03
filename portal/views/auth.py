@@ -31,7 +31,6 @@ from flask_user.signals import (
     user_registered,
     user_reset_password,
 )
-from flask_wtf import FlaskForm
 import requests
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
@@ -63,6 +62,7 @@ from ..models.user import (
     get_user,
     unchecked_get_user,
 )
+from ..forms import FlaskForm
 from .crossdomain import crossdomain
 
 auth = Blueprint('auth', __name__)

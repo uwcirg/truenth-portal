@@ -29,7 +29,6 @@ from flask_babel import gettext as _
 from flask_sqlalchemy import get_debug_queries
 from flask_swagger import swagger
 from flask_user import roles_required
-from flask_wtf import FlaskForm
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest
@@ -79,6 +78,7 @@ from ..models.url_token import BadSignature, SignatureExpired, verify_token
 from ..models.user import User, current_user, get_user, unchecked_get_user
 from ..system_uri import SHORTCUT_ALIAS
 from ..timeout_lock import TimeoutLock
+from ..forms import FlaskForm
 from ..trace import dump_trace, establish_trace, trace
 from ..type_tools import check_int
 from .auth import logout, next_after_login
