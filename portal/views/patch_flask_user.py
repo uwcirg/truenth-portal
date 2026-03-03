@@ -22,6 +22,12 @@ def patch_make_safe_url(url):
         returns: '/path1/path2?q1=v1&q2=v2#fragment
 
     """
+    # Flask-User and underlying Werkzeug/Flask expect text URLs. Under some
+    # combinations of dependency versions the value passed here may be bytes;
+    # normalize to str so downstream functions like html.escape() don't fail.
+    if isinstance(url, bytes):
+        url = url.decode("utf-8", errors="ignore")
+
     parts = urlsplit(url)
     no_scheme, no_hostname = '', ''
     safe_url = urlunsplit(
