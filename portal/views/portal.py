@@ -206,10 +206,11 @@ class ShortcutAliasForm(FlaskForm):
     @staticmethod
     def validate_shortcut_alias(field):
         """Custom validation to confirm an alias match"""
-        if len(field.data.strip()):
+        data = (field.data or '').strip()
+        if data:
             try:
                 Identifier.query.filter_by(
-                    system=SHORTCUT_ALIAS, _value=field.data).one()
+                    system=SHORTCUT_ALIAS, _value=data).one()
             except NoResultFound:
                 raise validators.ValidationError("Code not found")
 
