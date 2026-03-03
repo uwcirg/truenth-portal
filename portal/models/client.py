@@ -47,6 +47,19 @@ class Client(db.Model):
             return self.intervention
         return INTERVENTION.DEFAULT
 
+    @intervention_or_default.setter
+    def intervention_or_default(self, value):
+        """Setter required for WTForms 3 FormField.populate_obj
+
+        The application never needs to assign this property directly; it is
+        derived from the underlying `intervention` relationship or the
+        INTERVENTION.DEFAULT sentinel. The setter is defined as a no-op to
+        satisfy WTForms 3, which now unconditionally calls setattr() on
+        FormField targets during populate_obj.
+        """
+        # Intentionally ignore assignments from WTForms populate_obj.
+        return
+
     def __str__(self):
         """print details needed in audit logs"""
         return "Client: {0}, redirects: {1}, callback: {2} {3}".format(
