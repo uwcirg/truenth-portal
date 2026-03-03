@@ -281,4 +281,5 @@ class TestConfig(BaseConfig):
 
     WTF_CSRF_ENABLED = False
     FILE_UPLOAD_DIR = 'test_uploads'
+    TMP_REPORT_DIR = '/tmp'
     SECRET_KEY = 'testing key'
