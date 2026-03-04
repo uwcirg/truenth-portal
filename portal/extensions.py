@@ -39,29 +39,46 @@ if not hasattr(flask_user_signals, "user_password_failed"):
     )
 
 
-class PatchedSQLAlchemyAdapter(SQLAlchemyAdapter):
-    """SQLAlchemy adapter with safer case-insensitive lookup."""
-
-    def ifind_first_object(self, ObjectClass, **kwargs):
-        """Retrieve the first object matching case insensitive filters in 'kwargs'."""
-
-        query = ObjectClass.query
-        for field_name, field_value in kwargs.items():
-            field = getattr(ObjectClass, field_name, None)
-            if field is None:
-                raise KeyError(
-                    "SQLAlchemyAdapter.find_first_object(): Class '%s' has no field '%s'."
-                    % (ObjectClass, field_name)
-                )
-
-            # Add a case INsensitive filter to the query without wildcard semantics
-            query = query.filter(func.lower(field) == func.lower(field_value))
-
-        return query.first()
-
-
-db_adapter = PatchedSQLAlchemyAdapter(db, User)
+db_adapter = SQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter)
+
+
+def _user_manager_find_user_by_email(self, email):
+    """Case-insensitive user lookup by email without wildcard semantics."""
+    if not email:
+        return None, None
+
+    UserModel = getattr(self.db_adapter, "UserClass", User)
+    user = (
+        UserModel.query.filter(
+            func.lower(UserModel.email) == func.lower(email)
+        ).first()
+    )
+    return user, None
+
+
+def _user_manager_find_user_by_username(self, username):
+    """Case-insensitive user lookup by username without wildcard semantics."""
+    if not username:
+        return None
+
+    UserModel = getattr(self.db_adapter, "UserClass", User)
+    user = (
+        UserModel.query.filter(
+            func.lower(UserModel.username) == func.lower(username)
+        ).first()
+    )
+    return user
+
+
+# Bind the patched lookup methods onto the user_manager instance so Flask-User
+# uses them wherever it calls find_user_by_email/username.
+user_manager.find_user_by_email = _user_manager_find_user_by_email.__get__(
+    user_manager, type(user_manager)
+)
+user_manager.find_user_by_username = _user_manager_find_user_by_username.__get__(
+    user_manager, type(user_manager)
+)
 
 
 class OAuthOrAlternateAuth(OAuth2Provider):
