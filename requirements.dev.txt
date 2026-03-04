@@ -386,7 +386,7 @@ websocket-client==1.8.0
     # via selenium
 webtest==3.0.6
     # via flask-webtest
-werkzeug==2.0.3
+werkzeug==3.1.6
     # via
     #   flask
     #   pytest-flask
