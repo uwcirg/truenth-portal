@@ -33,6 +33,7 @@ billiard==4.2.1
     # via celery
 blinker==1.9.0
     # via
+    #   flask
     #   flask-mail
     #   flask-webtest
 cachelib==0.13.0
@@ -85,7 +86,7 @@ filelock==3.18.0
     # via
     #   tox
     #   virtualenv
-flask==2.0.3
+flask==2.3.3
     # via
     #   flask-babel
     #   flask-caching
@@ -125,7 +126,7 @@ flask-oauthlib==0.9.6
     # via portal (setup.cfg)
 flask-recaptcha==0.4.2
     # via portal (setup.cfg)
-flask-session==0.4.1
+flask-session==0.5.0
     # via portal (setup.cfg)
 flask-sqlalchemy==2.5.1
     # via
@@ -160,7 +161,9 @@ idna==3.10
 imagesize==1.4.1
     # via sphinx
 importlib-metadata==8.7.1
-    # via sphinx
+    # via
+    #   flask
+    #   sphinx
 importlib-resources==6.5.2
     # via swagger-spec-validator
 iniconfig==2.1.0
@@ -169,7 +172,7 @@ itsdangerous==2.2.0
     # via
     #   flask
     #   flask-wtf
-jinja2==3.0.3
+jinja2==3.1.6
     # via
     #   flask
     #   flask-babel
@@ -190,6 +193,7 @@ markupsafe==3.0.3
     # via
     #   jinja2
     #   mako
+    #   werkzeug
 mock==4.0.3
     # via portal (setup.cfg)
 oauthlib==2.1.0
@@ -386,7 +390,7 @@ websocket-client==1.8.0
     # via selenium
 webtest==3.0.6
     # via flask-webtest
-werkzeug==2.0.3
+werkzeug==3.1.6
     # via
     #   flask
     #   pytest-flask
