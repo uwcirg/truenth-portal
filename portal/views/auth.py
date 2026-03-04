@@ -11,6 +11,7 @@ from flask import (
     abort,
     current_app,
     flash,
+    g,
     jsonify,
     redirect,
     render_template,
@@ -459,7 +460,12 @@ def flask_user_password_failed_event(app, user, **extra):
 
     If this happens too often, for security reasons,
     the user will be locked out of the system.
+    Only count once per request so duplicate signal sends do not double-count.
     """
+    key = '_password_failed_counted_user_id'
+    if getattr(g, key, None) == user.id:
+        return
+    setattr(g, key, user.id)
     count = user.add_password_verification_failure()
     auditable_event(
         'local user failed password verification. Count "{}"'.format(
