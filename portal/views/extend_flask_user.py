@@ -1,5 +1,5 @@
 """Module to extend or specialize flask user views for our needs"""
-from flask import abort, current_app, request, session, url_for
+from flask import abort, current_app, g, request, session, url_for
 from flask_user import signals
 from flask_user.forms import LoginForm
 from flask_user.translations import lazy_gettext as _
@@ -65,11 +65,16 @@ class LockoutLoginForm(LoginForm):
 
         # If a user exists and password verification failed, emit a signal so
         # downstream logic can track failures (for lockout, auditing, etc.).
+        # Guard: only send once per request so we don't double-count if
+        # validate() is invoked more than once (e.g. lockout branch re-validates).
         if user and user_manager.get_password(user):
             if not user_manager.verify_password(self.password.data, user):
-                signals.user_password_failed.send(
-                    current_app._get_current_object(), user=user
-                )
+                sent = getattr(g, '_user_password_failed_sent', False)
+                if not sent:
+                    signals.user_password_failed.send(
+                        current_app._get_current_object(), user=user
+                    )
+                    g._user_password_failed_sent = True
 
         # If the user is locked out display a message under the password field
         if user and user.is_locked_out:
