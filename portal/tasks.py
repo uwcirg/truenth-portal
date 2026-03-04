@@ -142,7 +142,8 @@ def cache_research_data_task(**kwargs):
 @celery.task(bind=True, track_started=True, queue=LOW_PRIORITY)
 def research_report_task(self, **kwargs):
     current_app.logger.debug("launch research report task: %s", self.request.id)
-    kwargs['celery_task'] = self
+    if 'celery_task' not in kwargs:
+        kwargs['celery_task'] = self
     return research_report(**kwargs)
 
 

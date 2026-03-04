@@ -32,6 +32,9 @@ services:
       - source: tmp-persistence-data
         target: ${PERSISTENCE_EXCLUSIONS_DIR:-/var/tmp/exclusions}
         type: volume
+      - source: tmp-report-data
+        target: ${TMP_REPORT_DIR:-/var/lib/portal/exports}
+        type: volume
 
   celeryworker:
     <<: *service_base
@@ -57,6 +60,10 @@ services:
       '
     depends_on:
       - redis
+    volumes:
+      - source: tmp-report-data
+        target: ${TMP_REPORT_DIR:-/var/lib/portal/exports}
+        type: volume
 
   celerybeat:
     <<: *service_base
@@ -95,3 +102,4 @@ volumes:
     postgres-data: {}
     user-documents: {}
     tmp-persistence-data: {}
+    tmp-report-data: {}

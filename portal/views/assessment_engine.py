@@ -774,9 +774,9 @@ def get_assessments():
           - json
           - csv
         default: json
-      - name: patch_dstu2
+      - name: test_in_foreground
         in: query
-        description: whether or not to make bundles DTSU2 compliant
+        description: set to run as test in foreground
         required: false
         type: boolean
         default: false
@@ -849,30 +849,20 @@ def get_assessments():
     """
     from ..tasks import research_report_task
 
-    research_studies = set()
-    questionnaire_list = request.args.getlist('instrument_id')
-    for q in questionnaire_list:
-        research_studies.add(research_study_id_from_questionnaire(q))
-    if len(research_studies) != 1:
-        abort(
-            400,
-            f"Requested instruments ({questionnaire_list}) span multiple "
-            "research studies")
-    research_study_id = research_studies.pop()
-    if research_study_id is None:
-        research_study_id = 0
-
     # This frequently takes over a minute to produce.  Generate a serializable
     # form of all args for reliable hand off to a background task.
     kwargs = {
-        'instrument_ids': questionnaire_list,
-        'research_study_id': research_study_id,
+        'instrument_ids': request.args.getlist('instrument_id'),
         'acting_user_id': current_user().id,
-        'patch_dstu2': request.args.get('patch_dstu2'),
         'request_url': request.url,
         'lock_key': "research_report_task_lock",
         'response_format': request.args.get('format', 'json').lower()
     }
+
+    if request.args.get('test_in_foreground', False):
+        kwargs['celery_task'] = None
+        results = research_report_task(**kwargs)
+        return jsonify(results)
 
     try:
         # Hand the task off to the job queue, and return 202 with URL for

@@ -61,15 +61,7 @@
                             v-on:doneExport="handleAfterExport"
                             v-on:initExportCustomEvent="initExportEvent"></ExportDataLoader>
                         <!-- display link to the last export -->
-                        <div class="export__history" v-if="hasExportHistory()">
-                            <div class="text-muted prompt" v-text="exportHistoryTitle"></div>
-                            <div v-if="exportHistory">
-                                <a :href="exportHistory.url" target="_blank">
-                                    <span v-text="(exportHistory.instruments || []).join(', ')"></span>
-                                    <span v-text="exportHistory.date"></span>
-                                </a>
-                            </div>
-                        </div>
+                       <div v-html="getExportHistoryHTMLSnippet()"></div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-default btn-emphasis" id="patientsDownloadButton" :disabled="!hasInstrumentsSelection()" v-text="exportLabel"></button>
@@ -100,7 +92,8 @@
                 mainStudyInstrumentsList:[],
                 subStudyInstrumentsList:[],
                 exportHistory: null,
-                currentTaskUrl: null
+                currentTaskUrl: null,
+                exportHistoryTitle: "Last data export"
             }};
         },
         mixins: [CurrentUser],
@@ -366,7 +359,6 @@
             },
             setCacheExportedDataInfo: function(resultUrl) {
                 if (!resultUrl) return false;
-                if (!this.hasInstrumentsSelection()) return;
                 var o = {
                     ...this.getDefaultExportObj(),
                     url: resultUrl
@@ -388,17 +380,39 @@
                 }
                 return resultJSON;
             },
+            getExportHistory: function() {
+                if (this.exportHistory) return this.exportHistory;
+                return this.getCacheExportedDataInfo();
+            },
             hasExportHistory: function() {
-                return this.exportHistory || this.getCacheExportedDataInfo();
+                return !!this.getExportHistory();
             },
             setExportHistory: function(o) {
                 this.exportHistory = o;
             },
+            getExportHistoryHTMLSnippet: function() {
+                if (!this.hasExportHistory()) return null;
+                const exportHistory = this.getExportHistory();
+                return `
+                     <div class="export__history">
+                        <div class="text-muted prompt">${this.exportHistoryTitle}</div>
+                        <div>
+                            <a href="${exportHistory.url}" target="_blank">
+                                <span>${(exportHistory.instruments || []).join(', ')}</span>
+                                <span>${exportHistory.date}</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+            },
             handleSetExportHistory: function() {
+                const cachedDataInfo = this.getCacheExportedDataInfo();
+                this.setExportHistory(cachedDataInfo ? cachedDataInfo : null);
+                if (!this.hasInstrumentsSelection()) return;
                 const self = this;
                 this.getExportDataInfoFromTask(function(data) {
                     if (data && data.data) {
-                        this.setExportHistory(data.data);
                         const task = this.getCacheTask();
                       //  console.log("current task URL ", self.getFinishedStatusURL(self.currentTaskUrl));
                       //  console.log("cached task URL ", self.getFinishedStatusURL(task.url));
@@ -408,10 +422,6 @@
                             this.setInProgress(false);
                         }
                         return;
-                    }
-                    const cachedDataInfo = this.getCacheExportedDataInfo();
-                    if (cachedDataInfo) {
-                        this.setExportHistory(cachedDataInfo);
                     }
                 }.bind(this));
             }
