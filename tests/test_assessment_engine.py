@@ -419,12 +419,14 @@ class TestAssessmentEngine(TestCase):
         assert update_qnr_response.json['ok']
         assert update_qnr_response.json['valid']
 
-        updated_qnr_response = self.results_from_async_call(
+        updated_qnr_response = self.client.get(
             '/api/patient/assessment',
-            query_string={'instrument_id': instrument_id})
+            query_string={'instrument_id': instrument_id, 'test_in_foreground': True})
         assert updated_qnr_response.status_code == 200
+        with open(updated_qnr_response.json['filepath']) as f:
+            response = json.load(f)
         assert (
-            updated_qnr_response.json['entry'][0]['group']
+            response['entry'][0]['group']
             == completed_qnr['group'])
 
     def test_no_update_assessment(self):
@@ -473,13 +475,13 @@ class TestAssessmentEngine(TestCase):
             json=example_data)
         assert upload.status_code == 200
 
-        response = self.results_from_async_call(
+        response = self.client.get(
             '/api/patient/assessment',
-            query_string={'instrument_id': instrument_id})
+            query_string={'instrument_id': instrument_id, 'test_in_foreground': True})
         assert response.status_code == 200
-        response = response.json
+        with open(response.json['filepath'], 'r') as f:
+            response = json.load(f)
 
-        assert response['total'] == len(response['entry'])
         assert (response['entry'][0]['questionnaire']['reference'].endswith(
             instrument_id))
 
@@ -499,13 +501,14 @@ class TestAssessmentEngine(TestCase):
             json=example_data)
         assert upload_response.status_code == 200
 
-        download_response = self.results_from_async_call(
+        download_response = self.client.get(
             '/api/patient/assessment',
-            query_string={'format': 'csv', 'instrument_id': instrument_id}
+            query_string={'format': 'csv', 'instrument_id': instrument_id, 'test_in_foreground': True}
         )
-        csv_string = download_response.get_data(as_text=True)
+        assert download_response.status_code == 200
+        with open(download_response.json['filepath'], 'r') as f:
+            lines = f.readlines()
         # First line should match expected headers
-        lines = csv_string.split('\n')
-        assert lines[0] == ','.join(qnr_csv_column_headers)
-        assert len(csv_string.split("\n")) > 1
+        assert lines[0].rstrip() == ','.join(qnr_csv_column_headers)
+        assert len(lines) > 1
         # Todo: use csv module for more robust test

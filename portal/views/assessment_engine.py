@@ -774,9 +774,9 @@ def get_assessments():
           - json
           - csv
         default: json
-      - name: patch_dstu2
+      - name: test_in_foreground
         in: query
-        description: whether or not to make bundles DTSU2 compliant
+        description: set to run as test in foreground
         required: false
         type: boolean
         default: false
@@ -858,6 +858,11 @@ def get_assessments():
         'lock_key': "research_report_task_lock",
         'response_format': request.args.get('format', 'json').lower()
     }
+
+    if request.args.get('test_in_foreground', False):
+        kwargs['celery_task'] = None
+        results = research_report_task(**kwargs)
+        return jsonify(results)
 
     try:
         # Hand the task off to the job queue, and return 202 with URL for
