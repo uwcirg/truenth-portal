@@ -22,6 +22,8 @@ from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
 from flask_recaptcha import ReCaptcha
 from flask_user import SQLAlchemyAdapter, UserManager
+from flask_user import signals as flask_user_signals
+from sqlalchemy import func
 
 from .csrf import csrf
 from .database import db
@@ -29,7 +31,36 @@ from .models.login import login_user
 from .models.user import User, current_user
 from .session import RedisSameSiteSession as Session
 
-db_adapter = SQLAlchemyAdapter(db, User)
+# Ensure Flask-User exposes a 'user_password_failed' signal even if the
+# installed version does not define it yet.
+if not hasattr(flask_user_signals, "user_password_failed"):
+    flask_user_signals.user_password_failed = (
+        flask_user_signals._signals.signal("user.password_failed")
+    )
+
+
+class PatchedSQLAlchemyAdapter(SQLAlchemyAdapter):
+    """SQLAlchemy adapter with safer case-insensitive lookup."""
+
+    def ifind_first_object(self, ObjectClass, **kwargs):
+        """Retrieve the first object matching case insensitive filters in 'kwargs'."""
+
+        query = ObjectClass.query
+        for field_name, field_value in kwargs.items():
+            field = getattr(ObjectClass, field_name, None)
+            if field is None:
+                raise KeyError(
+                    "SQLAlchemyAdapter.find_first_object(): Class '%s' has no field '%s'."
+                    % (ObjectClass, field_name)
+                )
+
+            # Add a case INsensitive filter to the query without wildcard semantics
+            query = query.filter(func.lower(field) == func.lower(field_value))
+
+        return query.first()
+
+
+db_adapter = PatchedSQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter)
 
 
