@@ -56,7 +56,7 @@ dnspython==2.7.0
 dogpile-cache==0.9.0
     # via portal (setup.cfg)
 email-validator==2.3.0
-    # via wtforms
+    # via flask-wtf
 flask==2.0.3
     # via
     #   flask-babel
@@ -108,7 +108,7 @@ flask-swagger==0.2.14
     # via portal (setup.cfg)
 flask-user @ git+https://github.com/uwcirg/Flask-User.git@0.6.21.2
     # via portal (setup.cfg)
-flask-wtf==1.2.2
+flask-wtf[email]==1.2.2
     # via
     #   flask-user
     #   portal (setup.cfg)
@@ -236,10 +236,8 @@ wcwidth==0.2.13
     # via prompt-toolkit
 werkzeug==2.0.3
     # via flask
-wtforms[email]==3.0.1
-    # via
-    #   flask-wtf
-    #   portal (setup.cfg)
+wtforms==3.0.1
+    # via flask-wtf
 zipp==3.23.0
     # via importlib-resources
 
