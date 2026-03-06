@@ -889,6 +889,9 @@ def aggregate_responses(
     total = query.count()
     if instrument_ids:
         query = query.filter(ResearchData.instrument.in_(tuple(instrument_ids)))
+        instrument_label = '-'.join(instrument_ids)
+    else:
+        instrument_label = ""
 
     suffix = ".csv"
     header = qnr_csv_column_headers
@@ -901,7 +904,7 @@ def aggregate_responses(
         dir=current_app.config['TMP_REPORT_DIR'],
         mode="w",
         newline="",
-        prefix=f"qnr-data-{datetime.today().strftime('%Y-%m-%d')}-",
+        prefix=f"qnr-data-{instrument_label}-{datetime.today().strftime('%Y-%m-%d')}-",
         suffix=suffix,
         delete=False)
     if bundle_format:
