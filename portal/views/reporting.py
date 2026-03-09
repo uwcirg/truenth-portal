@@ -336,7 +336,7 @@ def questionnaire_status():
 
 
 @reporting_api.route('/research/<filename>')
-@roles_required([ROLE.ADMIN.value, ROLE.ANALYST.value])
+@roles_required([ROLE.ADMIN.value, ROLE.RESEARCHER.value])
 @oauth.require_oauth()
 def expose_report_download(filename):
     """Direct access to files generated via research_report_task"""
