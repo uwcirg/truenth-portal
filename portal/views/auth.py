@@ -459,13 +459,7 @@ def flask_user_password_failed_event(app, user, **extra):
 
     If this happens too often, for security reasons,
     the user will be locked out of the system.
-    Only count once per request so duplicate signal sends do not double-count.
-    Use request.environ (not g) so the flag is cleared between requests.
     """
-    key = '_portal_password_failed_counted_user_id'
-    if request.environ.get(key) == user.id:
-        return
-    request.environ[key] = user.id
     count = user.add_password_verification_failure()
     auditable_event(
         'local user failed password verification. Count "{}"'.format(
