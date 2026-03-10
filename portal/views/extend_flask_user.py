@@ -1,5 +1,6 @@
 """Module to extend or specialize flask user views for our needs"""
 from flask import abort, current_app, request, session, url_for
+from flask_user import signals
 from flask_user.forms import LoginForm
 from flask_user.translations import lazy_gettext as _
 from flask_user.views import reset_password
@@ -61,6 +62,18 @@ class LockoutLoginForm(LoginForm):
         # Find user by email address (email field)
         user_manager = current_app.user_manager
         user = user_manager.find_user_by_email(self.email.data)[0]
+
+        # If a user exists and password verification failed, record and signal it.
+        if user and user_manager.get_password(user):
+            if not user_manager.verify_password(self.password.data, user):
+                count = user.add_password_verification_failure()
+                signals.user_password_failed.send(
+                    current_app._get_current_object(), user=user
+                )
+                current_app.logger.debug(
+                    "LockoutLoginForm: password verification failed "
+                    "for user %s, count=%s", user.id, count
+                )
 
         # If the user is locked out display a message under the password field
         if user and user.is_locked_out:
