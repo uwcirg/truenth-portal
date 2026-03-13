@@ -23,14 +23,7 @@ from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.google import make_google_blueprint
 from flask_login import logout_user
-from flask_user import roles_required
-from flask_user.signals import (
-    user_changed_password,
-    user_logged_in,
-    user_password_failed,
-    user_registered,
-    user_reset_password,
-)
+from flask_user import roles_required, signals as flask_user_signals
 from flask_wtf import FlaskForm
 import requests
 from sqlalchemy import func
@@ -490,11 +483,11 @@ def flask_user_changed_password(app, user, **extra):
 
 
 # Register functions to receive signals from flask_user
-user_changed_password.connect(flask_user_changed_password)
-user_logged_in.connect(flask_user_login_event)
-user_password_failed.connect(flask_user_password_failed_event)
-user_registered.connect(flask_user_registered_event)
-user_reset_password.connect(flask_user_changed_password)
+flask_user_signals.user_changed_password.connect(flask_user_changed_password)
+flask_user_signals.user_logged_in.connect(flask_user_login_event)
+flask_user_signals.user_password_failed.connect(flask_user_password_failed_event)
+flask_user_signals.user_registered.connect(flask_user_registered_event)
+flask_user_signals.user_reset_password.connect(flask_user_changed_password)
 
 
 def capture_next_view_function(real_function):
