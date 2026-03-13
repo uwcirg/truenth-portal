@@ -1,5 +1,6 @@
 """Module to extend or specialize flask user views for our needs"""
 from flask import abort, current_app, request, session, url_for
+from flask_user import signals
 from flask_user.forms import LoginForm
 from flask_user.translations import lazy_gettext as _
 from flask_user.views import reset_password
@@ -62,27 +63,37 @@ class LockoutLoginForm(LoginForm):
         user_manager = current_app.user_manager
         user = user_manager.find_user_by_email(self.email.data)[0]
 
-        # If the user is locked out display a message
-        # under the password field
+        # If a user exists and password verification failed, record and signal it.
+        if user and user_manager.get_password(user):
+            if not user_manager.verify_password(self.password.data, user):
+                count = user.add_password_verification_failure()
+                signals.user_password_failed.send(
+                    current_app._get_current_object(), user=user
+                )
+                current_app.logger.debug(
+                    "LockoutLoginForm: password verification failed "
+                    "for user %s, count=%s", user.id, count
+                )
+
+        # If the user is locked out display a message under the password field
         if user and user.is_locked_out:
-            # Make sure validators are run so we
-            # can populate self.password.errors
+            # Make sure validators are run so we can populate self.password.errors
             super(LoginForm, self).validate()
 
             auditable_event(
-                'local user attempted to login after being locked out',
+                "local user attempted to login after being locked out",
                 user_id=user.id,
                 subject_id=user.id,
-                context='login'
+                context="login",
             )
 
             error_message = _(
-                'We see you\'re having trouble - let us help. \
-                Your account will now be locked while we give it a refresh. \
-                Please try again in %(time)d minutes. \
-                If you\'re still having issues, please click \
-                "Having trouble logging in?" below.',
-                time=user.lockout_period_minutes
+                "We see you're having trouble - let us help. "
+                "Your account will now be locked while we give it a refresh. "
+                "Please try again in %(time)d minutes. "
+                'If you\'re still having issues, please click '
+                '"Having trouble logging in?" below.',
+                time=user.lockout_period_minutes,
             )
             self.password.errors.append(error_message)
 

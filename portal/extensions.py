@@ -22,6 +22,8 @@ from flask_mail import Mail
 from flask_oauthlib.provider import OAuth2Provider
 from flask_recaptcha import ReCaptcha
 from flask_user import SQLAlchemyAdapter, UserManager
+from flask_user import signals as flask_user_signals
+from sqlalchemy import func
 
 from .csrf import csrf
 from .database import db
@@ -29,8 +31,42 @@ from .models.login import login_user
 from .models.user import User, current_user
 from .session import RedisSameSiteSession as Session
 
+class PortalUserManager(UserManager):
+    """UserManager with safer case-insensitive user lookups."""
+
+    def find_user_by_email(self, email):
+        """Case-insensitive user lookup by email without wildcard semantics."""
+        if not email:
+            return None, None
+
+        UserModel = getattr(self.db_adapter, "UserClass", User)
+        user = UserModel.query.filter(
+            func.lower(UserModel.email) == func.lower(email)
+        ).first()
+        return user, None
+
+    def find_user_by_username(self, username):
+        """Case-insensitive user lookup by username without wildcard semantics."""
+        if not username:
+            return None
+
+        UserModel = getattr(self.db_adapter, "UserClass", User)
+        user = UserModel.query.filter(
+            func.lower(UserModel.username) == func.lower(username)
+        ).first()
+        return user
+
+
+# Ensure Flask-User exposes a 'user_password_failed' signal even if the
+# installed version does not define it yet.
+if not hasattr(flask_user_signals, "user_password_failed"):
+    flask_user_signals.user_password_failed = (
+        flask_user_signals._signals.signal("user.password_failed")
+    )
+
+
 db_adapter = SQLAlchemyAdapter(db, User)
-user_manager = UserManager(db_adapter)
+user_manager = PortalUserManager(db_adapter)
 
 
 class OAuthOrAlternateAuth(OAuth2Provider):

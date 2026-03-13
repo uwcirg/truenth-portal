@@ -38,6 +38,16 @@ class TestPathFlaskUser(TestCase):
         index = url.find('/search')
         assert url[index:] == safe_url
 
+    def test_user_manager_find_user_by_email_exact(self):
+        """Ensure exact email lookups return the correct user."""
+        added_user = self.add_user(
+            username='foo', email='user0@example.com'
+        )
+        user_manager = current_app.user_manager
+        found_user = user_manager.find_user_by_email(added_user.email)[0]
+        assert found_user is not None
+        assert found_user.id == added_user.id
+
     def test_user_manager_find_user_wildcards_not_respected(self):
         # At the time of writing this test flask-user looked up
         # users using the LIKE clause which treats certain characters
@@ -58,3 +68,20 @@ class TestPathFlaskUser(TestCase):
         user = user_manager.find_user_by_email('crazycasing@example.com')[0]
         assert user is not None
         assert user.id == added_user.id
+
+    def test_user_manager_find_user_by_username_exact(self):
+        """Ensure exact username lookups return the correct user."""
+        added_user = self.add_user(
+            username='user0', email='user0@example.com'
+        )
+        user_manager = current_app.user_manager
+        found_user = user_manager.find_user_by_username(added_user.username)
+        assert found_user is not None
+        assert found_user.id == added_user.id
+
+    def test_user_manager_find_user_by_username_wildcards_not_respected(self):
+        """Ensure username lookups do not treat '_' as a wildcard."""
+        self.add_user(username='user0', email='user0@example.com')
+        user_manager = current_app.user_manager
+        found_user = user_manager.find_user_by_username('user_')
+        assert found_user is None
