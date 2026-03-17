@@ -485,7 +485,7 @@ def patient_timeline(patient_id):
     }
     qnr_responses = bundle_from_aggregate_responses(**agg_args)
 
-    if qnr_responses['total'] == 0:
+    if len(qnr_responses.get('entry', [])) == 0:
         from ..models.research_data import update_single_patient_research_data
         update_single_patient_research_data(patient_id)
         qnr_responses = bundle_from_aggregate_responses(**agg_args)
