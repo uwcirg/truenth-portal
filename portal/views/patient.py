@@ -330,7 +330,7 @@ def patient_timeline(patient_id):
     from ..models.qbd import QBD
     from ..models.qb_status import QB_Status
     from ..models.questionnaire_bank import translate_visit_name, visit_name
-    from ..models.questionnaire_response import aggregate_responses
+    from ..models.questionnaire_response import bundle_from_aggregate_responses
     from ..models.research_protocol import ResearchProtocol
     from ..tasks import cache_single_patient_adherence_data
     from ..trace import dump_trace, establish_trace
@@ -483,12 +483,12 @@ def patient_timeline(patient_id):
         'current_user': current_user(),
         'patient_ids': [patient_id],
     }
-    qnr_responses = aggregate_responses(**agg_args)
+    qnr_responses = bundle_from_aggregate_responses(**agg_args)
 
     if qnr_responses['total'] == 0:
         from ..models.research_data import update_single_patient_research_data
         update_single_patient_research_data(patient_id)
-        qnr_responses = aggregate_responses(**agg_args)
+        qnr_responses = bundle_from_aggregate_responses(**agg_args)
 
     # filter qnr data to a manageable result data set
     qnr_data = []
