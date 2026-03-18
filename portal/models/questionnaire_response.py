@@ -852,6 +852,14 @@ def row_by_format(data, bundle_format):
         yield from generate_qnr_csv(data)
 
 
+def bundle_from_aggregate_responses(**kwargs):
+    kwargs.update({'bundle_format': True})
+    filename = aggregate_responses(**kwargs)
+    with open(filename, 'r') as fh:
+        bundle = json.load(fh)
+    return bundle
+
+
 def aggregate_responses(
         instrument_ids, current_user, celery_task=None, patient_ids=None, bundle_format=False):
     """Build a bundle of QuestionnaireResponses in a temporary file
