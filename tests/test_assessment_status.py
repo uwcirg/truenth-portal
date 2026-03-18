@@ -28,7 +28,7 @@ from portal.models.questionnaire_bank import (
 from portal.models.questionnaire_response import (
     QNR_results,
     QuestionnaireResponse,
-    aggregate_responses,
+    bundle_from_aggregate_responses,
     qnr_document_id,
 )
 from portal.models.recur import Recur
@@ -337,12 +337,10 @@ class TestAggregateResponses(TestQuestionnaireSetup):
         # only the latest to the research data cache.  flush and add all
         invalidate_patient_research_data(TEST_USER_ID, research_study_id=0)
         update_single_patient_research_data(TEST_USER_ID)
-        filename = aggregate_responses(
+        bundle = bundle_from_aggregate_responses(
             instrument_ids=[instrument_id],
             current_user=staff,
             bundle_format=True)
-        with open(filename, 'r') as f:
-            bundle = json.load(f)
         expected = {'Baseline', 'Month 3', 'Month 6', 'Month 9'}
         found = [i['timepoint'] for i in bundle['entry']]
         assert set(found) == expected
@@ -380,10 +378,8 @@ class TestAggregateResponses(TestQuestionnaireSetup):
                 Organization.name == 'metastatic').one())
         self.promote_user(staff, role_name=ROLE.STAFF.value)
         staff = db.session.merge(staff)
-        filepath = aggregate_responses(
+        bundle = bundle_from_aggregate_responses(
             instrument_ids=[instrument_id], current_user=staff, bundle_format=True)
-        with open(filepath, 'r') as f:
-            bundle = json.load(f)
         id1 = db.session.merge(id1)
         assert 1 == len(bundle['entry'])
         assert (1 ==
