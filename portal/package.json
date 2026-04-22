@@ -14,7 +14,7 @@
   },
   "license": "BSD-Source-Code",
   "dependencies": {
-    "i18next-http-backend": "^3.0.2",
+    "i18next-http-backend": "^3.0.5",
     "vue-router": "^3.6.5",
     "whatwg-fetch": "^3.6.20"
   },
