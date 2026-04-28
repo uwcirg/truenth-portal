@@ -362,7 +362,6 @@
                 var o = {
                     ...this.getDefaultExportObj(),
                     url: resultUrl,
-                    timestamp: Date.now()
                 };
                 localStorage.setItem(this.getCacheExportedDataInfoKey(), JSON.stringify(o));
                 this.setExportHistory(o);
@@ -379,18 +378,16 @@
                     console.log("Unable to parse cached data export info ", e);
                     resultJSON = null;
                 }
-                if (resultJSON) {
-                    const timestamp = resultJSON.timestamp;
-                    if (timestamp) {
-                        const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000; // 1 day is 24 hours x 60 minutes x 60 seconds x 1000 miliseconds
-                        const isFiveDaysOld = (Date.now() - timestamp) >= fiveDaysInMs;
-                        if (isFiveDaysOld) {
-                            return null;
-                        }
-                        return resultJSON;
-                    } else {
-                        return resultJSON;
+                const timestamp = resultJSON.date ? new Date(resultJSON.date) : null;
+                if (timestamp && !isNaN(timestamp)) {  // guard against Invalid Date
+                    const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000;
+                    const isFiveDaysOld = (Date.now() - timestamp) >= fiveDaysInMs;
+                    if (isFiveDaysOld) {
+                        return null;
                     }
+                    return resultJSON;
+                } else {
+                    return resultJSON;
                 }
                 return null;
             },
