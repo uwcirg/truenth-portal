@@ -2546,7 +2546,7 @@
     {
       "extension": [
         {
-          "timezone": "America/New_York",
+          "timezone": "America/Chicago",
           "url": "http://hl7.org/fhir/StructureDefinition/user-timezone"
         },
         {
