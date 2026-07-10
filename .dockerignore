@@ -41,7 +41,6 @@ portal/static/css/*.css
 # nodeJS virtual environment and files
 node_env/
 portal/node_modules/
-portal/package-lock.json
 
 # auto-generated JS eslint config when linting JS files (via command eslint) at development
 portal/static/js/.eslintrc.js
