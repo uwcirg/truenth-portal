@@ -6986,7 +6986,1348 @@
           "value": "physactivity"
         }
       ],
-      "resourceType": "Questionnaire"
+      "status": "draft",
+      "resourceType": "Questionnaire",
+      "item": [
+        {
+          "type": "choice",
+          "linkId": "physactivity.1",
+          "text": "What is your usual walking pace outdoors?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Unable to walk",
+                "code": "physactivity.1.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Easy, casual (less than 2 mph)",
+                "code": "physactivity.1.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Normal, average (2-2.9 mph)",
+                "code": "physactivity.1.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Brisk pace (3-3.9 mph)",
+                "code": "physactivity.1.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Very brisk/striding (4 mph or faster)",
+                "code": "physactivity.1.5"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.2",
+          "text": "Walking for exercise or walking for transportation or errands",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.2.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.2.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.2.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.2.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.2.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.2.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.2.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.2.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.2.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.2.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.3",
+          "text": "Jogging (slower than 10 minutes per mile)",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.3.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.3.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.3.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.3.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.3.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.3.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.3.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.3.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.3.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.3.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.4",
+          "text": "Running (10 minutes per mile or faster)",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.4.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.4.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.4.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.4.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.4.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.4.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.4.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.4.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.4.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.4.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.5",
+          "text": "Bicycling stationary exercise bike:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.5.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.5.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.5.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.5.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.5.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.5.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.5.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.5.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.5.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.5.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.6",
+          "text": "Intensity:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Low",
+                "code": "physactivity.6.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Medium",
+                "code": "physactivity.6.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "High",
+                "code": "physactivity.6.3"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.7",
+          "text": "Bicycling outside, separated from traffic (e.g. bike path):",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.7.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.7.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.7.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.7.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.7.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.7.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.7.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.7.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.7.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.7.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.8",
+          "text": "Intensity:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Low",
+                "code": "physactivity.8.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Medium",
+                "code": "physactivity.8.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "High",
+                "code": "physactivity.8.3"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.9",
+          "text": "Bicycling outside on road:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.9.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.9.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.9.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.9.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.9.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.9.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.9.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.9.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.9.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.9.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.10",
+          "text": "Intensity:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Low",
+                "code": "physactivity.10.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Medium",
+                "code": "physactivity.10.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "High",
+                "code": "physactivity.10.3"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.11",
+          "text": "Playing tennis, squash, or racquetball sport:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.11.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.11.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.11.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.11.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.11.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.11.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.11.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.11.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.11.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.11.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.12",
+          "text": "Intensity:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Low",
+                "code": "physactivity.12.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Medium",
+                "code": "physactivity.12.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "High",
+                "code": "physactivity.12.3"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.13",
+          "text": "Lap swimming:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.13.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.13.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.13.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.13.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.13.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.13.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.13.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.13.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.13.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.13.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.14",
+          "text": "Intensity:",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Low",
+                "code": "physactivity.14.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Medium",
+                "code": "physactivity.14.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "High",
+                "code": "physactivity.14.3"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.15",
+          "text": "Other aerobic exercise (aerobic dance, ski or stair machine, etc.)",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.15.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.15.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.15.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.15.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.15.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.15.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.15.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.15.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.15.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.15.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.16",
+          "text": "Low intensity exercise (yoga, stretching, toning)",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.16.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.16.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.16.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.16.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.16.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.16.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.16.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.16.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.16.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.16.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.17",
+          "text": "Other vigorous activities (e.g. lawn mowing)",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.17.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.17.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.17.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.17.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.17.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.17.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.17.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.17.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.17.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.17.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.18",
+          "text": "Weight training or resistance exercises (include free weights or resistance machines): arm weights",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.18.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.18.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.18.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.18.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.18.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.18.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.18.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.18.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.18.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.18.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.19",
+          "text": "Weight training or resistance exercises (include free weights or resistance machines): leg weights",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero",
+                "code": "physactivity.19.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-4 minutes",
+                "code": "physactivity.19.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "5-19 minutes",
+                "code": "physactivity.19.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "20-59 minutes",
+                "code": "physactivity.19.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.19.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "1-1.5 hours",
+                "code": "physactivity.19.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-3 hours",
+                "code": "physactivity.19.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "4-6 hours",
+                "code": "physactivity.19.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "7-10 hours",
+                "code": "physactivity.19.9"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11 or more hours",
+                "code": "physactivity.19.10"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.20",
+          "text": "Standing or walking around at work or away from home?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero hours",
+                "code": "physactivity.20.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.20.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-5 hours",
+                "code": "physactivity.20.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "6-10 hours",
+                "code": "physactivity.20.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11-20 hours",
+                "code": "physactivity.20.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "21-40 hours",
+                "code": "physactivity.20.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "41-60 hours",
+                "code": "physactivity.20.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "61-90 hours",
+                "code": "physactivity.20.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Over 90 hours",
+                "code": "physactivity.20.9"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.21",
+          "text": "Standing or walking around at home?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero hours",
+                "code": "physactivity.21.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.21.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-5 hours",
+                "code": "physactivity.21.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "6-10 hours",
+                "code": "physactivity.21.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11-20 hours",
+                "code": "physactivity.21.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "21-40 hours",
+                "code": "physactivity.21.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "41-60 hours",
+                "code": "physactivity.21.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "61-90 hours",
+                "code": "physactivity.21.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Over 90 hours",
+                "code": "physactivity.21.9"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.22",
+          "text": "Sitting at work or away from home or while driving?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero hours",
+                "code": "physactivity.22.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.22.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-5 hours",
+                "code": "physactivity.22.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "6-10 hours",
+                "code": "physactivity.22.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11-20 hours",
+                "code": "physactivity.22.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "21-40 hours",
+                "code": "physactivity.22.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "41-60 hours",
+                "code": "physactivity.22.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "61-90 hours",
+                "code": "physactivity.22.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Over 90 hours",
+                "code": "physactivity.22.9"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.23",
+          "text": "Sitting at home while watching TV/DVD/movies?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero hours",
+                "code": "physactivity.23.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.23.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-5 hours",
+                "code": "physactivity.23.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "6-10 hours",
+                "code": "physactivity.23.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11-20 hours",
+                "code": "physactivity.23.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "21-40 hours",
+                "code": "physactivity.23.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "41-60 hours",
+                "code": "physactivity.23.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "61-90 hours",
+                "code": "physactivity.23.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Over 90 hours",
+                "code": "physactivity.23.9"
+              }
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "linkId": "physactivity.24",
+          "text": "Other sitting at home (e.g. reading, meal times, at desk)?",
+          "option": [
+            {
+              "valueCoding": {
+                "display": "Zero hours",
+                "code": "physactivity.24.1"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "One hour",
+                "code": "physactivity.24.2"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "2-5 hours",
+                "code": "physactivity.24.3"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "6-10 hours",
+                "code": "physactivity.24.4"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "11-20 hours",
+                "code": "physactivity.24.5"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "21-40 hours",
+                "code": "physactivity.24.6"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "41-60 hours",
+                "code": "physactivity.24.7"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "61-90 hours",
+                "code": "physactivity.24.8"
+              }
+            },
+            {
+              "valueCoding": {
+                "display": "Over 90 hours",
+                "code": "physactivity.24.9"
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "identifier": [
