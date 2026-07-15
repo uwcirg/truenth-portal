@@ -14,20 +14,6 @@
       "task": "send_questionnaire_summary"
     },
     {
-      "active": true,
-      "args": null,
-      "id": 6,
-      "kwargs": {
-        "research_study_id": 1,
-        "run_dates": [15, 16, 17, 18, 19, 20, 21],
-        "org_id": 20000
-      },
-      "name": "EMPRO site summary email",
-      "resourceType": "ScheduledJob",
-      "schedule": "r 20 * * 1",
-      "task": "send_questionnaire_summary"
-    },
-    {
       "active": false,
       "args": null,
       "kwargs": {
@@ -262,15 +248,6 @@
       "resourceType": "ScheduledJob",
       "schedule": "0 0 1 1 0",
       "task": "update_tous_task"
-    },
-    {
-      "active": true,
-      "args": null,
-      "kwargs": null,
-      "name": "IRONMAN EMPRO Trigger Reminder Emails",
-      "resourceType": "ScheduledJob",
-      "schedule": "*/5 * * * *",
-      "task": "process_triggers_task"
     },
     {
       "active": false,
