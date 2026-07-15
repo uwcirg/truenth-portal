@@ -736,6 +736,10 @@ def set_user_consents(user_id):
         consent = UserConsent.from_json(request.json)
         if 'research_study_id' not in request.json:
             consent.research_study_id = 0
+        # TN-3364 disable addition of new EMPRO consents
+        if consent.research_study_id != 0:
+            raise ValueError(
+                f"`research_study_id` with value {consent.research_study_id} not permitted")
         consent_list = [consent, ]
         user.update_consents(
             consent_list=consent_list, acting_user=current_user())
