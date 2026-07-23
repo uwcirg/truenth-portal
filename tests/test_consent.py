@@ -1,6 +1,7 @@
 """Unit test module for user consent"""
 
 from datetime import datetime, timedelta
+import pytest
 from time import sleep
 
 from dateutil import parser
@@ -285,6 +286,7 @@ class TestUserConsent(TestCase):
                                          status='deleted').first()
         assert dc.deleted_id
 
+    @pytest.mark.skip("EMPRO consents no longer valid")
     def test_post_2nd_study_user_consent(self):
         """second consent for different study shouldn't replace existing"""
         self.shallow_org_tree()
