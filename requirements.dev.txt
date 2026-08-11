@@ -265,7 +265,7 @@ pyyaml==6.0.2
     #   swagger-spec-validator
 redis==3.5.3
     # via portal (setup.cfg)
-requests==2.32.4
+requests==2.33.0
     # via
     #   flask-dance
     #   flask-recaptcha
