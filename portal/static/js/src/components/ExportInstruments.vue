@@ -361,7 +361,7 @@
                 if (!resultUrl) return false;
                 var o = {
                     ...this.getDefaultExportObj(),
-                    url: resultUrl
+                    url: resultUrl,
                 };
                 localStorage.setItem(this.getCacheExportedDataInfoKey(), JSON.stringify(o));
                 this.setExportHistory(o);
@@ -378,7 +378,18 @@
                     console.log("Unable to parse cached data export info ", e);
                     resultJSON = null;
                 }
-                return resultJSON;
+                const timestamp = resultJSON.date ? new Date(resultJSON.date) : null;
+                if (timestamp && !isNaN(timestamp)) {  // guard against Invalid Date
+                    const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000;
+                    const isFiveDaysOld = (Date.now() - timestamp) >= fiveDaysInMs;
+                    if (isFiveDaysOld) {
+                        return null;
+                    }
+                    return resultJSON;
+                } else {
+                    return resultJSON;
+                }
+                return null;
             },
             getExportHistory: function() {
                 if (this.exportHistory) return this.exportHistory;
