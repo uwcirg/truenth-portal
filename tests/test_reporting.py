@@ -3,6 +3,8 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from flask_webtest import SessionScope
+import os
+import pytest
 from time import sleep
 
 from portal.cache import cache
@@ -114,6 +116,7 @@ class TestReporting(TestCase):
 
 class TestQBStats(TestQuestionnaireBankFixture):
 
+    @pytest.mark.skipif("skip_celery_tests" in os.environ, reason="skip celery dependent tests")
     def test_empty(self):
         self.promote_user(role_name=ROLE.STAFF.value)
         self.login()
@@ -122,6 +125,7 @@ class TestQBStats(TestQuestionnaireBankFixture):
         assert response.json['resourceType'] == 'Bundle'
         assert response.json['total'] == 0
 
+    @pytest.mark.skipif("skip_celery_tests" in os.environ, reason="skip celery dependent tests")
     def test_protected_results(self):
         self.promote_user(role_name=ROLE.STAFF.value)
         self.login()
@@ -220,6 +224,7 @@ class TestQBStats(TestQuestionnaireBankFixture):
             cache_moderation.reset()
             cache_adherence_data(patient_id=u.id)
 
+    @pytest.mark.skipif("skip_celery_tests" in os.environ, reason="skip celery dependent tests")
     def test_permissions(self):
         """Shouldn't get results from orgs outside view permissions"""
 
@@ -278,6 +283,7 @@ class TestQBStats(TestQuestionnaireBankFixture):
             "/api/report/questionnaire_status", timeout=10)
         assert response.json['total'] == 2
 
+    @pytest.mark.skipif("skip_celery_tests" in os.environ, reason="skip celery dependent tests")
     def test_results(self):
         # Generate a few patients with differing results
         org = self.setup_org_qbs()

@@ -13,11 +13,10 @@ from flask import current_app
 import logging
 from sqlalchemy.orm import sessionmaker
 from portal.database import db
-from portal.trigger_states.empro_domains import (
-    EMPRO_DOMAINS,
-    sequential_hard_trigger_count_key,
-)
-from portal.trigger_states.models import TriggerState
+# Obsolete references replaced in obsolete migration
+EMPRO_DOMAINS = []
+sequential_hard_trigger_count_key = None
+TriggerState = None
 
 # revision identifiers, used by Alembic.
 revision = '80c3b1e96c45'

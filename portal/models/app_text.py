@@ -343,9 +343,7 @@ class SiteSummaryEmail_ATMA(AppTextModelAdapter):
         """
         # If there's a specialized version, use it.
         tag = None
-        if kwargs.get('research_study'):
-            tag = "EMPRO"
-        elif kwargs.get('org'):
+        if kwargs.get('org'):
             tag = kwargs.get('org')
 
         if tag:

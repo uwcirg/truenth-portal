@@ -38,7 +38,6 @@ from ..models.questionnaire_bank import trigger_date
 from ..models.qb_timeline import QB_StatusCacheKey, invalidate_users_QBT
 from ..models.questionnaire_response import QuestionnaireResponse
 from ..models.relationship import Relationship
-from ..models.research_study import EMPRO_RS_ID
 from ..models.role import ROLE, Role
 from ..models.table_preference import TablePreference
 from ..models.url_token import url_token
@@ -757,11 +756,6 @@ def set_user_consents(user_id):
         invalidate_users_QBT(
             user_id=user.id, research_study_id=consent.research_study_id)
 
-        # If user has submitted EMPRO - those must also be recalculated
-        if consent.research_study_id == EMPRO_RS_ID:
-            from ..trigger_states.models import rebuild_trigger_states
-            rebuild_trigger_states(user)
-
     except ValueError as e:
         abort(400, str(e))
 
@@ -1036,8 +1030,6 @@ def delete_user_consents(user_id):
         abort(404, "matching user consent not found")
 
     audit_comment = 'Deleted consent agreement'
-    if research_study_id == EMPRO_RS_ID:
-        audit_comment = 'Deleted EMPRO consent agreement'
     remove_uc.deleted = Audit(
         user_id=current_user().id, subject_id=user_id,
         comment=audit_comment, context='consent')

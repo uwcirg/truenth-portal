@@ -284,18 +284,6 @@
     {
       "active": true,
       "args": null,
-      "kwargs": {
-        "include_test_role": true,
-        "research_study_id": 1
-      },
-      "name": "Cache Adherence Data -- EMPRO Study",
-      "resourceType": "ScheduledJob",
-      "schedule": "30 14 * * *",
-      "task": "cache_adherence_data_task"
-    },
-    {
-      "active": true,
-      "args": null,
       "kwargs": null,
       "name": "Cache Research Report Data",
       "resourceType": "ScheduledJob",

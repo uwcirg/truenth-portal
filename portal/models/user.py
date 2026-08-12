@@ -141,7 +141,6 @@ def permanently_delete_user(
                 "Contradicting username and user_id values given")
 
     def purge_user(user, acting_user):
-        from ..trigger_states.models import TriggerState
         if not user:
             raise ValueError("No such user: {}".format(username))
         if acting_user.id == user.id:
@@ -157,8 +156,6 @@ def permanently_delete_user(
         tous = ToU.query.join(Audit).filter(Audit.subject_id == user.id)
         for t in tous:
             db.session.delete(t)
-
-        TriggerState.query.filter(TriggerState.user_id == user.id).delete()
 
         # possible this user generated a temp user for auth flows - that
         # user's deleted audit record holds a key to the user being purged.
@@ -1309,34 +1306,8 @@ class User(db.Model, UserMixin):
 
     def check_consents(self):
         """Hook method for application of consent related rules"""
-
-        # For EMPRO, automatically add the PI on consent
-        from .user_consent import latest_consent
-        from .research_study import EMPRO_RS_ID
-        consent = latest_consent(self, EMPRO_RS_ID)
-        if consent and len([c for c in self.clinicians]) == 0:
-            try:
-                pi = User.query.filter(User.roles.any(
-                    name=ROLE.PRIMARY_INVESTIGATOR.value)).filter(
-                    User.organizations.any(id=consent.organization_id)).one()
-                self._clinicians.append(pi)
-                audit = Audit(
-                    user_id=self.id,
-                    subject_id=self.id,
-                    comment=f"PI: {pi} assigned as default clinician",
-                    context='account',
-                    timestamp=datetime.utcnow())
-                db.session.add(audit)
-                db.session.commit()
-            except NoResultFound:
-                current_app.logger.error(
-                    "Primary Investigator not assigned to organization"
-                    f" {consent.organization_id}")
-            except MultipleResultsFound:
-                current_app.logger.error(
-                    "Multiple Primary Investigators for organization"
-                    f" {consent.organization_id}")
-
+        # Removed obsolete EMPRO check - currently a nop
+        return
 
     def mask_withdrawn(self):
         """withdrawn users get email mask to prevent any communication
@@ -1350,31 +1321,20 @@ class User(db.Model, UserMixin):
         alternatively, if the user has been reactivated and the withdrawn mask
         is present, remove it.
         """
-        from .research_study import EMPRO_RS_ID, BASE_RS_ID
+        from .research_study import BASE_RS_ID
         from .user_consent import consent_withdrawal_dates
 
         mask_user = None
-        # check former consent/withdrawal status for both studies
+        # check former consent/withdrawal status
         consent_g, withdrawal_g = consent_withdrawal_dates(self, BASE_RS_ID)
-        consent_e, withdrawal_e = consent_withdrawal_dates(self, EMPRO_RS_ID)
 
         if not consent_g:
             # never consented, done.
             mask_user = False
-        if mask_user is None and not consent_e:
-            # only in global study
-            if withdrawal_g:
-                mask_user = True
-            else:
-                mask_user = False
-        elif mask_user is None:
-            # in both studies
-            if not withdrawal_g or not withdrawal_e:
-                # haven't withdrawn from both
-                mask_user = False
-            elif withdrawal_g and withdrawal_e:
-                # withdrawn from both
-                mask_user = True
+        if consent_g and withdrawal_g:
+            mask_user = True
+        if consent_g and not withdrawal_g:
+            mask_user = False
 
         # apply or remove mask if needed
         comment = None
