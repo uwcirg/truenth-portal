@@ -35,7 +35,7 @@ from .questionnaire_bank import (
     visit_name,
 )
 from .research_data import ResearchData
-from .research_study import EMPRO_RS_ID, research_study_id_from_questionnaire
+from .research_study import research_study_id_from_questionnaire
 from .user import User, current_user, patients_query
 from .user_consent import consent_withdrawal_dates
 
@@ -110,12 +110,7 @@ class QuestionnaireResponse(db.Model):
         qn = Questionnaire.find_by_name(name=qn_name)
         research_study_id = None
 
-        if qn_name == 'ironman_ss_post_tx':
-            # special case for the EMPRO Staff QB
-            from ..trigger_states.empro_states import empro_staff_qbd_accessor
-            qbd_accessor = empro_staff_qbd_accessor(self)
-            research_study_id = EMPRO_RS_ID
-        elif qbd_accessor is None:
+        if qbd_accessor is None:
             from .qb_status import QB_Status  # avoid cycle
             if self.questionnaire_bank is not None:
                 research_study_id = self.questionnaire_bank.research_study_id

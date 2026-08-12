@@ -9,8 +9,6 @@ from alembic import op
 import logging
 from sqlalchemy import text
 
-from portal.models.research_study import EMPRO_RS_ID
-
 # revision identifiers, used by Alembic.
 revision = 'b5b6f6753c9b'
 down_revision = 'c4f8a2b91d07'
@@ -24,7 +22,7 @@ def upgrade():
     # A number of significant steps.  NB, no supported downgrade
     # once done, only "undo" would be a database restoration.
 
-    assert(EMPRO_RS_ID == 1)
+    # NB, EMPRO_RS_ID purged - can no longer:    assert(EMPRO_RS_ID == 1)
     logger.info(f"PURGING EMPRO DATA")
 
     # 1. Delete all EMPRO consents.
@@ -57,6 +55,15 @@ def upgrade():
     result = conn.execute(query, {'search_pattern': 'ironman_ss%'})
     logger.info(f"DELETE {result.rowcount} questionnaires rows")
 
+    # Remove all EMPRO timeline and cached patient list data
+    query = text("DELETE FROM qb_timeline WHERE research_study_id = 1")
+    result = conn.execute(query)
+    logger.info(f"DELETE {result.rowcount} qb_timeline rows")
+
+    query = text("DELETE FROM patient_list WHERE empro_consentdate IS NOT NULL")
+    result = conn.execute(query)
+    logger.info(f"DELETE {result.rowcount} patient_list rows")
+
     #4. Purge the EMPRO QuestionnaireBanks
     #   must first purge related Communications and CommunicationRequests.
     query = text(
@@ -86,7 +93,6 @@ def upgrade():
         "  (SELECT id FROM codings WHERE system = :search_pattern))"
     )
     result = conn.execute(query, {'search_pattern': 'http://us.truenth.org/observation'})
-    #observation_ids = [row[0] for row in result.fetchall()]
     logger.info(f"DELETE {result.rowcount} observations rows")
 
     query = text(

@@ -556,7 +556,6 @@ def patient_timewarp(patient_id, days):
     from copy import deepcopy
     from portal.models.questionnaire_response import QuestionnaireResponse
     from portal.models.user_consent import UserConsent
-    from ..trigger_states.models import TriggerState
 
     def sanity_check():
         """confirm user state before / after timewarp"""
@@ -565,30 +564,6 @@ def patient_timewarp(patient_id, days):
         consents = patient.valid_consents
         rps = [c for c in consents if c.research_study_id == 0]
         assert len(rps) == 1
-
-        rp1s = [c for c in consents if c.research_study_id == 1]
-        if not len(rp1s):
-            return
-        assert len(rp1s) == 1
-
-        # Confirm valid trigger_states.  No data prior to consent.
-        ts = TriggerState.query.filter(
-            TriggerState.user_id == patient_id,
-            TriggerState.timestamp < rp1s[0].acceptance_date).count()
-        assert ts == 0
-
-        # should never be more than a single row for any given state
-        ts = TriggerState.query.filter(
-            TriggerState.user_id == patient_id
-        )
-        data = defaultdict(int)
-        for row in ts:
-            key = f"{row.visit_month}:{row.state}"
-            data[key] += 1
-        for k, v in data.items():
-            if v > 1:
-                raise RuntimeError(
-                    f"Unique visit_month:state {k} broken in trigger_states for {patient}")
 
     sanity_check()
     if current_app.config['SYSTEM_TYPE'] == "production":
@@ -613,25 +588,6 @@ def patient_timewarp(patient_id, days):
         doc = deepcopy(qnr.document)
         doc['authored'] = FHIR_datetime.as_fhir(new_authored)
         qnr.document = doc
-
-    # trigger_state
-    if current_app.config['GIL'] is None:
-        for ts in TriggerState.query.filter(
-                TriggerState.user_id == user.id):
-            changed.append(f"trigger_state {ts.id}")
-            ts.timestamp = ts.timestamp - delta
-            if ts.triggers is not None:
-                triggers = deepcopy(ts.triggers)
-                # Some early records don't include source-authored
-                if 'authored' in triggers['source']:
-                    triggers['source']['authored'] = FHIR_datetime.as_fhir(
-                        FHIR_datetime.parse(triggers['source']['authored'])
-                        - delta)
-                if 'actions' in triggers:
-                    for email in triggers['actions']['email']:
-                        email['timestamp'] = FHIR_datetime.as_fhir(
-                            FHIR_datetime.parse(email['timestamp']) - delta)
-                ts.triggers = triggers
 
     # reminder email dates
     for em in EmailMessage.query.join(
