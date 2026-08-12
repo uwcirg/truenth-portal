@@ -139,7 +139,7 @@ flask-swagger==0.2.14
     # via portal (setup.cfg)
 flask-testing==0.8.1
     # via portal (setup.cfg)
-flask-user @ git+https://github.com/uwcirg/Flask-User.git@0.6.21.2
+flask-user==0.6.21
     # via portal (setup.cfg)
 flask-webtest==0.0.9
     # via portal (setup.cfg)
