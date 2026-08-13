@@ -39,7 +39,6 @@
     "gulp-rename": "^2.1.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-using": "^0.1.1",
-    "html-webpack-plugin": "^5.6.3",
     "i18next-conv": "^15.1.1",
     "i18next-scanner": "^4.6.0",
     "less-loader": "^12.3.0",

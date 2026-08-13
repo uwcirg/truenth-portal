@@ -232,9 +232,7 @@ def configure_blueprints(app, blueprints):
         app.register_blueprint(exercise_diet)
     else:
         from ..eproms.views import eproms
-        from ..trigger_states.views import trigger_states
         app.register_blueprint(eproms)
-        app.register_blueprint(trigger_states)
 
     for blueprint in blueprints:
         app.register_blueprint(blueprint)

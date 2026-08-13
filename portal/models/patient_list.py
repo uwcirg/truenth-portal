@@ -1,7 +1,7 @@
 """Module for PatientList, used specifically to populate and page patients"""
 from datetime import datetime, timedelta
 from ..database import db
-from .research_study import BASE_RS_ID, EMPRO_RS_ID
+from .research_study import BASE_RS_ID
 
 
 class PatientList(db.Model):
@@ -90,16 +90,4 @@ def patient_list_update_patient(patient_id, research_study_id=None):
             patient.visit = qb_status['visit_name']
             patient.consentdate, _ = consent_withdrawal_dates(user=user, research_study_id=rs_id)
 
-        if (research_study_id == EMPRO_RS_ID or research_study_id is None) and user.clinicians:
-            rs_id = EMPRO_RS_ID
-            patient.clinician = '; '.join(
-                (clinician_name_map().get(c.id, "not in map") for c in user.clinicians)) or ""
-            qb_status = qb_status_visit_name(
-                patient.userid, research_study_id=rs_id, as_of_date=now)
-            patient.empro_status = str(qb_status['status'])
-            patient.empro_visit = qb_status['visit_name']
-            patient.action_state = qb_status['action_state'].title() \
-                if qb_status['action_state'] else ""
-            patient.empro_consentdate, _ = consent_withdrawal_dates(
-                user=user, research_study_id=rs_id)
         db.session.commit()
