@@ -4,7 +4,10 @@ import tnthDates from "./TnthDate.js";
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import CLINICAL_CODE_ENUM from "./CLINICAL_CODE_ENUM.js";
 import Consent from "./Consent.js";
-import {DEFAULT_SERVER_DATA_ERROR, EPROMS_MAIN_STUDY_ID, EMPRO_TRIGGER_UNPROCCESSED_STATES} from "../data/common/consts.js";
+import {
+  DEFAULT_SERVER_DATA_ERROR,
+  EPROMS_MAIN_STUDY_ID,
+} from "../data/common/consts.js";
 const MAX_ATTEMPTS = 3;
 // track error reporting per key
 let errorReportedByKey = new Map();
@@ -496,90 +499,6 @@ export default { /*global $ */
             callback(convertArrayToObject(data.research_study, "id"));
         });
     },
-    getSubStudyTriggers: function(userId, params, callback) {
-        callback = callback || function() {};
-        params = params || {};
-        params.retryAttempt = params.retryAttempt || 0;
-        params.maxTryAttempts = !isNaN(params.maxTryAttempts) ? params.maxTryAttempts : MAX_ATTEMPTS;
-
-        if (!userId) {
-            callback({error: i18next.t("User id is required.")});
-            return false;
-        }
-        let triggerDataKey = `cachedTriggers_${userId}`;
-        if (params.clearCache) {
-            sessionStorage.removeItem(triggerDataKey);
-        } else {
-            if (sessionStorage.getItem(triggerDataKey)) {
-                callback(JSON.parse(sessionStorage.getItem(triggerDataKey)));
-                return;
-            }
-        }
-        this.sendRequest(`/api/patient/${userId}/triggers`, "GET", userId, params, (data) => {
-            if (!data || data.error || !data.state) {
-                callback({"error": true});
-                return false;
-            }
-
-            const dataState = String(data.state).toLowerCase();
-            params = params || {};
-            const isUnprocessed = EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(dataState) !== -1;
-
-            //if the trigger data has not been processed, try again until maximum number of attempts has been reached
-            if (params.retryAttempt < params.maxTryAttempts &&
-                isUnprocessed) {
-                params.retryAttempt++;
-                setTimeout(function() {
-                    this.getSubStudyTriggers(userId, params, callback);
-                }.bind(this), 1500*params.retryAttempt);
-                if (params.retryAttempt === params.maxTryAttempts) {
-                    this.postAuditLog(userId, {
-                        context: "assessment",
-                        message: `maximum retry attempts reached for retrieving triggers, state: ${dataState ? dataState : "unknown"}`
-                    });
-                }
-                return false;
-            }
-            params.retryAttempt = 0;
-            if (!isUnprocessed) {
-                sessionStorage.setItem(triggerDataKey, JSON.stringify(data));
-            }
-            callback(data);
-            return true;
-        });
-    },
-    "getTriggersHistory": function(userId, params, callback) {
-        callback = callback || function() {};
-        params = params || {};
-        if (!userId) {
-            callback({error: true});
-            return false;
-        }
-        this.sendRequest(`/api/patient/${userId}/trigger_history`, "GET", userId, params, (data) => {
-            if (!data || data.error) {
-                callback({"error": true});
-                return false;
-            }
-            callback(data);
-            return true;
-        });
-    },
-    "setOptoutTriggers": function(userId, params, callback) {
-        callback = callback || function() {};
-        params = params || {};
-        if (!userId) {
-            callback({error: true});
-            return false;
-        }
-        this.sendRequest(`/api/patient/${userId}/triggers/opt_out`, "PUT", userId, params, (data) => {
-            if (!data || data.error) {
-                callback({"error": true});
-                return false;
-            }
-            callback(data);
-            return true;
-        });
-    },
     "getCliniciansList": function(orgIds, callback) {
         callback = callback || function() {};
         orgIds = orgIds || [];
@@ -637,8 +556,7 @@ export default { /*global $ */
         if (params.acceptance_date) {
             data.acceptance_date = params.acceptance_date;
         }
-        //research study id helps determine whether user is in a substudy
-        data.research_study_id = params.research_study_id ? parseInt(params.research_study_id) : EPROMS_MAIN_STUDY_ID;
+        data.research_study_id = !isNaN(params.research_study_id) ? parseInt(params.research_study_id) : 0;
         this.sendRequest(__url, "POST", userId, {sync: sync, data: JSON.stringify(data)}, function(data) {
             if (!data.error) {
                 $(".set-consent-error").html("");

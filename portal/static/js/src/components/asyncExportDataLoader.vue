@@ -24,7 +24,7 @@
                 type: String,
                 required: true
             },
-            //unique identifier exports, e.g. substudy vs main study
+            //unique identifier exports
             exportIdentifier: {
                 type: String
             }
