@@ -6,16 +6,8 @@ import ProcApp from "./modules/Procedures.js";
 import Utility from "./modules/Utility.js";
 import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
-import {sortArrayByField, getUrlParameter} from "./modules/Utility.js";
+import {sortArrayByField} from "./modules/Utility.js";
 import {
-  EPROMS_SUBSTUDY_ID,
-  EPROMS_SUBSTUDY_TITLE,
-  EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
-  EPROMS_SUBSTUDY_SHORT_TITLE,
-  EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER,
-  EMPRO_TRIGGER_STATE_OPTOUT_KEY,
-  EMPRO_TRIGGER_UNPROCCESSED_STATES,
-  EMPRO_TRIGGER_WITHDRAWN_STATE,
   REQUIRED_PI_ROLES,
   REQUIRED_PI_ROLES_WARNING_MESSAGE,
 } from "./data/common/consts.js";
@@ -86,26 +78,28 @@ export default (function() {
         },
        mounted: function() {
             var self = this;
+            clearInterval(self.initIntervalId);
             Vue.nextTick(function () {
                 // DOM updated
                 self.initIntervalId = setInterval(function() { //wait for ajax calls to finish
+                    
                     self.initEndTime = new Date();
                     var elapsedTime = self.initEndTime - self.initStartTime;
                     elapsedTime /= 1000;
                     var checkFinished = self.initChecks.length === 0;
                     if (checkFinished || (elapsedTime >= 5)) {
                         clearInterval(self.initIntervalId);
-                        //setting subject substudy status BEFORE initializing each section in profile
-                        //as the visibilities of some of the sections are dependent on it
-                        self.setSubjectResearchStudies(function() {
-                            self.initSections(function() {
+                        self.initSections(
+                            function() {
                                 self.onSectionsDidLoad();
-                                self.handleOptionalCoreData();});
-                            });
+                                self.handleOptionalCoreData();
+                            }
+                        );
                     }
+
                 }, 30);
             });
-        },
+      },
         data: {
             subjectId: "",
             currentUserId: "",
@@ -117,12 +111,10 @@ export default (function() {
             initIntervalId: 0,
             currentUserRoles: [],
             userOrgs: [],
-            subjectOrgs: [],
             subjectReseachStudies: [],
             subjectResearchStudyStatuses: {},
             userRoles: [],
             PIList: [],
-            selectedClinicians: [],
             staffEditableRoles: ["clinician", "primary_investigator", "staff", "staff_admin"],
             adminOnlyEditableRoles: ['access_on_verify', 'write_only', 'promote_without_identity_challenge'],
             userEmailReady: true,
@@ -133,7 +125,7 @@ export default (function() {
             },
             mode: "profile",
             demo: { //skeleton
-                data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: "", clinician: {}}
+                data: { resourceType:"Patient", email: "", name: {given: "",family: ""}, birthDay: "",birthMonth: "",birthYear: ""}
             },
             stateDict: {AL: i18next.t("Alabama"),AK: i18next.t("Alaska"), AS: i18next.t("American Samoa"),AZ: i18next.t("Arizona"),AR:i18next.t("Arkansas"),CA: i18next.t("California"),CO:i18next.t("Colorado"),CT:i18next.t("Connecticut"),DE:i18next.t("Delaware"),DC:i18next.t("District Of Columbia"),FM: i18next.t("Federated States Of Micronesia"),FL:i18next.t("Florida"),GA:i18next.t("Georgia"),GU:i18next.t("Guam"),HI:i18next.t("Hawaii"),ID:i18next.t("Idaho"),IL:i18next.t("Illinois"),IN:i18next.t("Indiana"),IA:i18next.t("Iowa"),KS:i18next.t("Kansas"),KY:i18next.t("Kentucky"),LA:i18next.t("Louisiana"),ME:i18next.t("Maine"),MH:i18next.t("Marshall Islands"),MD:i18next.t("Maryland"),MA:i18next.t("Massachusetts"),MI:i18next.t("Michigan"),MN:i18next.t("Minnesota"),MS:i18next.t("Mississippi"),MO:i18next.t("Missouri"),MT:i18next.t("Montana"),NE: i18next.t("Nebraska"),NV:i18next.t("Nevada"),NH:i18next.t("New Hampshire"),NJ:i18next.t("New Jersey"),NM:i18next.t("New Mexico"),NY:i18next.t("New York"),NC:i18next.t("North Carolina"),ND:i18next.t("North Dakota"),MP:i18next.t("Northern Mariana Islands"),OH:i18next.t("Ohio"),OK:i18next.t("Oklahoma"),OR:i18next.t("Oregon"),PW:i18next.t("Palau"),PA:i18next.t("Pennsylvania"),PR:i18next.t("Puerto Rico"),RI:i18next.t("Rhode Island"),SC:i18next.t("South Carolina"),SD:i18next.t("South Dakota"),TN:i18next.t("Tennessee"),TX:i18next.t("Texas"),UT:i18next.t("Utah"),VT:i18next.t("Vermont"),VI:i18next.t("Virgin Islands"),VA:i18next.t("Virginia"),WA:i18next.t("Washington"),WV:i18next.t("West Virginia"),WI:i18next.t("Wisconsin"),WY:i18next.t("Wyoming")},
             roles: {data: []},
@@ -197,20 +189,6 @@ export default (function() {
                 answers: [],
                 loading: true
             },
-            /*
-             * based on trigger history
-             * last triggers state
-             */
-            subStudyTriggers: {
-                domains: [],
-                optout_domains: [],
-                date: "",
-                state: "",
-                data: {}
-            },
-            subStudyAssessment: {
-                data: []
-            },
             disableFields: [],
             topLevelOrgs: [],
             fillViews: {},
@@ -250,31 +228,13 @@ export default (function() {
                     };
                 }
             },
-            updateInProgress: false
+            updateInProgress: false,
+            updateDemoIntervalId: 0
         },
         computed: {
-            computedIsSubStudyPatient: function() {
-                //will re-compute when the dependent prop, this.subjectReseachStudies, updates
-                return this.subjectReseachStudies.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
-            },
             computedUserEmail: function() {
                 //will re-compute when email updates
                 return this.demo.data.email;
-            },
-            computedTreatingClinician: function() {
-                return this.demo.data.clinicians && this.demo.data.clinicians.length;
-            },
-            computedSubStudyTriggers: function() {
-                return this.subStudyTriggers.domains;
-            },
-            computedSubStudyOptOutDomains: function() {
-                return this.subStudyTriggers.optout_domains;
-            },
-            computedSubStudyAssessmentData: function() {
-                return this.subStudyAssessment.data;
-            },
-            computedSubStudyPostTxResponses: function() {
-                return this.postTxQuestionnaire.answers;
             },
             computedOptionalCoreData: function() {
                 return this.optionalCoreData;
@@ -546,18 +506,6 @@ export default (function() {
                             });
                         }
                         self.demo.data.raceCodes = self.demo.data.raceCodes || [];
-                        if (data.careProvider && data.careProvider.length) {
-                            let clone = [...data.careProvider];
-                            let clinicianFilteredSet = clone.filter(item => {
-                                return item.reference.match(/^api\/clinician/gi);
-                            });
-                            self.demo.data.clinicians = clinicianFilteredSet.length? clinicianFilteredSet : [];
-                            self.selectedClinicians = self.demo.data.clinicians;
-                            self.subjectOrgs = self.getOrgTool().getOrgsByCareProvider(data.careProvider);
-                        } else {
-                            self.demo.data.clinicians = [];
-                            self.subjectOrgs = [];
-                        }
                     }
                     callback(data);
                 });
@@ -626,28 +574,6 @@ export default (function() {
                     this.initUserRoles({sync:true});
                 }
                 return this.userRoles.indexOf("patient") !== -1;
-            },
-            hasSubStudySubjectOrgs: function() {
-                var orgTool = this.getOrgTool();
-                //check via organization API
-                return this.subjectOrgs.filter(orgId => {
-                    return  orgTool.isSubStudyOrg(orgId);
-                }).length;
-            },
-            /*
-             * subject is ready to take EMPRO assessment
-             */
-            isSubStudyReadyPatient: function() {
-                return this.isSubStudyPatient() && this.getResearchStudyStatus(EPROMS_SUBSTUDY_ID)["ready"];
-            },
-            isSubStudyPatient: function() {
-                return this.computedIsSubStudyPatient;
-            },
-            hasSubStudyStatusErrors: function() {
-                return this.hasResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
-            },
-            getSubStudyStatusErrors: function() {
-                return this.getResearchStudyStatusErrors(EPROMS_SUBSTUDY_ID);
             },
             getResearchStudyStatus: function(studyId) {
                 return this.subjectResearchStudyStatuses[studyId];
@@ -775,7 +701,8 @@ export default (function() {
                             if (!$(this).attr("data-update-on-validated") && valid) {
                                 var o = $(this);
                                 var parentContainer = $(this).closest(".profile-item-container");
-                                var setDemoInterval = setInterval(function() {
+                                clearInterval(self.updateDemoIntervalId);
+                                self.updateDemoIntervalId = setInterval(function() {
                                     var customErrorField = $("#" + o.attr("data-error-field"));
                                     var hasError = customErrorField.length > 0 && customErrorField.text() !== "";
                                     if (!hasError) { //need to check default help block for error as well
@@ -783,10 +710,10 @@ export default (function() {
                                         hasError = errorBlock.length > 0 && errorBlock.text() !== "";
                                     }
                                     if (hasError) {
-                                        clearInterval(setDemoInterval);
+                                        clearInterval(self.updateDemoIntervalId);
                                         return false;
                                     }
-                                    clearInterval(setDemoInterval);
+                                    clearInterval(self.updateDemoIntervalId);
                                     o.trigger("updateDemoData");
                                 }, 10);
                             }
@@ -951,15 +878,6 @@ export default (function() {
                     this.initResetPasswordSection();
                     this.initCommunicationSection();
                     break;
-                case "treatingclinician":
-                    this.initTreatingClinicianSection();
-                    break;
-                case "longitudinalreport":
-                        this.initLongitudinalReportSection();
-                        break;
-                case "posttxquestionnaire":
-                        this.initPostTxQuestionnaireSection();
-                        break;
                 case "patientemailform":
                     this.initPatientEmailFormSection();
                     break;
@@ -1227,385 +1145,9 @@ export default (function() {
                     self.updateIdentifierData(this);
                 });
             },
-            hasTreatingClinician: function() {
-                return this.computedTreatingClinician;
-            },
-            isPI: function(reference) {
-                if (!reference) return false;
-                let referenceValue = this.getReferenceValue(reference);
-                return this.PIList.filter(item => {
-                    return item.identifier[0].value == referenceValue;
-                }).length;
-            },
             getReferenceValue: function(reference) {
                 if (!reference) return "";
                 return reference.split("/")[2];
-            },
-            getSelectedCliniciansDisplays: function() {
-                if (!this.demo.data.clinicians || ! this.demo.data.clinicians.length) {
-                    return "";
-                }
-                return this.demo.data.clinicians.map(item => {
-                    return item.display;
-                }).join(", ");
-            },
-            addClinician: function() {
-                let selectedOption = $("#clinicianSelector option:selected");
-                if (!selectedOption.length) return;
-                let reference = `api/clinician/${selectedOption.val()}`;
-                let exist = this.selectedClinicians.filter(item => {
-                    return item.reference === reference;
-                });
-                if (exist.length) return;
-                this.selectedClinicians.push({
-                    "display": selectedOption.text(),
-                    "reference": reference
-                });
-            },
-            removeClinicianEvent: function(event) {
-                event.stopPropagation();
-                if (this.selectedClinicians.length === 1) {
-                    $("#treatingClinicianContainer .select-list-error").text("You must add a clinician before removing the last.");
-                    return;
-                }
-                let targetValue = $(event.target).closest(".clinician-item").attr("dataValue");
-                if (!targetValue) return;
-                this.removeClinicians(targetValue);
-            },
-            removeClinicians: function(targetValue) {
-                if (!targetValue || this.updateInProgress) return;
-                let targetIndex = -1;
-                this.selectedClinicians.forEach((item, index) => {
-                    if (item.reference == targetValue) {
-                        targetIndex = index;
-                    }
-                });
-                if (targetIndex !== -1) {
-                    $("#treatingClinicianContainer .select-list-error").text("");
-                    this.selectedClinicians.splice(targetIndex, 1);
-                    this.updateClinicians();
-                }
-            },
-            updateClinicians: function() {
-                if (!this.selectedClinicians || !this.selectedClinicians.length) {
-                    return;
-                }
-                let postData = {"careProvider": []};
-                if (this.demo.data.careProvider && this.demo.data.careProvider.length) {
-                    postData.careProvider = [...this.demo.data.careProvider];
-                    /*
-                        * exclude pre-existing clinician reference
-                        */
-                    let filteredSet = (postData.careProvider).filter(item => {
-                        return !item.reference.match(/^api\/clinician/gi);
-                    });
-                    postData.careProvider = filteredSet;
-                }
-                postData.careProvider = [...postData.careProvider, ...this.selectedClinicians];
-                // set update in progess flag while clinician is being added/removed
-                this.updateInProgress = true;
-                this.postDemoData($("#treatingClinicianContainer"), postData, () => {
-                    /* reset selector value */
-                    $("#clinicianSelector").val("");
-                    // re-set update in progress flag
-                    this.updateInProgress = false;
-                    /*
-                        * set research study status after clinician is set
-                        */
-                    this.setSubjectResearchStudies();
-                });
-            },
-            getPIIndicatorText: function() {
-                return i18next.t("principal investigator");
-            },
-            initTreatingClinicianSection: function() {
-                let self = this;
-                this.modules.tnthAjax.getCliniciansList(this.subjectOrgs, function(data) {
-                    if (!data || !data.entry || !data.entry.length) {
-                        let errorMessage = i18next.t("No treating clinician available for this site");
-                        $("#treatingClinicianContainer .select-list-error").text(errorMessage);
-                        return;
-                    }
-                    let seletElement = $(
-                      "#treatingClinicianContainer .select-list #clinicianSelector"
-                    );
-                    seletElement.find("option").remove();
-                    seletElement.append(
-                      `<option value="">-- ${i18next.t("Add a Clinician")} --</option>`
-                    );
-                    // populate list with available clinicians
-                    (data.entry).forEach(item => {
-                        let cloneItem = JSON.parse(JSON.stringify(item));
-                        let isPI = item.identifier.filter(i => {
-                            return i.system == SYSTEM_IDENTIFIER_ENUM["primary_investigator"];
-                        }).length;
-                        if (isPI) {
-                            /* gather a list of PI for use later */
-                            self.PIList.push(cloneItem);
-                        }
-                        seletElement.append(`<option value="${item.identifier[0].value}" ${isPI.length ? "data-pi" : ""}>${item.name[0].given} ${item.name[0].family}</option>`);
-                    });
-                    $( "#treatingClinicianContainer" ).delegate( "select", "change", function() {
-                        if ($(this).val() === "") {
-                            $("#treatingClinicianContainer .select-list-error").text(i18next.t("You must select a clinician"));
-                            return false;
-                        }
-                        $("#treatingClinicianContainer .select-list-error").text("");
-                        //add clinician
-                        self.addClinician();
-                        //update via api
-                        self.updateClinicians();
-                    });
-                });
-            },
-            setSubStudyAssessmentData: function(data) {
-                if (!data || !data.length) return;
-                //latest first
-                data = (data).sort(function(a, b) {
-                    return new Date(b.authored) - new Date(a.authored);
-                });
-                this.subStudyAssessment.data = data;
-            },
-            hasSubStudyAsssessmentData: function() {
-                return this.subStudyAssessment.data.length;
-            },
-            getSubStudyAssessmentStatus: function() {
-                if (!this.hasSubStudyAsssessmentData()) return "";
-                return String(this.subStudyAssessment.data[0].status).toLowerCase();
-            },
-            isSubStudyAssessmentCompleted: function() {
-                return this.getSubStudyAssessmentStatus() === "completed";
-            },
-            getSubStudyAssessmentStatusDisplay: function() {
-                return i18next.t("Last EMPRO questionnaire {status} on:").replace("{status}", this.getSubStudyAssessmentStatus());
-            },
-            getLastSubStudyAssessmentDate: function() {
-                if (!this.subStudyAssessment.data || !this.subStudyAssessment.data.length) return "";
-                return this.modules.tnthDates.formatDateString(this.subStudyAssessment.data[0].authored);
-            },
-            hasSubStudyAsssessmentData: function() {
-                return this.computedSubStudyAssessmentData.length;
-            },
-            initLongitudinalReportSection: function() {
-                if (!this.subjectId || !this.isSubStudyPatient()) return;
-                let CONTAINER_ID = "longitudinalReportContainer";
-                this.modules.tnthAjax.assessmentReport(this.subjectId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
-                    data => {
-                        if (!data || !data.entry || !data.entry.length) {
-                            $(`#longitudinalReportSection`).hide();
-                            return;
-                        }
-                        this.setSubStudyAssessmentData(data.entry);
-                        $(`#${CONTAINER_ID}`).html(`<a href="/patients/${this.subjectId}/longitudinal-report/${EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER}" id="btnLongitudinalReport" class="btn btn-tnth-primary">${i18next.t("View {title} Report").replace("{title}", EPROMS_SUBSTUDY_SHORT_TITLE)}</a>`);
-                }, {cache: false});
-            },
-            setSubStudyTriggers: function(callback, params) {
-                callback = callback || function() {};
-                params = params || {};
-                this.modules.tnthAjax.assessmentReport(this.subjectId, EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
-                    data => {
-                        if (!data || !data.entry || !data.entry.length) {
-                            //if no assessment data, no need to set triggers
-                            callback();
-                            return;
-                        }
-                        this.setSubStudyAssessmentData(data.entry);
-                        this.modules.tnthAjax.getTriggersHistory(this.subjectId, params, (data) => {
-                            if (!data || !data.length) {
-                                callback();
-                                return;
-                            }
-                            let domains = new Array();
-                            let arrOptOut = new Array();
-                            let lastTriggerItem = null;
-                            for (var index = data.length-1; index >= 0; index--) {
-                               if (EMPRO_TRIGGER_UNPROCCESSED_STATES.indexOf(String(data[index].state).toLowerCase()) === -1) {
-                                    lastTriggerItem = data[index];
-                                    break;
-                               }
-                            }
-                            if (!lastTriggerItem || !lastTriggerItem.triggers) {
-                                callback();
-                                return false;
-                            }
-                            for (let topic in lastTriggerItem.triggers.domain) {
-                                if (!Object.keys(lastTriggerItem.triggers.domain[topic]).length) {
-                                    continue;
-                                }
-                                if (lastTriggerItem.triggers.domain[topic][EMPRO_TRIGGER_STATE_OPTOUT_KEY]) {
-                                    arrOptOut.push(topic);
-                                    continue;
-                                }
-                                for (let q in lastTriggerItem.triggers.domain[topic]) {
-                                    /*
-                                     * HARD triggers ONLY
-                                     */
-                                    if (lastTriggerItem.triggers.domain[topic][q] === "hard"
-                                        && domains.indexOf(topic) === -1) {
-                                        domains.push(topic);
-                                    }
-                                }
-                            }
-                            let completedDate = lastTriggerItem.triggers.source && lastTriggerItem.triggers.source.authored ? lastTriggerItem.triggers.source.authored : lastTriggerItem.timestamp;
-                            completedDate = new Date(completedDate); //convert to local date/time
-                            console.log("Last trigger item ", lastTriggerItem);
-                            [
-                                this.subStudyTriggers.domains,
-                                this.subStudyTriggers.optout_domains,
-                                this.subStudyTriggers.date,
-                                this.subStudyTriggers.displaydate,
-                                this.subStudyTriggers.state,
-                                this.subStudyTriggers.data
-                            ] = [
-                                domains,
-                                arrOptOut,
-                                completedDate,
-                                i18next.t(
-                                    this.modules.tnthDates.formatDateString(completedDate, "d M y hh:mm")+" <span class='small muted'>({timezone})</span>"
-                                ).replace('{timezone}', this.modules.tnthDates.getTimeZoneDisplay()), //local date/time and time zone display
-                                lastTriggerItem.state,
-                                lastTriggerItem.triggers];
-                            callback();
-                    });
-                });
-            },
-            hasSubStudyTriggers: function() {
-                return this.computedSubStudyTriggers.length;
-            },
-            hasSubStudyOptOutDomains: function() {
-                return this.computedSubStudyOptOutDomains.length > 0;
-            },
-            hasPrevSubStudyPostTx: function() {
-                return this.computedSubStudyPostTxResponses.length;
-            },
-            getSubStudyOptoutDomainsDisplay: function() {
-                if (!this.hasSubStudyOptOutDomains()) return "";
-                const arrOptoutDomains = this.subStudyTriggers.optout_domains;
-                if (!arrOptoutDomains || !arrOptoutDomains.length) return "";
-                return arrOptoutDomains.map(
-                    (item) => item.replace(/_/g, " ")
-                ).join(", ");
-            },
-            setPrevPostTxResponses: function(qnrId) {
-                if (!qnrId) {
-                    return;
-                }
-                this.modules.tnthAjax.getAssessmentByQNRId(this.subjectId, qnrId, false, (data) => {
-
-                    if (!data.group || !data.group.question) {
-                        return;
-                    }
-
-                    this.postTxQuestionnaire.answers = data.group.question;
-                     (this.postTxQuestionnaire.answers).forEach(item => {
-                        let valueCoding = item.answer.filter(answer => {
-                            return answer.valueCoding;
-                        });
-                        let valueString = item.answer.filter(answer => {
-                            return answer.valueString;
-                        });
-                        let valueBoolean = item.answer.filter(answer => {
-                            return answer.valueBoolean;
-                        });
-                        if (valueCoding.length) {
-                            valueCoding.forEach(subItem => {
-                                let fields = $(`#postTxQuestionnaireContainer [code="${subItem.valueCoding.code}"]`);
-                                fields.each(function() {
-                                    if ($(this).attr("dataType") === "open-choice") $(this).prop("checked", true);
-                                    if ($(this).attr("dataType") === "choice") $(this).prop("selected", true);
-                                    $(this).attr("answered", true);
-                                });
-                            });
-                        }
-                        if (valueBoolean.length) {
-                            $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"]`)
-                            .prop("checked", valueBoolean[0].valueBoolean)
-                            .attr("answered", true);
-
-                        }
-                        if (valueString.length) {
-                            valueString.forEach(subItem => {
-                                $(`#postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="string"], #postTxQuestionnaireContainer [linkId="${item.linkId}"][dataType="date"]`).each(function() {
-                                    if ($(`#postTxQuestionnaireContainer [linkId="${item.linkId}"][value="${subItem.valueString}"][dataType != "string"]`).length) {
-                                        return true;
-                                    }
-                                    $(this).val(subItem.valueString)
-                                    $(this).attr("answered", true);
-                                });
-
-                            });
-                        }
-
-                        $("#postTxResolutionContainer").text(i18next.t("Last updated on {authoredDate} GMT").replace("{authoredDate}",this.modules.tnthDates.formatDateString(data.authored, "iso")));
-                     });
-                });
-            },
-            isPostTxQuestionnaireEligible: function() {
-                const objResearchStudy = this.getResearchStudyStatus(EPROMS_SUBSTUDY_ID);
-                return (
-                  objResearchStudy &&
-                  objResearchStudy["intervention_qnr_eligible"]
-                );
-            },
-            shouldShowSubstudyPostTx: function() {
-                return this.isSubStudyPatient() && (this.isPostTxActionRequired() || this.hasPrevSubStudyPostTx());
-            },
-            shouldDisableSubstudyPostTx: function() {
-                return (
-                  !this.isPostTxQuestionnaireEligible() ||
-                  this.isPostTxActionNotApplicable() ||
-                  this.isSubStudyTriggersResolved()
-                );
-            },
-            hasPostTxQuestionnaireErrors: function() {
-              // see API /api/patient/[id]/research_study
-              // USE intervention_qnr_eligible flag returned from the API to determine whether to display error(s) related to post tx questionnaire eligibility
-              // the flag is set to FALSE if there is any associated error
-              // NOTE: intervention_qnr_eligible flag is still TRUE even if there is any pending IRONMAN main study questionnaire
-              // that makes sense as staff can still fill in post tx questionnaire
-              return (
-                !this.isPostTxQuestionnaireEligible() &&
-                this.hasSubStudyStatusErrors()
-              );
-            },
-            shouldShowPostTxError: function() {
-                return this.shouldDisableSubstudyPostTx() && this.hasPostTxQuestionnaireErrors();
-            },
-            getPostTxActionStatus: function() {
-                if (!this.subStudyTriggers.data || !this.subStudyTriggers.data.action_state) {
-                    return "";
-                }
-                const paramActionState = getUrlParameter("trigger_action_state");
-                // for debugging
-                if (paramActionState) return paramActionState.toLowerCase();
-                const actionState = this.subStudyTriggers.data.action_state;
-                if (!actionState &&
-                    !this.shouldDisableSubstudyPostTx() &&
-                    this.hasSubStudyTriggers()
-                ) return "required";
-                return String(actionState).toLowerCase();
-            },
-            hasMissedPostTxAction: function() {
-                return this.hasSubStudyTriggers() && this.getPostTxActionStatus() === "missed";
-            },
-            isPostTxActionRequired: function() {
-                const actionStatus = this.getPostTxActionStatus();
-                return this.subStudyTriggers.data &&
-                (["due", "overdue", "required"].indexOf(actionStatus) !== -1
-                );
-            },
-            isPostTxActionNotApplicable: function() {
-                if (!this.subStudyTriggers.data) {
-                    return true;
-                }
-                return this.getPostTxActionStatus() === "not applicable";
-            },
-            isSubStudyTriggersResolved: function() {
-                if (!this.subStudyTriggers.data) {
-                    return true;
-                }
-                if (this.getPostTxActionStatus() === EMPRO_TRIGGER_WITHDRAWN_STATE) return true; // subject withdrawn
-                return this.getPostTxActionStatus() === "completed" || this.subStudyTriggers.data.resolution;
             },
             getDataRequiredAttribute:function(element) {
                 if (!element) return null;
@@ -1651,180 +1193,6 @@ export default (function() {
                     return;
                 }
                 $(`${containerIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
-            },
-            shouldShowPostTxQuestionnaireSection: function() {
-                return this.isSubStudyPatient() && this.hasSubStudyAsssessmentData();
-            },
-            initPostTxQuestionnaireSection: function(params) {
-                if (!this.isSubStudyPatient()) {
-                    return false;
-                }
-                let self = this;
-
-                this.setSubStudyTriggers(() => {
-                    if (!this.hasSubStudyAsssessmentData()) {
-                        this.postTxQuestionnaire.loading = false;
-                        return;
-                    }
-                    this.modules.tnthAjax.getInstrument(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER, false, (data) => {
-                        let containerIdentifier = "#postTxQuestionnaireContainer";
-                        setTimeout(function() {
-                            this.postTxQuestionnaire.loading = false;
-                        }.bind(this), 50);
-
-                        if (!data.item) {
-                            $(`${containerIdentifier}`).hide();
-                            return;
-                        }
-                        this.postTxQuestionnaire.questions = data.item;
-                        this.postTxQuestionnaire.questions.forEach(question => {
-                            const numId = (question.linkId).split(".").slice(1).join(".");
-                            // id like 2.1, 3.1 as opposed to 2, 3,
-                            if (parseFloat(numId) % 1 !== 0) {
-                                question.partOf = true;
-                            }
-                            return question;
-                        });
-                        Vue.nextTick(function() {
-                            /*
-                             *  if the triggers are considered proccessed. check to see if they have been resolved
-                             */
-                            if (
-                                self.subStudyTriggers.data &&
-                                self.subStudyTriggers.data.resolution &&
-                                self.subStudyTriggers.data.resolution.qnr_id
-                            ){
-                                self.setPrevPostTxResponses(self.subStudyTriggers.data.resolution.qnr_id);
-                            }
-                            if (self.isSubStudyTriggersResolved()) return;
-
-                            //initialize datepicker
-                            $(`${containerIdentifier} .data-datepicker`).datepicker(
-                                {
-                                    "format": "dd M yyyy",
-                                    "forceParse": false,
-                                    "autoclose": true,
-                                    startDate: self.subStudyTriggers.date, //restrict entry so date entered cannot be before the trigger date
-                                    endDate: new Date()}
-                            ).on("changeDate", self.onResponseChangeFieldEvent);
-                        });
-
-                    });
-                }, {...params, ...{clearCache: true}});
-            },
-            submitPostTxQuestionnaire: function(e) {
-                e.preventDefault();
-                let postData = {
-                    entry: []
-                };
-                let answerSet = [], self = this;
-                let containerElementIdentifier = "#postTxQuestionnaireContainer";
-                $(`${containerElementIdentifier} .question`).each(function() {
-                    let answers = [];
-                    $(this).find("[dataType]").each(function() {
-                        if ($(this).attr("dataType") === "date") {
-                            answers.push({
-                                "valueString": self.modules.tnthDates.formatDateString(new Date($(this).val()), "iso-short")
-                            });
-                        }
-                        if ($(this).attr("dataType") === "choice") {
-                            let selectedOption = $(this).find("option:selected");
-                            if (selectedOption.length) {
-                                answers.push({
-                                    "valueString": selectedOption.val()
-                                });
-                                answers.push({
-                                    "valueCoding": {
-                                        "code": selectedOption.attr("code"),
-                                        "system": `${location.origin}/api/codings/assessment`
-                                    }
-                                });
-                            }
-                        }
-                        if ($(this).attr("dataType") === "open-choice" && $(this).is(":checked")) {
-                            if ($(this).hasClass("other-text")) {
-                                return true;
-                            }
-                            if ($(this).hasClass("other")) {
-                                answers.push({
-                                    "valueCoding": {
-                                        "code": $(this).attr("code"),
-                                        "system": `${location.origin}/api/codings/assessment`
-                                    },
-                                    "valueString": $(this).val()
-                                });
-                                let valueString = $(`#postTxQuestionnaireContainer .other-text[code="${$(this).attr("code")}"]`).val();
-                                if (valueString) {
-                                    answers.push({
-                                        "valueString": valueString
-                                    });
-                                }
-                                return true;
-                            }
-                            answers.push({
-                                "valueString": $(this).val()
-                            });
-                            answers.push({
-                                "valueCoding": {
-                                    "code": $(this).attr("code"),
-                                    "system": `${location.origin}/api/codings/assessment`
-                                }
-                            });
-                        }
-                        if ($(this).attr("dataType") === "boolean") {
-                            answers.push({
-                                "valueBoolean": $(this).is(":checked") ? true: false
-                            });
-                        }
-                    });
-                    answerSet.push({
-                        "answer": answers,
-                        "linkId": $(this).attr("linkId"),
-                        "text": $(this).attr("text")
-                    });
-                });
-                let patientReference = `${location.origin}/api/demographics/${this.subjectId}`;
-                postData.entry.push({
-                    "author":{
-                        "display":"user info",
-                        "reference":`${location.origin}/api/me/${this.currentUserId}`
-                     },
-                     "authored":this.modules.tnthDates.getTodayDateObj().gmtDate,
-                     "group": {
-                        "question": answerSet
-                     },
-                     "resourceType":"QuestionnaireResponse",
-                     "questionnaire":{
-                        "display":"EMPRO Post Intervention Questionnaire",
-                        "reference":`${location.origin}/api/questionnaires/${EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER}`
-                     },
-                     "source": {
-                        "display": "user demographics",
-                        "reference": `${location.origin}/api/demographics/${this.currentUserId}`
-                    },
-                     "subject":{
-                        "display":"patient demographics",
-                        "reference": patientReference
-                     },
-                     "status": "completed"
-                });
-                $(`${containerElementIdentifier} .error-message`).html("");
-                $(`${containerElementIdentifier} .btn-submit`).addClass("disabled").attr("disabled", true);
-                this.modules.tnthAjax.postAssessment(this.subjectId, postData.entry[0], {targetField:$("#postTxSubmitContainer")}, (data) => {
-                    $(`${containerElementIdentifier} .btn-submit`).removeClass("disabled").removeAttr("disabled");
-                    if (data && data.error) {
-                        $(`${containerElementIdentifier} .error-message`).html(i18next.t("Error occurred submitting data, try again"));
-                        return;
-                    }
-                    // disabled questions section to prevent user from submitting it again
-                    // the disabled class with zIndex = -1 will prevent user from clicking on the submit button
-                    $(`${containerElementIdentifier} #questionsSection`).addClass("disabled");
-
-                    setTimeout(function() {
-                        location.reload();
-                    }.bind(this), 2000);
-                });
-                return false;
             },
             getAccessUrl: function() {
                 var url = "";
@@ -1966,15 +1334,6 @@ export default (function() {
                 $("#profileEmailLogTable a.item-link").on("click", function() {
                     self.getEmailContent($(this).attr("data-user-id"), $(this).attr("data-item-id"));
                 });
-            },
-            allowSubStudyWelcomeEmail: function() {
-                /*
-                 *  to allow option for sub-study welcome email in the dropdown
-                 *  the subject needs to have consented to the sub-study,
-                 *  ready for EMPRO assessment,
-                 *  have a valid email and an assigned treating clinician
-                 */
-                return this.isSubStudyReadyPatient() && !this.userHasNoEmail() && this.hasTreatingClinician();
             },
             initPatientEmailFormSection: function() {
                 var self = this;
@@ -2250,26 +1609,34 @@ export default (function() {
                     self.postDemoData(targetField, data, function(data) {
                         if (!data || data.error) {
                             setDisabledFields(false);
+                            hidePopover();
                             return false;
                         }
                         var orgTool = self.getOrgTool(), selectedOrgElement = orgTool.getSelectedOrg();
                         if (!selectedOrgElement.length) { //no need to continue if no affiliated org
                             setDisabledFields(false);
+                            hidePopover();
                             return;
                         }
-                        self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), "", function(data) {
-                            setDisabledFields(false);
-                            if (data.error) {
-                                $("#deceasedInfo").html(i18next.t("Error occurred suspending consent for subject."));
-                                return;
-                            }
-                            hidePopover();
-                            self.reloadConsentList(subjectId);
-                        });
-                        if (self.hasSubStudyConsent()) {
-                            self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), {
-                                research_study_id: EPROMS_SUBSTUDY_ID
+                        try {
+                            self.modules.tnthAjax.withdrawConsent(subjectId, selectedOrgElement.val(), null, function(data) {
+                                setDisabledFields(false);
+                                if (data.error) {
+                                    $("#deceasedInfo").html(i18next.t("Error occurred suspending consent for subject."));
+                                    return;
+                                }
+                                hidePopover();
+                                self.reloadConsentList(subjectId);
                             });
+                        } catch (e) { 
+                            $("#deceasedInfo").html(
+                              i18next.t(
+                                "Error occurred suspending consent for subject.",
+                              ),
+                            );  
+                            console.log("Error occurred calling withdrawConsent: ", e);
+                            setDisabledFields(false);
+                            hidePopover();
                         }
                     });
                 });
@@ -2432,9 +1799,6 @@ export default (function() {
                     }
                     entries.forEach(function(entry, index) {
                         var reference = entry.questionnaire.reference;
-                        if ((new RegExp(EMPRO_POST_TX_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {
-                            return true;
-                        }
                         var arrRefs = String(reference).split("/");
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
                         if (!instrumentId) {
@@ -2464,9 +1828,6 @@ export default (function() {
                          */
                         var visitStatus = extensionStatus ? extensionStatus: entry.status;
                         let displayName = entry.questionnaire.display;
-                        if ((new RegExp(EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER)).test(reference)) {
-                            displayName = i18next.t("EMPRO Questionnaire");
-                        }
                         self.assessment.assessmentListItems.push({
                             title: i18next.t("Click to view report"),
                             link: reportLink,
@@ -3201,7 +2562,8 @@ export default (function() {
                 });
                 return content;
             },
-            getConsentEditDisplayIconHTML: function(item="", targetElementId="") {
+            getConsentEditDisplayIconHTML: function(item="", targetElementId="", editable=true) {
+                if (!editable) return "";
                 return `&nbsp;&nbsp;<a data-toggle="modal" data-target="#${targetElementId}" data-orgId="${item.organization_id}" data-agreementUrl="${item.agreement_url}" data-userId="${this.subjectId}" data-status="${item.statusText || this.getConsentStatusHTMLObj(item).statusText}" data-signed-date="${this.modules.tnthDates.formatDateString(item.acceptance_date, "system")}" data-researchStudyId="${item.research_study_id}"><span class="glyphicon glyphicon-pencil edit-icon" aria-hidden="true"></span></a>`;
             },
             getLREditIconHTML: function(item) {
@@ -3220,51 +2582,49 @@ export default (function() {
                 //consent date is editable only if the field is not disabled (e.g. as related to MedidataRave), consent is editable (e.g., Eproms), current user is a staff and subject is a patient
                 return (this.isTestEnvironment() && !this.isSubjectPatient()) || (this.isConsentStatusEditable(item) && this.isSubjectPatient() && this.isStaff());
             },
-            /*
-             * stub row in the consent table for sub-study if the subject hasn't consented to the substudy but already consented to the main study
-             */
-            getSubStudyConsentUnknownRow: function() {
-                if (!this.hasCurrentConsent()) {
-                    return;
-                }
-                let currentConsentItem = this.consent.currentItems[0];
-                this.consent.consentDisplayRows.push(
-                    [{
-                        content: EPROMS_SUBSTUDY_TITLE
-                    },
-                    {
-                        content: i18next.t("Not consented") +
-                                this.getConsentEditDisplayIconHTML({
-                                    organization_id: currentConsentItem.organization_id,
-                                    statusText: "unknown",
-                                    agreement_url: currentConsentItem.agreement_url,
-                                    research_study_id: EPROMS_SUBSTUDY_ID
-                                }
-                        , "profileConsentListModal"),
-                        "_class": "indent"
-                    }, {content: `<span class="agreement">&nbsp;</span>`}, {content: "&nbsp;"}]
-                );
-            },
             getConsentRow: function(item) {
                 if (!item) {return false;}
                 var self = this, sDisplay = self.getConsentStatusHTMLObj(item).statusHTML;
-                var contentArray = [{
-                    content: self.getConsentOrgDisplayName(item)
-                }, {
-                    content: sDisplay + (self.isConsentStatusEditable(item) ? self.getConsentEditDisplayIconHTML(item, "profileConsentListModal") : ""),
-                    "_class": "indent"
-                }, {
-                    content: (function(item) {
-                        var viewLinkHTML = `<span class="agreement">&nbsp;&nbsp;<a href="${decodeURIComponent(item.agreement_url)}" target="_blank"><em>${i18next.t("View")}</em></a></span>`;
-                        var s = viewLinkHTML + self.getLREditIconHTML(item);
-                        if (self.isDefaultConsent(item)) {
-                            s = i18next.t("Sharing information with clinics") + viewLinkHTML;
-                        }
-                        return s;
-                    })(item)
-                }, {
-                    content: self.modules.tnthDates.formatDateString(item.acceptance_date) + (self.isConsentDateEditable(item) ? self.getConsentEditDisplayIconHTML(item, "consentDateModal") : "&nbsp;")
-                }];
+                var contentArray = [
+                  {
+                    content: self.getConsentOrgDisplayName(item),
+                  },
+                  {
+                    content:
+                      sDisplay +
+                      (self.isConsentStatusEditable(item)
+                        ? self.getConsentEditDisplayIconHTML(
+                            item,
+                            "profileConsentListModal"
+                          )
+                        : ""),
+                    _class: "indent",
+                  },
+                  {
+                    content: (function (item) {
+                      var viewLinkHTML = `<span class="agreement">&nbsp;&nbsp;<a href="${decodeURIComponent(item.agreement_url)}" target="_blank"><em>${i18next.t("View")}</em></a></span>`;
+                      var s = viewLinkHTML + self.getLREditIconHTML(item);
+                      if (self.isDefaultConsent(item)) {
+                        s =
+                          i18next.t("Sharing information with clinics") +
+                          viewLinkHTML;
+                      }
+                      return s;
+                    })(item),
+                  },
+                  {
+                    content:
+                      self.modules.tnthDates.formatDateString(
+                        item.acceptance_date,
+                      ) +
+                      (self.isConsentDateEditable(item)
+                        ? self.getConsentEditDisplayIconHTML(
+                            item,
+                            "consentDateModal"
+                          )
+                        : "&nbsp;"),
+                  },
+                ];
                 this.consent.consentDisplayRows.push(contentArray);
             },
             getConsentHistoryRow: function(item) {
@@ -3290,17 +2650,8 @@ export default (function() {
                 content += "</tr>";
                 return content;
             },
-            isSubStudyConsent: function(item) {
-                if (!item) {
-                    return false;
-                }
-                return parseInt(item.research_study_id) === EPROMS_SUBSTUDY_ID;
-            },
             getConsentOrgDisplayName: function(item) {
                 if (!item) {return "";}
-                if (this.isSubStudyConsent(item)) {
-                    return EPROMS_SUBSTUDY_TITLE;
-                }
                 var orgId = item.organization_id, OT = this.getOrgTool(), currentOrg = OT.orgsList[orgId], orgName = currentOrg ? currentOrg.name : item.organization_id;
                 if (!this.isConsentWithTopLevelOrg()) {
                     var topOrgID = OT.getTopLevelParentOrg(orgId), topOrg = OT.orgsList[topOrgID];
@@ -3408,8 +2759,7 @@ export default (function() {
                             });
                             let websiteConsentTerms = [
                                 ["website terms of use",
-                                "subject website consent"],
-                                ["empro website terms of use"]
+                                "subject website consent"]
                             ];
                             (data.tous).forEach(function(item) {
                                 let fType = $.trim(item.type).toLowerCase();
@@ -3475,27 +2825,6 @@ export default (function() {
             },
             hasConsentHistory: function() {
                 return this.consent.historyItems.length > 0;
-            },
-            hasSubStudyConsent: function() {
-                return this.hasCurrentConsent() && this.consent.currentItems.filter(item => item.research_study_id === EPROMS_SUBSTUDY_ID).length;
-            },
-            showSubStudyConsentAddElement: function() {
-                //check to see if user organization is in substudy
-                if (!this.hasSubStudySubjectOrgs()) {
-                    return false;
-                }
-                // no user email
-                if (this.userHasNoEmail()) return false;
-            
-                //adding a test substudy consent should only be allowed in Test environment
-                if (!this.isTestEnvironment()) {
-                    //allowed in non-Test environment based on additional check, e.g. user role, patient role, config etc.
-                    if (!this.isConsentEditable()) {
-                        return false;
-                    }
-                }
-                //should only show add substudy consent row if the subject is a patient and the user is a staff/staff admin
-                return this.hasCurrentConsent() && !this.hasSubStudyConsent() && this.isSubjectPatient() && this.isStaff();
             },
             hasCurrentConsent: function() {
                 return this.consent.currentItems.length > 0;
@@ -3567,9 +2896,6 @@ export default (function() {
                         existingOrgs[item.organization_id+"_"+item.research_study_id] = true;
                     }
                 });
-                if (this.showSubStudyConsentAddElement()) {
-                     this.getSubStudyConsentUnknownRow();
-                }
                 clearInterval(this.consentListReadyIntervalId);
                 this.consentListReadyIntervalId = setInterval(function() {
                     if ($("#consentListTable .consentlist-cell").length > 0) {

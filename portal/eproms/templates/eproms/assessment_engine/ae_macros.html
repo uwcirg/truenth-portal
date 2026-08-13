@@ -42,10 +42,12 @@
 {%- macro completed_card(assessment_status={}, OverallStatus={}, comp_date="", title_text=_("Completed Questionnaires"), card_class="") -%}
     {%- if assessment_status.overall_status == OverallStatus.completed -%}
         {% call render_card_content(title_text=title_text, card_class=card_class) %}
-            <div class="text-content">
-                <a class="portal-weak-auth-disabled" href='{{url_for("portal.profile", _anchor="proAssessmentsLoc")}}'>
-                    {{_("View questionnaire completed on %(comp_date)s", comp_date=comp_date)}}
-                </a>
+            <div class="text-content flex flex-2">
+                <div class="flex flex-end flex-self-stretch">
+                    <a class="btn-lg btn-tnth-primary portal-weak-auth-disabled" href='{{url_for("portal.profile", _anchor="proAssessmentsLoc")}}'>
+                        {{_("View questionnaire completed on %(comp_date)s", comp_date=comp_date)}}
+                    </a>
+                </div>
             </div>
         {% endcall %}
     {%- else -%}
