@@ -1,6 +1,6 @@
 """Communication model"""
 
-from collections import MutableMapping
+from collections.abc import MutableMapping
 from datetime import datetime
 import re
 from smtplib import SMTPRecipientsRefused
