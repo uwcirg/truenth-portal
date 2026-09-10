@@ -11,8 +11,8 @@ DH_VIRTUALENV_ARGS = \
 	--extra-pip-arg='--progress-bar=off' \
 	--extra-pip-arg='--quiet'
 
-# Staged virtualenv for the portal package (before .deb install)
-VENV_DIR = $(CURDIR)/debian/portal/opt/venvs/portal
+# Directory where venvs for dh-virtualenv packages are built
+VENV_BUILD_DIR = '$(PWD)/debian/portal/opt/venvs'
 
 
 override_dh_virtualenv:
@@ -26,28 +26,27 @@ override_dh_virtualenv:
 
 	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
-	# Compile backend PO files to MO files via the staged venv.
-	# Call create_app/compile_pos directly so ImportErrors surface as
-	# real tracebacks (Flask 1.0 CLI swallows NoAppException as
-	# "No such command").
-	# Run from / so the source checkout is not auto-discovered.
+override_dh_builddeb:
+	# lines preceding `dh_builddeb` occur after venv creation && `pip install`
+	# but before debian package creation
+
+
+	# change directory to something other than the original checkout
+	# `flask` commands will ignore given entrypoint (FLASK_APP) otherwise
+	# Todo: figure out underlying cause
+
+	# compile all back-end PO files to MO files
+	# run flask from new virtual environment
+	# avoid calling `flask` script directly
+	# import paths are relative to venv *after* .deb installation
 	cd / && \
 	LANG=C.UTF-8 \
-	SECRET_KEY=build-only \
-		$(VENV_DIR)/bin/python -c \
-		"from portal.factories.app import create_app; \
-		from portal.models.i18n_utils import compile_pos; \
-		app = create_app(); \
-		ctx = app.app_context(); ctx.push(); \
-		compile_pos(); \
-		print('Compiled backend PO files to MO files')"
+	FLASK_APP='$(VENV_BUILD_DIR)/portal/bin/manage.py' \
+	SECRET_KEY='' \
+	PATH='$(VENV_BUILD_DIR)/portal/bin' \
+		python -m flask compile-po-files
 
-override_dh_strip:
-	# Binary wheels in the venv can break under dh_strip; see
-	# https://dh-virtualenv.readthedocs.io/en/latest/howtos.html
-	dh_strip --exclude=/site-packages/
 
-override_dh_builddeb:
 	dh_builddeb
 
 %:
