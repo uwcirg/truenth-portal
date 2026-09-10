@@ -226,7 +226,7 @@ polib==1.1.1
     # via portal (setup.cfg)
 prompt-toolkit==3.0.51
     # via click-repl
-psycopg2-binary==2.8.6
+psycopg2-binary==2.9.9
     # via portal (setup.cfg)
 py==1.11.0
     # via tox
