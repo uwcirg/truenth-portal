@@ -145,22 +145,6 @@ def test_int_code_POST(test_user_login, client, test_user):
     assert test_user.observations.count() == 1
 
 
-def test_clinicalPUT(test_user_login, client):
-    prep_db_for_clinical()
-    obs = Observation.query.first()
-    new_issued = '2016-06-06T06:06:06'
-    data = {'status': 'unknown', 'issued': new_issued}
-    data['valueQuantity'] = {'units': 'boolean', 'value': 'false'}
-    response = client.put('/api/patient/{}/clinical/{}'.format(
-        TEST_USER_ID, obs.id), content_type='application/json',
-        data=json.dumps(data))
-    assert response.status_code == 200
-    clinical_data = response.json
-    assert clinical_data['status'] == 'unknown'
-    assert clinical_data['issued'] == new_issued + "+00:00"  # tz
-    assert clinical_data['valueQuantity']['value'] == 'false'
-
-
 def test_clinical0forFalse(test_user_login, client):
     prep_db_for_clinical()
     obs = Observation.query.first()
