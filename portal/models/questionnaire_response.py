@@ -1,11 +1,13 @@
-import csv
-import tempfile
 from collections import defaultdict, namedtuple
 import copy
+import csv
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from html.parser import HTMLParser
 import json
+import os
+import tempfile
+import time
 
 from flask import current_app, has_request_context, url_for
 from flask_swagger import swagger
@@ -941,6 +943,34 @@ def aggregate_responses(
     tf.close()
 
     return filepath
+
+
+def report_dir_janitor():
+    """Purge old reports to avoid filling disk
+
+    Intended to be called by a scheduled job, removes stale reports from
+    configured TMP_REPORT_DIR
+    """
+    report_dir = current_app.config['TMP_REPORT_DIR']
+    if not(os.path.exists(report_dir)):
+        current_app.logger.warning("configured TMP_REPORT_DIR not found")
+        return
+
+    days_to_keep = 7
+    cutoff = time.time() - (days_to_keep * 24 * 60 * 60)
+    delete_count = 0
+
+    for filename in os.listdir(report_dir):
+        filepath = os.path.join(report_dir, filename)
+        if os.path.isfile(filepath):
+            file_mtime = os.path.getmtime(filepath)
+            if file_mtime < cutoff:
+                try:
+                    os.remove(filepath)
+                    delete_count += 1
+                except Exception as e:
+                    current_app.logger.error(f"Error removing old report: {e}")
+    current_app.logger.debug(f"Deleted {delete_count} stale reports from {report_dir}")
 
 
 def qnr_document_id(
