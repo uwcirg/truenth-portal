@@ -130,20 +130,11 @@ def add_questionnaire_response(questionnaire_response, research_study_id):
                 providers.append(org_ref)
             document["subject"]["careProvider"] = providers
 
-        if instrument == 'ironman_ss_post_tx':
-            from ..trigger_states.models import TriggerState
-            # Can't simply do the visit month math, as the clinician response may come in
-            # after expiration of the visit to which this response should apply.  Locate
-            # this questionnaire response in the trigger states table.
-            visit_name = TriggerState.visit_from_resolution_qnr(
-                patient_id=subject.id, qnr_id=questionnaire_response.id)
-        else:
-            qb_status = qb_status_visit_name(
-                subject.id,
-                research_study_id,
-                FHIR_datetime.parse(questionnaire_response.document['authored']))
-            visit_name = qb_status['visit_name']
-        document["timepoint"] = visit_name
+        qb_status = qb_status_visit_name(
+            subject.id,
+            research_study_id,
+            FHIR_datetime.parse(questionnaire_response.document['authored']))
+        document["timepoint"] = qb_status['visit_name']
 
         research_data = ResearchData(
             subject_id=subject.id,
