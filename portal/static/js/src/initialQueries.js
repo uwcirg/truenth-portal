@@ -93,11 +93,6 @@ import Consent from "./modules/Consent.js";
                     self.setSectionDataLoadedFlag("topTerms", true);
                 });
             },
-            "substudyTerms": function() {
-                tnthAjax.getTerms(self.userId, "", "", function() {
-                    self.setSectionDataLoadedFlag("substudyTerms", true);
-                });
-            },
             "demographicsContainer": function() {
                 tnthAjax.getDemo(self.userId, {useWorker:true}, function(data) {
                     self.setSectionDataLoadedFlag("demographicsContainer", true);
@@ -469,9 +464,6 @@ import Consent from "./modules/Consent.js";
                 }
                 setTimeout(function() { Utility.disableHeaderFooterLinks();}, 1000);
             },
-            "substudyTerms": function() {
-                setTimeout(function() { Utility.disableHeaderFooterLinks();}, 1000);
-            },
             "orgsContainer": function() {
                 if (preselectClinic) {
                     self.handlePreSelectedClinic();
@@ -528,9 +520,6 @@ import Consent from "./modules/Consent.js";
         var self = this;
         var events = {
             "topTerms": function() {
-                self.termsCheckboxEvent();
-            },
-            "substudyTerms": function() {
                 self.termsCheckboxEvent();
             },
             "demographicsContainer": function() {
@@ -874,9 +863,6 @@ import Consent from "./modules/Consent.js";
             $(this).on("click", function(e) {
                 e.stopPropagation();
             });
-        });
-        $("#substudyTerms .terms-tick-box").on("click", function() {
-            termsEvent.apply(this);
         });
     };
 

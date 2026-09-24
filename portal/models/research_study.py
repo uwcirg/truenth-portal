@@ -8,7 +8,6 @@ from .research_protocol import ResearchProtocol
 from .user_consent import consent_withdrawal_dates
 
 BASE_RS_ID = 0
-EMPRO_RS_ID = 1
 
 status_types = (
     "active", "administratively-completed", "approved", "closed-to-accrual",

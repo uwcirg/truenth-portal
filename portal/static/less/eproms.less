@@ -382,6 +382,7 @@ a:focus {
   min-width: 100px;
   display: inline-block;
   text-transform: uppercase;
+  line-height: 1.6;
   &:focus {
     background-color: @btnColor;
     border-color: @btnColor;
@@ -3358,27 +3359,31 @@ body.portal .copyright-container  {
   }
 }
 .portal-item {
-  width: 100%;
   max-width: 100%;
 }
 .portal-header-container {
   color: #FFF;
   width: 87.5%;
-  margin: 1em auto 32px auto;
+  margin: 1em auto 20px auto;
   font-size: @subheadSize;
   max-width: 100%;
   text-align: center;
+  text-wrap: balance;
 }
 @media (min-width: 768px) {
   .portal-header-container {
-    margin: 3.5em auto 32px auto;
+    margin: 3.5em auto 20px auto;
   }
 }
 @media (min-width: 992px) {
   .portal-header-container {
-    margin: 32px auto 32px auto;
-    max-width: 70%;
+    margin: 32px auto 20px auto;
+    max-width: 100%;
   }
+}
+section:has(.portal-header-logout-container) + .portal-main:not(:has(.portal-no-description-container)) {
+  padding-top: 1.5em;
+  border-top: 1px solid #8c8a8a;
 }
 .button-callout {
   position: relative;
@@ -3422,8 +3427,6 @@ body.portal .copyright-container  {
     font-size: @subSmallHeadSize*0.96;
   }
   .portal-intro-text {
-    padding-left: 32px;
-    padding-right: 32px;
     line-height: 1.55;
   }
 }
@@ -3432,7 +3435,7 @@ body.portal .copyright-container  {
   width: 100%;
   max-width: 100%;
   margin: auto;
-  margin-bottom: 2em;
+  margin-bottom: 1.5em;
   text-align: center;
   & a {
     padding: 16px;
@@ -3454,15 +3457,18 @@ body.portal .copyright-container  {
 .portal-description {
   background: #3d4750;
   color: #FFF;
-  padding: 0.5em 1.35em 2.5em;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5em 1.5em 2.25em;
   position: relative;
   width: 420px;
   max-width: 100%;
   margin: 1em;
   min-height: 250px;
   overflow: hidden;
-  line-height: 1.5;
+  line-height: 1.6;
   align-self: stretch;
+  text-wrap: balance;
   p {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3558,7 +3564,7 @@ body.portal .copyright-container  {
   -webkit-font-smoothing: antialiased;
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  flex-grow: 2;
   justify-content: space-between;
   .button-container {
     align-self: flex-end;
@@ -5554,6 +5560,15 @@ body.vis-on-callback { /* allow page-specific presentation of content after load
   display: flex;
   justify-content: space-between;
 }
+.flex-end {
+  align-items: flex-end;
+}
+.flex-self-stretch {
+  align-self: stretch;
+}
+.flex-2 {
+  flex: 2;
+}
 .btn-group>.btn:first-child {
   font-size: @mediumText * 0.89 !important;
 }
@@ -6750,14 +6765,6 @@ div.timezone-warning.text-warning {
   #profileProcedureContainer {
      .button-container {
       margin-top: 2em;
-    }
-  }
-  #patientList {
-    .admin-table {
-      div.pull-right,
-      div.pull-right.search {
-        top: 0.75em;
-      }
     }
   }
 }

@@ -8,7 +8,6 @@ from portal.models.adherence_data import AdherenceData
 from portal.models.qb_timeline import visit_name
 from portal.models.questionnaire_bank import QBD
 from portal.models.reporting import single_patient_adherence_data
-from portal.models.research_study import EMPRO_RS_ID
 from portal.models.role import ROLE
 from portal.models.user import unchecked_get_user
 from portal.timeout_lock import ADHERENCE_DATA_KEY, CacheModeration
@@ -24,18 +23,14 @@ def baseline_id(study_id):
         if baseline_ids[study_id] is not None:
             return baseline_ids[study_id]
         baseline_ids[study_id] = []
-        query = text("select id from questionnaire_banks where name = :name")
-        if study_id == EMPRO_RS_ID:
-            baseline_ids[study_id].append(db.engine.execute(query, {"name": "ironman_ss_baseline"}).first()[0])
-        else:
-            # Due to protocol change, multiple potential baseline IDs
-            query = text("select id from questionnaire_banks where name like :name")
+        # Due to protocol change, multiple potential baseline IDs
+        query = text("select id from questionnaire_banks where name like :name")
 
-            results = []
-            for r in db.engine.execute(query, {"name": "IRONMAN_%baseline"}):
-                results.append(r[0])
+        results = []
+        for r in db.engine.execute(query, {"name": "IRONMAN_%baseline"}):
+            results.append(r[0])
 
-            baseline_ids[study_id] = tuple(results)
+        baseline_ids[study_id] = tuple(results)
         return baseline_ids[study_id]
     return lookup()
 
@@ -144,8 +139,6 @@ class CombinedData:
         retval = None
         # Iterate over all known visit months.
         max = 60
-        if self.study_id == EMPRO_RS_ID:
-            max = 12
         for i in range(1,max+1):
             ad = self.adherence_data.get(i)
             td = self.timeline_data.get(i)

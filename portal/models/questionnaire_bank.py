@@ -9,7 +9,6 @@ from ..cache import FIVE_MINS, TWO_HOURS, cache
 from ..database import db
 from ..date_tools import RelativeDelta
 from ..trace import trace
-from ..trigger_states.models import TriggerState
 from .clinical_constants import CC
 from .fhir import bundle_results
 from .intervention import Intervention, INTERVENTION
@@ -334,8 +333,6 @@ def trigger_date(user, research_study_id, qb=None):
     :return: UTC datetime for the given user / QB, or None if N/A
 
     """
-    from .qb_timeline import QBT
-    from .research_study import EMPRO_RS_ID
     trace("calculate trigger date (not currently cached)")
 
     def consent_date(user, research_study_id):
@@ -345,76 +342,7 @@ def trigger_date(user, research_study_id, qb=None):
                 consent))
             return consent
 
-    def completed_global_date(user, consent_date):
-        """EMPRO requires a global study completed w/i 4 weeks
-
-        :returns: the completed datetime of a global study QB either
-          prior to consent_date, but within 4 weeks or
-          after consent_date or
-          None
-
-        """
-        four_weeks_back = consent_date - RelativeDelta(weeks=4)
-        completed = QBT.query.filter(QBT.user_id == user.id).filter(
-            QBT.status == 'completed').filter(
-            QBT.research_study_id == 0).filter(
-            QBT.at > four_weeks_back).order_by(QBT.at).with_entities(
-            QBT.at)
-
-        best = None
-        for timepoint in completed:
-            if not best:
-                best = timepoint.at
-                continue
-            if timepoint.at > consent_date:
-                # already have a match, don't accept a "better" option
-                # beyond the consent date.
-                break
-        return best
-
     trigger = None
-
-    if research_study_id == EMPRO_RS_ID:
-        c_date = consent_date(user, research_study_id)
-        if not c_date:
-            return None
-        completed_global = completed_global_date(user, c_date)
-        if not completed_global:
-            # User didn't complete a global study within four weeks prior to
-            # their consent date.  BUT we may be looking this up at a later
-            # date.  In a situation in which, on initial consent, the above
-            # was true, and the next global visit hadn't started yet, the user
-            # could legitimately start their EMPRO.
-            #
-            # However, looking this up at a later date when the subsequent
-            # global visit is due, they would NOT be allowed to begin work
-            # on EMPRO, until that global visit was completed.
-            #
-            # Therefore, if they did start EMPRO before the subsequent became
-            # due, we can't move the trigger date, and must stick with the
-            # original.  Should there be any rows in trigger_states for the
-            # user prior to the subsequent global due date, use consent date.
-            next_global_due = QBT.query.filter(QBT.user_id == user.id).filter(
-                QBT.status == 'due').filter(
-                QBT.research_study_id == 0).filter(
-                QBT.at > c_date).order_by(QBT.at).with_entities(
-                QBT.at).first()
-            if not next_global_due:
-                # No subsequent found - N/A
-                return None
-            trigger_states = TriggerState.query.filter(
-                TriggerState.user_id == user.id).filter(
-                TriggerState.timestamp < next_global_due)
-
-            if trigger_states.count():
-                # Found subsequent global work due and EMPRO work commenced
-                # prior to the subsequent global, return consent date.
-                return c_date
-
-            return None
-        if completed_global < c_date:
-            return c_date
-        return completed_global
 
     # If given a QB, use its details to determine trigger
     if qb and qb.research_protocol_id:
@@ -595,10 +523,7 @@ def visit_name(qbd):
 
     NB - only returns english version.  See `translate_visit_name()`
     """
-    from .research_study import (
-        EMPRO_RS_ID,
-        research_study_id_from_questionnaire,
-    )
+    from .research_study import research_study_id_from_questionnaire
 
     if not qbd.questionnaire_bank or qbd.questionnaire_bank.id == 0:
         return None
@@ -619,12 +544,8 @@ def visit_name(qbd):
         clm = clrd.months or 0
         clm += (clrd.years * 12) if clrd.years else 0
         total = clm * qbd.iteration + sm
-        if rs_id == EMPRO_RS_ID:
-            return f'Month {total+1}'
         return f'Month {total}'
 
-    if rs_id == EMPRO_RS_ID:
-        return 'Month 1'
     return qbd.questionnaire_bank.classification.title()
 
 

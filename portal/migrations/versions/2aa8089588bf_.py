@@ -15,8 +15,9 @@ from portal.models.user import User, unchecked_get_user
 from portal.models.user_consent import consent_withdrawal_dates
 from portal.models.qb_timeline import update_users_QBT
 from portal.models.questionnaire_response import QuestionnaireResponse
-from portal.models.research_study import EMPRO_RS_ID
-from portal.trigger_states.empro_states import lookup_visit_month
+EMPRO_RS_ID = 1  #  Obsolete in obsolete migration file
+def lookup_visit_month(patient_id, visit_month):
+    return  ## NOP in obsolete migration file
 
 # revision identifiers, used by Alembic.
 revision = '2aa8089588bf'

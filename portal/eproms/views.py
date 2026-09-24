@@ -93,7 +93,7 @@ def assessment_engine_view(user):
     from datetime import datetime
     from ..models.overall_status import OverallStatus
     from ..models.qb_status import QB_Status, patient_research_study_status
-    from ..models.research_study import BASE_RS_ID, EMPRO_RS_ID, ResearchStudy
+    from ..models.research_study import BASE_RS_ID
     now = datetime.utcnow()
 
     research_study_status = patient_research_study_status(user)
@@ -122,24 +122,6 @@ def assessment_engine_view(user):
         research_study_status.get(BASE_RS_ID, {}).get('ready', False))
     enrolled_in_indefinite = assessment_status.enrolled_in_classification(
         "indefinite")
-    substudy_assessment_status = QB_Status(
-        user=user,
-        research_study_id=EMPRO_RS_ID,
-        as_of_date=now)
-    enrolled_in_substudy = EMPRO_RS_ID in research_study_status
-    substudy_due_date = (
-        localize_datetime(substudy_assessment_status.target_date, user)
-        if substudy_assessment_status.target_date else None)
-    substudy_comp_date = (
-        localize_datetime(substudy_assessment_status.completed_date, user)
-        if substudy_assessment_status.completed_date else None)
-    substudy_assessment_is_due = (
-        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['ready'])
-
-    substudy_assessment_is_ready = (
-        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['ready'])
-    substudy_assessment_errors = (
-        enrolled_in_substudy and research_study_status[EMPRO_RS_ID]['errors'])
 
     return render_template(
         "eproms/assessment_engine.html",
@@ -156,13 +138,6 @@ def assessment_engine_view(user):
         expired_date=expired_date,
         assessment_is_due=assessment_is_due,
         comp_date=comp_date,
-        enrolled_in_substudy=enrolled_in_substudy,
-        substudy_assessment_status=substudy_assessment_status,
-        substudy_assessment_is_due=substudy_assessment_is_due,
-        substudy_due_date=substudy_due_date,
-        substudy_comp_date=substudy_comp_date,
-        substudy_assessment_is_ready=substudy_assessment_is_ready,
-        substudy_assessment_errors=substudy_assessment_errors
     )
 
 
@@ -200,8 +175,6 @@ def home():
             ROLE.INTERVENTION_STAFF.value,
             ROLE.STAFF.value):
         return redirect(url_for('patients.patients_root'))
-    if user.has_role(ROLE.CLINICIAN.value):
-        return redirect(url_for('patients.patients_substudy'))
     if user.has_role(ROLE.RESEARCHER.value):
         return redirect(url_for('portal.research_dashboard'))
 
@@ -399,25 +372,6 @@ def resources():
                                results=results, demo_content=demo_content)
     else:
         abort(400, 'no resources found')
-
-
-@eproms.route('/empro-resources', methods=['GET'])
-@roles_required([ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value])
-@oauth.require_oauth()
-def empro_resources():
-    user = current_user()
-    org = user.first_top_organization()
-    if not org:
-        abort(400, 'user must belong to an organization')
-    resources_data = get_any_tag_data("empro-training-material")
-    results = resources_data['results']
-    if len(results) == 0:
-        abort(400, 'resources not found')
-    for item in results:
-        content = asset_by_uuid(item['uuid'])
-        item['content'] = content
-    return render_template('eproms/empro_resources.html',
-                           results=results)
 
 
 @eproms.route('/resources/work-instruction/<string:tag>', methods=['GET'])

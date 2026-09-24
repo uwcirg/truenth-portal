@@ -5,10 +5,7 @@
         <div class="content" :class="{'has-legend':shouldShowLegend()}" v-show="!loading">
             <div v-show="shouldShowLegend()" class="text-muted text-right report-legend" :class="{active: shouldShowLegend()}">
                 <div class="flex" style="justify-content: flex-end; gap: 8px">
-                    <span class="title" v-text="triggerLegendTitle"></span>
                     <div class="legend-list">
-                        <span class="hard-trigger-legend" v-text="hardTriggerLegend" v-show="hasHardTriggers()"></span>
-                        <span class="soft-trigger-legend" v-text="softTriggerLegend" v-show="hasSoftTriggers()"></span>
                         <span class="in-progress-legend" v-show="hasInProgressData()" v-text="inProgressLegend"></span>
                     </div>
                 </div>
@@ -49,10 +46,6 @@
     import AssessmentReportData from "../data/common/AssessmentReportData.js";
     import tnthDates from "../modules/TnthDate.js";
     import SYSTEM_IDENTIFIER_ENUM from "../modules/SYSTEM_IDENTIFIER_ENUM";
-    import {
-        EMPRO_TRIGGER_STATE_OPTOUT_KEY,
-        EMPRO_TRIGGER_PROCCESSED_STATES
-    } from "../data/common/consts.js";
     let resizeVisIntervalId = 0;
 	export default {
     data () {
@@ -65,11 +58,6 @@
             }],
             questionnaireData:[],
             assessmentData:[],
-            triggerData: {
-                data: [],
-                hardTriggers: [],
-                softTriggers: []
-            },
             questionnaireDates: [],
             questions: [{
                 code: "",
@@ -206,64 +194,13 @@
             });
             return question.length ? question[0].option : [];
         },
-        setTriggerData() {
-            let self = this;
-            this.triggerData.data.forEach(item => {
-                if (!item.triggers.domain) {
-                    return true;
-                }
-                for (let domain in item.triggers.domain) {
-                    if (!Object.keys(item.triggers.domain[domain]).length) {
-                        continue;
-                    }
-                    const hasOptOut = item.triggers.domain[domain][EMPRO_TRIGGER_STATE_OPTOUT_KEY];
-                    for (let q in item.triggers.domain[domain]) {
-                        if (!item.triggers.source || !item.triggers.source.authored) {
-                            continue;
-                        }
-                        /*
-                        * get questions that trigger hard trigger
-                        */
-                        if (item.triggers.domain[domain][q] === "hard") {
-                            self.triggerData.hardTriggers.push({
-                                "authored": item.triggers.source.authored,
-                                "questionLinkId": q,
-                                "optOut": hasOptOut
-                            });
-                        }
-                        /*
-                        * get questions that trigger soft trigger
-                        */
-                        if (item.triggers.domain[domain][q] === "soft") {
-                            self.triggerData.softTriggers.push({
-                                "authored": item.triggers.source.authored,
-                                "questionLinkId": q
-                            });
-                        }
-                    }
-                }
-            });
-            console.log("trigger data: ", self.triggerData);
-        },
-        hasTriggers() {
-            return this.hasSoftTriggers() || this.hasHardTriggers();
-        },
-        hasSoftTriggers() {
-            return this.triggerData.softTriggers.length;
-        },
-        hasHardTriggers() {
-            return this.triggerData.hardTriggers.length;
-        },
-        hasOptOutTriggers() {
-            return this.triggerData.hardTriggers.find((item) => item.optOut);
-        },
         hasInProgressData() {
             return this.assessmentData.filter(item => {
                 return String(item.status).toLowerCase() === "in-progress";
             }).length;
         },
         shouldShowLegend() {
-            return this.hasTriggers() || this.hasInProgressData();
+            return this.hasInProgressData();
         },
         isAssessmentInProgress(index) {
             if (!this.assessmentData[index]) return false;
@@ -296,24 +233,7 @@
                     arrValueCoding = arrValueCoding.map(function(item) {
                         return item.valueCoding.code;
                     });
-        
-                    let hardTriggers = $.grep(this.triggerData.hardTriggers, subitem => {
-                        let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
-                        let linkIdComparison = subitem.questionLinkId === entry.linkId;
-                        return !subitem.optOut && timeStampComparison && linkIdComparison
-                    });
 
-                    let softTriggers = $.grep(this.triggerData.softTriggers, subitem => {
-                        let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
-                        let linkIdComparison = subitem.questionLinkId === entry.linkId;
-                        return timeStampComparison && linkIdComparison;
-                    });
-
-                    let optedOutTriggers =  $.grep(this.triggerData.hardTriggers, subitem => {
-                        let timeStampComparison = new Date(subitem.authored).toLocaleString() === new Date(authoredDate).toLocaleString();
-                        let linkIdComparison = subitem.questionLinkId === entry.linkId;
-                        return subitem.optOut && timeStampComparison && linkIdComparison
-                    });
         
                     /*
                     * using valueCoding.code for answer and linkId for question if BOTH question and answer are empty strings
@@ -328,7 +248,7 @@
                     let optionsLength = this.getQuestionOptions(entry.linkId);
                     let answerObj = {
                         q: q,
-                        a: a + (hardTriggers.length?" **": ((optedOutTriggers.length || softTriggers.length)?" *": (optedOutTriggers.length? "&nbsp;&nbsp;<span class='sub'>ⓘ</span>":""))),
+                        a: a,
                         linkId: entry.linkId,
                         value: answerValue,
                         cssClass: (
@@ -381,8 +301,7 @@
             $.when(
                 $.ajax(`/api/questionnaire/${this.instrumentId}?system=${SYSTEM_IDENTIFIER_ENUM.TRUENTH_QUESTIONNAIRE_CODE_SYSTEM}`),
                 $.ajax(`/api/patient/${this.userId}/assessment/${this.instrumentId}`),
-                $.ajax(`/api/patient/${this.userId}/trigger_history`)
-            ).done((questionnaireData, assessmentData, triggerData) => {
+            ).done((questionnaireData, assessmentData) => {
                 this.errorMessage = "";
                
                 if ((!questionnaireData || !questionnaireData[0]) ||
@@ -399,12 +318,6 @@
                 this.assessmentData = (assessmentData[0].entry).sort(function(a, b) {
                                         return new Date(a.authored) - new Date(b.authored);
                                     });
-                if (triggerData && triggerData[0]) {
-                    this.triggerData.data = triggerData[0].filter(item => {
-                        return EMPRO_TRIGGER_PROCCESSED_STATES.indexOf(item.state) !== -1 && item.triggers;
-                    });
-                    this.setTriggerData();
-                }
                 this.setDomains();
                 this.setQuestions();
                 this.setQuestionnaireDates();

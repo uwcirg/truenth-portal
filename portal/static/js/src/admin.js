@@ -4,7 +4,6 @@ import Utility from "./modules/Utility.js";
 import CurrentUser from "./mixins/CurrentUser.js";
 import {
   EPROMS_MAIN_STUDY_ID,
-  EPROMS_SUBSTUDY_ID,
 } from "./data/common/consts.js";
 
 let requestTimerId = 0;
@@ -245,25 +244,9 @@ let requestTimerId = 0;
           self.onCurrentUserInit();
         }, true);
       },
-      isSubStudyPatientView: function () {
-        return $("#patientList").hasClass("substudy");
-      },
-      allowSubStudyView: function () {
-        return this.userResearchStudyIds.indexOf(EPROMS_SUBSTUDY_ID) !== -1;
-      },
-      setSubStudyUIElements: function () {
-        if (this.allowSubStudyView()) {
-          $("#patientList .eproms-substudy").removeClass("tnth-hide").show();
-          return;
-        }
-        $("#patientList .eproms-substudy").hide();
-      },
       getExportReportUrl: function () {
         let dataType = this.exportDataType || "json";
-        let researchStudyID = this.isSubStudyPatientView()
-          ? EPROMS_SUBSTUDY_ID
-          : EPROMS_MAIN_STUDY_ID;
-        return `/api/report/questionnaire_status?research_study_id=${researchStudyID}&format=${dataType}`;
+        return `/api/report/questionnaire_status?research_study_id=${EPROMS_MAIN_STUDY_ID}&format=${dataType}`;
       },
       clearExportReportTimeoutID: function () {
         if (!this.arrExportReportTimeoutID.length) {
@@ -511,7 +494,6 @@ let requestTimerId = 0;
           this.initOrgsFilter();
           this.initOrgsEvent();
         }
-        this.setSubStudyUIElements();
         this.initRoleBasedEvent();
         this.fadeLoader();
         setTimeout(
@@ -588,9 +570,6 @@ let requestTimerId = 0;
         if (adminTableContainer.hasClass("staff-view")) {
           this.tableIdentifier = "staffList";
         }
-        if (adminTableContainer.hasClass("substudy")) {
-          this.tableIdentifier = "substudyPatientList";
-        }
       },
       setOrgsSelector: function (obj) {
         if (!obj) {
@@ -605,8 +584,7 @@ let requestTimerId = 0;
       },
       setSortFilterProp: function () {
         this.sortFilterEnabled =
-          this.tableIdentifier === "patientList" ||
-          this.tableIdentifier === "substudyPatientList";
+          this.tableIdentifier === "patientList";
       },
       setFilterOptionsList: function () {
         this.filterOptionsList.forEach((o) => {
@@ -1062,22 +1040,6 @@ let requestTimerId = 0;
           orgFields.prop("checked", true);
         }
       },
-      initSubStudyOrgsVis: function () {
-        var orgFields = $("#userOrgs input[name='organization']");
-        let ot = this.getOrgTool();
-        let isSubStudyPatientView = this.isSubStudyPatientView();
-        orgFields.each(function () {
-          var val = $(this).val();
-          if (
-            val &&
-            isSubStudyPatientView &&
-            !ot.isSubStudyOrg(val, { async: true })
-          ) {
-            $(this).attr("disabled", true);
-            $(this).parent("label").addClass("disabled");
-          }
-        });
-      },
       setOrgsFilterWarning: function () {
         if (!this.siteFilterApplied()) {
           return;
@@ -1109,7 +1071,6 @@ let requestTimerId = 0;
           $(this)
             .find(".glyphicon-menu-up, .glyphicon-menu-down")
             .toggleClass("tnth-hide"); //toggle menu up/down button
-          self.initSubStudyOrgsVis();
           setTimeout(function () {
             self.setOrgsMenuHeight(95);
             self.clearFilterButtons();
