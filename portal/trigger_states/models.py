@@ -250,21 +250,6 @@ class TriggerState(db.Model):
             TriggerState.visit_month == visit_month).order_by(
             TriggerState.id.desc()).first()
 
-    @staticmethod
-    def visit_from_resolution_qnr(patient_id, qnr_id):
-        """Special lookup to locate visit from resolution qnr (clinician response)
-
-        :param patient_id: User/patient in question
-        :param qnr_id: QuestionnaireResponse ID to look up.
-        :return: visit month 1 indexed, or None if not found
-        """
-        result = TriggerState.query.filter(
-            TriggerState.user_id == patient_id).filter(
-            TriggerState.triggers["resolution"]["qnr_id"].astext == f"{qnr_id}").first()
-        if result:
-            # adjust for zero indexed month
-            return f"Month {result.visit_month + 1}"
-
     def resolve_outstanding(self, visit_month):
         """resolve any visits prior to visit_month during transition
 
