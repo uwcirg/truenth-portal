@@ -1,4 +1,4 @@
-FROM debian:bookworm as builder
+FROM debian:trixie as builder
 
 ENV \
     ARTIFACT_DIR=/tmp/artifacts \
@@ -37,7 +37,7 @@ RUN \
 
 # -----------------------------------------------------------------------------
 
-FROM debian:bookworm as production
+FROM debian:trixie as production
 
 LABEL org.opencontainers.image.source https://github.com/uwcirg/truenth-portal
 
