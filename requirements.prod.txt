@@ -1,7 +1,7 @@
 # application production dependencies
 --requirement requirements.txt
 
-gunicorn==20.0.4
+gunicorn==22.0.0
 
 # build from source for prod, use pre-compiled binary for testing
 # http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
