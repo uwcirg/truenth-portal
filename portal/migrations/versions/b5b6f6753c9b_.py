@@ -1,7 +1,7 @@
 """Purge EMPRO data (TN-3367)
 
 Revision ID: b5b6f6753c9b
-Revises: c4f8a2b91d07
+Revises: 138e7a0feffc
 Create Date: 2026-08-03 13:18:54.677341
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy import text
 
 # revision identifiers, used by Alembic.
 revision = 'b5b6f6753c9b'
-down_revision = 'c4f8a2b91d07'
+down_revision = '138e7a0feffc'
 
 logger = logging.getLogger("alembic")
 #logger.setLevel(logging.DEBUG)
