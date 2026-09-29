@@ -192,7 +192,7 @@ markupsafe==3.0.3
     #   mako
 mock==4.0.3
     # via portal (setup.cfg)
-oauthlib==2.1.0
+oauthlib==4.0.0
     # via
     #   flask-dance
     #   flask-oauthlib
