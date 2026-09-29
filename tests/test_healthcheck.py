@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 from mock import Mock, patch
 import pytest
@@ -16,6 +17,7 @@ from tests import TestCase
 class TestHealthcheck(TestCase):
     """Health check module and view tests"""
 
+    @pytest.mark.skipif("skip_celery_tests" in os.environ, reason="skip celery dependent tests")
     def test_celery_available_succeeds_when_celery_test_success(self):
         results = celery_available()
         assert results[0] is True

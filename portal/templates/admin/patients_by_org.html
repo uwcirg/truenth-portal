@@ -5,7 +5,6 @@
   <div id="patientList">
     <div class="patientList-header">
       <h4 class="tnth-headline">{{_("Patient List")}}</h4>
-      {{patientListToggle(selected='mainStudy')}}
     </div>
     <div id="patientListOptions">
       {%- if user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}

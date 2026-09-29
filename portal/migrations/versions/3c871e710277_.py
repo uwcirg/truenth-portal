@@ -11,7 +11,8 @@ from sqlalchemy.sql.functions import func
 
 from portal.cache import cache
 from portal.models.adherence_data import AdherenceData
-from portal.models.research_study import BASE_RS_ID, EMPRO_RS_ID
+from portal.models.research_study import BASE_RS_ID
+EMPRO_RS_ID = 1  #  Obsolete in obsolete migration file
 from portal.models.qb_timeline import QBT, update_users_QBT
 from portal.models.questionnaire_bank import trigger_date
 from portal.models.questionnaire_response import (

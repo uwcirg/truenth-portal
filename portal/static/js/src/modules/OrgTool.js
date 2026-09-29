@@ -1,7 +1,6 @@
 import SYSTEM_IDENTIFIER_ENUM from "./SYSTEM_IDENTIFIER_ENUM.js";
 import tnthAjax from "./TnthAjax.js";
 import Consent from "./Consent.js";
-import {EPROMS_SUBSTUDY_ID} from "../data/common/consts.js";
 
 export default (function() { /*global i18next $ */
     var OrgObj = function(orgId, orgName, parentOrg) {
@@ -123,36 +122,6 @@ export default (function() { /*global i18next $ */
         if (!researchProtocols.length) return [];
         return researchProtocols[0].research_protocols;
     }
-    OrgTool.prototype.isSubStudyOrg = function(orgId, params) {
-        if (!orgId) return false;
-        params = params || {};
-        var orgsList = this.getOrgsList();
-        if (!orgsList.hasOwnProperty(orgId)) return false;
-        if (!this.getResearchProtocolsByOrgId(orgId).length) {
-            if (sessionStorage.getItem(`extension_${orgId}`)) {
-                orgsList[orgId].extension = [...JSON.parse(sessionStorage.getItem(`extension_${orgId}`))];
-            } else {
-                /*
-                * include flag for inherited attributes to find added inherited attributes that include research study
-                * information
-                */
-                tnthAjax.getOrg(orgId, {include_inherited_attributes: true, sync: params.async ? false : true}, function(data) {
-                    if (data && data.extension) {
-                        orgsList[orgId].extension = [...data.extension];
-                        sessionStorage.setItem(`extension_${orgId}`, JSON.stringify(data.extension));
-                    }
-                });
-            }
-        }
-        let researchProtocolSet = this.getResearchProtocolsByOrgId(orgId);
-
-        /*
-         * match substudy research protocol study id with that from the org
-         */
-        return researchProtocolSet.filter(p => {
-            return parseInt(p.research_study_id) === EPROMS_SUBSTUDY_ID;
-        }).length > 0;
-    };
     OrgTool.prototype.filterOrgs = function(leafOrgs) {
         leafOrgs = leafOrgs || [];
         if (leafOrgs.length === 0) { return false; }

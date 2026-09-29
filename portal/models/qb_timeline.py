@@ -25,7 +25,7 @@ from .questionnaire_bank import (
     trigger_date,
     visit_name,
 )
-from .questionnaire_response import QNR_results, QuestionnaireResponse
+from .questionnaire_response import QNR_results
 from .research_data import ResearchData
 from .research_protocol import ResearchProtocol
 from .role import ROLE
@@ -1311,8 +1311,7 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
     ``QB_StatusCacheKey.current()`` for as_of_date parameter, to avoid
     a new lookup with each passing moment.
 
-    If no data is available for the user, `status` of `Not Yet Available` for
-    the EMPRO study, `expired` for all others, as part of:
+    If no data is available for the user, return `status` of `expired`, as part of:
      {'status': 'expired', 'visit_name': None, 'action_state': 'not applicable'}
 
     :returns: dictionary with key/values for:
@@ -1321,16 +1320,11 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
       action_state: 'not applicable', or status of follow-up action
 
     """
-    from .research_study import EMPRO_RS_ID
-
     assert isinstance(research_study_id, int)
     assert isinstance(as_of_date, datetime)
 
-    default_status = (
-        "Not Yet Available" if research_study_id == EMPRO_RS_ID
-        else OverallStatus.expired)
     results = {
-        'status': default_status,
+        'status': OverallStatus.expired,
         'visit_name': None,
         'action_state': 'not applicable'
     }
@@ -1357,22 +1351,6 @@ def qb_status_visit_name(user_id, research_study_id, as_of_date):
 
         results['status'] = qbt.status
         results['visit_name'] = visit_name(qbt.qbd())
-
-        if research_study_id == EMPRO_RS_ID:
-            # Not available to all products, thus the nested import
-            from ..trigger_states.models import TriggerState
-
-            # Don't include the most recent `due` as they hide
-            # outstanding work, allowed till subsequent submission.
-            ts = TriggerState.query.filter(
-                TriggerState.user_id == user_id).filter(
-                TriggerState.state != 'due').order_by(
-                TriggerState.timestamp.desc()).first()
-            if ts and ts.triggers:
-                results['action_state'] = ts.triggers.get(
-                    'action_state', 'required')
-            else:
-                results['action_state'] = 'not applicable'
 
     return results
 

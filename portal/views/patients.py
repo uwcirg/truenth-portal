@@ -20,7 +20,6 @@ from ..models.patient_list import PatientList
 from ..models.questionnaire_bank import translate_visit_name
 from ..models.qb_status import patient_research_study_status
 from ..models.role import ROLE
-from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.table_preference import TablePreference
 from ..models.user import current_user, get_user
 
@@ -32,8 +31,6 @@ def users_table_pref_from_research_study_id(user, research_study_id):
     """Returns user's table preferences for given research_study id"""
     if research_study_id == 0:
         table_name = 'patientList'
-    elif research_study_id == 1:
-        table_name = 'substudyPatientList'
     else:
         raise ValueError('Invalid research_study_id')
 
@@ -58,7 +55,7 @@ def preference_filter(user, research_study_id, arg_filter):
     Looks first in request args, defaults to table preferences if not found
 
     :param user: current user
-    :param research_study_id: 0 or 1, i.e. EMPRO_STUDY_ID
+    :param research_study_id: 0
     :param arg_filter: value of request.args.get("filter")
 
     returns: dictionary of key/value pairs for filtering
@@ -85,7 +82,7 @@ def preference_sort(user, research_study_id, arg_sort, arg_order):
     Looks first in request args, defaults to table preferences if not found
 
     :param user: current user
-    :param research_study_id: 0 or 1, i.e. EMPRO_STUDY_ID
+    :param research_study_id: 0
     :param arg_sort: value of request.args.get("sort")
     :param arg_sort: value of request.args.get("order")
 
@@ -110,7 +107,7 @@ def filter_query(query, filter_field, filter_value):
         # ignore requests to filter by unknown column
         return query
 
-    if filter_field in ('birthdate', 'consentdate', 'empro_consentdate'):
+    if filter_field in ('birthdate', 'consentdate'):
         # these are not filterable (partial strings on date complexity) - ignore such a request
         return query
 
@@ -118,7 +115,7 @@ def filter_query(query, filter_field, filter_value):
         query = query.filter(PatientList.userid == int(filter_value))
         return query
 
-    if filter_field in ('questionnaire_status', 'empro_status', 'action_state'):
+    if filter_field in ('questionnaire_status',):
         query = query.filter(getattr(PatientList, filter_field) == filter_value)
 
     pattern = f"%{filter_value.lower()}%"
@@ -154,7 +151,7 @@ def page_of_patients():
     :param order: direction to apply to sorted column,
     :param offset: offset from first page of the given search params
     :param limit: count in a page
-    :param research_study_id: default 0, set to 1 for EMPRO
+    :param research_study_id: default 0
 
     """
     def requested_orgs(user, research_study_id):
@@ -176,39 +173,21 @@ def page_of_patients():
     # due to potentially translated content, need to capture all potential values to sort
     # (not just the current page) for the front-end options list
     options = []
-    if research_study_id == EMPRO_RS_ID:
-        distinct_status = PatientList.query.distinct(PatientList.empro_status).with_entities(
-            PatientList.empro_status)
-        options.append({"empro_status": [(status[0], _(status[0])) for status in distinct_status]})
-        distinct_action = PatientList.query.distinct(PatientList.action_state).with_entities(
-            PatientList.action_state)
-        options.append({"action_state": [(state[0], _(state[0])) for state in distinct_action]})
-        distinct_visits = PatientList.query.distinct(PatientList.empro_visit).with_entities(
-            PatientList.empro_visit)
-        sorted_visits = sorted(
-            [v[0] for v in distinct_visits if v[0]],
-            key=lambda x: (0 if not x.split()[-1].isdigit() else int(x.split()[-1]))
-        )
-        options.append({"empro_visit": [(visit, translate_visit_name(visit)) for visit in sorted_visits]})
-    else:
-        distinct_status = PatientList.query.distinct(
-            PatientList.questionnaire_status).with_entities(PatientList.questionnaire_status)
-        options.append(
-            {"questionnaire_status": [(status[0], _(status[0])) for status in distinct_status]})
-        distinct_visits = PatientList.query.distinct(PatientList.visit).with_entities(
-            PatientList.visit)
-        sorted_visits = sorted(
-            [v[0] for v in distinct_visits if v[0]],
-            key=lambda x: (0 if not x.split()[-1].isdigit() else int(x.split()[-1]))
-        )
-        options.append({"visit": [(visit, translate_visit_name(visit)) for visit in sorted_visits]})
+    distinct_status = PatientList.query.distinct(
+        PatientList.questionnaire_status).with_entities(PatientList.questionnaire_status)
+    options.append(
+        {"questionnaire_status": [(status[0], _(status[0])) for status in distinct_status]})
+    distinct_visits = PatientList.query.distinct(PatientList.visit).with_entities(
+        PatientList.visit)
+    sorted_visits = sorted(
+        [v[0] for v in distinct_visits if v[0]],
+        key=lambda x: (0 if not x.split()[-1].isdigit() else int(x.split()[-1]))
+    )
+    options.append({"visit": [(visit, translate_visit_name(visit)) for visit in sorted_visits]})
 
     viewable_orgs = requested_orgs(user, research_study_id)
     query = PatientList.query.filter(PatientList.org_id.in_(viewable_orgs))
     query = query.filter(PatientList.deleted==False)
-    if research_study_id == EMPRO_RS_ID:
-        # only include those in the study.  use empro_consentdate as a quick check
-        query = query.filter(PatientList.empro_consentdate.isnot(None))
     if not request.args.get('include_test_role', "false").lower() == "true":
         query = query.filter(PatientList.test_role.is_(False))
 
@@ -237,14 +216,9 @@ def page_of_patients():
             "birthdate": row.birthdate,
             "email": row.email,
             "questionnaire_status": _(row.questionnaire_status),
-            "empro_status": _(row.empro_status),
-            "action_state": _(row.action_state),
             "visit": translate_visit_name(row.visit),
-            "empro_visit": translate_visit_name(row.empro_visit),
             "study_id": row.study_id,
             "consentdate": row.consentdate,
-            "empro_consentdate": row.empro_consentdate,
-            "clinician": row.clinician,
             "org_id": row.org_id,
             "org_name": row.org_name,
             "deleted": row.deleted,
@@ -283,31 +257,6 @@ def patients_root():
     )
 
 
-@patients.route('/substudy', methods=('GET', 'POST'))
-@roles_required([
-    ROLE.CLINICIAN.value,
-    ROLE.STAFF.value,
-    ROLE.STAFF_ADMIN.value])
-@oauth.require_oauth()
-def patients_substudy():
-    """substudy patients list dependent on user role
-
-    :param reset_cache: (as query parameter).  If present, the cached
-     as_of_date key used in assessment status lookup will be reset to
-     current (forcing a refresh)
-
-    The returned list of patients depends on the users role:
-      clinicians: all patients in the sub-study with common consented orgs
-      staff, staff_admin: all patients with common consented organizations
-
-    """
-    user = current_user()
-    return render_template(
-        'admin/patients_substudy.html', user=user,
-        wide_container="true",
-    )
-
-
 @patients.route('/patient-profile-create')
 @roles_required([ROLE.STAFF_ADMIN.value, ROLE.STAFF.value])
 @oauth.require_oauth()
@@ -336,10 +285,8 @@ def session_report(subject_id, instrument_id, authored_date):
 @oauth.require_oauth()
 def longitudinal_report(subject_id, instrument_id):
     user = get_user(subject_id, 'view')
-    enrolled_in_substudy = EMPRO_RS_ID in ResearchStudy.assigned_to(user)
     return render_template(
         "longitudinalReport.html", user=user,
-        enrolled_in_substudy=enrolled_in_substudy,
         instrument_id=instrument_id, current_user=current_user())
 
 
@@ -366,12 +313,10 @@ def patient_profile(patient_id):
                 display.link_label is not None):
             user_interventions.append({"name": intervention.name})
     research_study_status = patient_research_study_status(patient)
-    enrolled_in_substudy = EMPRO_RS_ID in research_study_status
 
     return render_template(
         'profile/patient_profile.html', user=patient,
         current_user=user,
-        enrolled_in_substudy=enrolled_in_substudy,
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
 

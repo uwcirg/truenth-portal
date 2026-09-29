@@ -36,11 +36,6 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=60c7a272-a79e-5795-06c3-5f55d358469b&editorUrl=true",
-      "name": "IRONMAN EMPRO Study patient website consent URL",
-      "resourceType": "AppText"
-    },
-    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?version=latest&uuid=81e5a604-2090-3730-aedf-3d5f460f491f&editorUrl=true",
       "name": "IRONMAN staff privacy URL",
       "resourceType": "AppText"
@@ -161,53 +156,8 @@
       "resourceType": "AppText"
     },
     {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=01fbb874-b7cb-21b5-625c-8221e10cec6b",
-      "name": "patient invite email IRONMAN EMPRO Study",
-      "resourceType": "AppText"
-    },
-    {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=605ac1fe-8217-55c8-f5b6-8db73b8959ea",
       "name": "patient reminder email TrueNTH Global Registry",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=9bd6f29d-965d-7752-f4f4-d0d26c14b89f",
-      "name": "empro patient thank you email",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=76ae0f03-3018-52f3-34a1-f477bd5f8a1b",
-      "name": "empro patient both triggers email",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=dcd1f80b-6d6d-a649-75c6-5e042c8442fd",
-      "name": "empro patient soft triggers email",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=fbef98f2-53be-316c-a671-c1ebb423ed33",
-      "name": "empro clinician trigger notification",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=a1f1a57c-b250-0cf5-548b-5b0284e82ae7",
-      "name": "empro clinician trigger notification partially opted out",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=e875dceb-58d9-c8ce-3f44-6b95503e725a",
-      "name": "empro clinician trigger notification all opted out",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=3d1ab756-fe6c-eef5-5eda-78f17ac669ee",
-      "name": "empro clinician trigger reminder",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=76eff370-1b98-9387-bbfd-94ffc199ed49",
-      "name": "empro clinician trigger reminder partially opted out",
       "resourceType": "AppText"
     },
     {
@@ -248,11 +198,6 @@
     {
       "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=161e7769-dbe0-a3e4-104f-9fc39213ea04",
       "name": "site summary email",
-      "resourceType": "AppText"
-    },
-    {
-      "custom_text": "{config[LR_ORIGIN]}/c/portal/truenth/asset/mail?version=latest&uuid=cada90dd-090d-d412-1afa-2ad42a2060bf",
-      "name": "site summary email EMPRO",
       "resourceType": "AppText"
     },
     {

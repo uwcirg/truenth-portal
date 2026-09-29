@@ -10,8 +10,4 @@ export default {
     serverError: i18next.t("Server Error occurred retrieving report data"),
     noDataError: i18next.t("No data returned from server"),
     loadError: i18next.t("Unable to load report data"),
-    triggerLegendTitle: i18next.t("Clinician use only"),
-    softTriggerLegend: i18next.t("Support needed"),
-    hardTriggerLegend: i18next.t("Action required"),
-    inProgressLegend: i18next.t("In-progress")
 };

@@ -5,12 +5,6 @@
       "title": "Base Study",
       "status": "active",
       "resourceType": "ResearchStudy"
-    },
-    {
-      "id": 1,
-      "title": "IRONMAN EMPRO Study",
-      "status": "active",
-      "resourceType": "ResearchStudy"
     }
   ],
   "id": "SitePersistence v0.2",

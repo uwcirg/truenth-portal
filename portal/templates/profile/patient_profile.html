@@ -49,20 +49,6 @@
     </nav>
   {%- endif %}
   {{profile_macro.profileDemo(user, current_user)}}
-  {%- if current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value) -%}
-      {{profile_macro.profileTreatingClinician(user)}}
-  {%- endif -%}
-  {%- if current_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value, ROLE.CLINICIAN.value) -%}
-    <div class="row" id="longitudinalReportSection" class="eproms-substudy" v-show="hasSubStudyAsssessmentData()"> 
-      <div class="col-md-12 col-xs-12">
-          {{profile_macro.longitudinalReport(user)}}
-      </div>
-    </div>
-    <!-- post intervention questionnaire, EMPRO only -->
-    {%- if enrolled_in_substudy -%}
-      {{profile_macro.postInterventionQuestionnaire(user, current_user)}}
-    {%- endif -%}
-  {%- endif -%}
   {{profile_macro.profileDemoDetail(user, current_user)}}
   {{profile_macro.profileCommunications(user, current_user)}}
   <div class="row">

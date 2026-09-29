@@ -9,19 +9,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <!-- radio buttons selector for either main study or sub-study instruments -->
-                            <div id="studyListSelector" class="list-selector sub-study">
-                                <div class="items">
-                                    <div class="item">
-                                        <input type="radio" name="listSelector" @click="setCurrentMainStudy()" checked>
-                                        <span class="text" v-text="mainStudySelectorLabel" :class="{'active': isCurrentMainStudy()}"></span>
-                                    </div>
-                                    <div class="item">
-                                        <input type="radio" name="listSelector" @click="setCurrentSubStudy()">
-                                        <span class="text" v-text="subStudySelectorLabel" :class="{'active': isCurrentSubStudy()}"></span>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- radio buttons selector for main study instruments -->
                             <label class="text-muted prompt" v-text="instrumentsPromptLabel"></label>
                             <div id="patientsInstrumentListWrapper">
                                 <!-- dynamically load instruments list -->
@@ -29,12 +17,6 @@
                                     <div v-show="isCurrentMainStudy()">
                                         <div class="list">
                                             <div class="checkbox instrument-container" :id="code+'_container'" v-for="code in mainStudyInstrumentsList"><label><input type="checkbox" name="instrument" :value="code">{{getDisplayInstrumentName(code)}}</label></div>
-                                        </div>
-                                    </div>
-                                    <!-- sub-study instrument list, should only display when the user is part of the sub-study -->
-                                    <div v-show="isCurrentSubStudy()">
-                                        <div class="list">
-                                            <div class="checkbox instrument-container" :id="code+'_container'" v-for="code in subStudyInstrumentsList"><label><input type="checkbox" name="instrument" :value="code">{{getDisplayInstrumentName(code)}}</label></div>
                                         </div>
                                     </div>
                                 </div>
@@ -79,7 +61,6 @@
     import Global from "../modules/Global.js";
     import tnthAjax from "../modules/TnthAjax.js";
     import CurrentUser from "../mixins/CurrentUser.js";
-    import {EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER} from "../data/common/consts.js";
     import ExportInstrumentsData from "../data/common/ExportInstrumentsData.js";
     import ExportDataLoader from "./asyncExportDataLoader.vue";
     export default { /*global i18next */
@@ -88,9 +69,7 @@
             return {...ExportInstrumentsData, ...{
                 currentStudy: "main",
                 mainStudyIdentifier: "main",
-                subStudyIdentifier: "substudy",
                 mainStudyInstrumentsList:[],
-                subStudyInstrumentsList:[],
                 exportHistory: null,
                 currentTaskUrl: null,
                 exportHistoryTitle: "Last data export"
@@ -126,14 +105,8 @@
             setCurrentMainStudy: function() {
                 this.setCurrentStudy(this.mainStudyIdentifier);
             },
-            setCurrentSubStudy: function() {
-                this.setCurrentStudy(this.subStudyIdentifier);
-            },
             isCurrentMainStudy: function() {
                 return this.currentStudy === this.mainStudyIdentifier;
-            },
-            isCurrentSubStudy: function() {
-                return this.currentStudy === this.subStudyIdentifier;
             },
             setErrorMessage: function(message) {
                 var errorEl = document.querySelector("#instrumentsExportErrorMessage");
@@ -143,41 +116,25 @@
             getInstrumentList: function () {
                 var self = this;
                 //set sub-study elements vis
-                Global.setSubstudyElementsVis(".sub-study", (data) => {
-                    tnthAjax.getInstrumentsList(false, function (data) {
-                        if (!data || !data.length) {
-                            self.setErrorMessage(data.error);
-                            self.setInstrumentsListReady();
-                            return false;
-                        }
-                        self.setErrorMessage("");
-                        let entries = data.sort();
-                        self.setMainStudyInstrumentsListContent(entries);
-                        self.setSubStuyInstrumentsListContent(entries);
+                tnthAjax.getInstrumentsList(false, function (data) {
+                    if (!data || !data.length) {
+                        self.setErrorMessage(data.error);
                         self.setInstrumentsListReady();
-                        setTimeout(function() {
-                            self.setInstrumentInputEvent();
-                        }.bind(self), 150);
-                    });
+                        return false;
+                    }
+                    self.setErrorMessage("");
+                    let entries = data.sort();
+                    self.setMainStudyInstrumentsListContent(entries);
+                    self.setInstrumentsListReady();
+                    setTimeout(function() {
+                        self.setInstrumentInputEvent();
+                    }.bind(self), 150);
                 });
-            },
-            isSubStudyInstrument: function(instrument_code) {
-                if (!instrument_code) return false;
-                let re = new RegExp(EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER, "i");
-                if (re.test(instrument_code)) {
-                    return true;
-                }
             },
             setMainStudyInstrumentsListContent: function(list) {
                 if (!list) return false;
                 this.mainStudyInstrumentsList = list.filter(code => {
-                    return !this.isSubStudyInstrument(code);
-                });
-            },
-            setSubStuyInstrumentsListContent: function(list) {
-                if (!list) return false;
-                this.subStudyInstrumentsList = list.filter(code => {
-                    return this.isSubStudyInstrument(code);
+                    return !!code;
                 });
             },
             getDisplayInstrumentName: function(code) {

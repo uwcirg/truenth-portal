@@ -548,7 +548,7 @@ def patient_research_study_status(
 
     """
     from datetime import datetime
-    from .research_study import EMPRO_RS_ID, ResearchStudy
+    from .research_study import ResearchStudy
     if as_of_date is None:
         as_of_date = datetime.utcnow()
 
@@ -563,12 +563,6 @@ def patient_research_study_status(
             'errors': [],
         }
         results[rs] = rs_status
-        if rs == EMPRO_RS_ID and len([c for c in patient.clinicians]) == 0:
-            # Enforce biz rule - must have clinician on file.
-            trace("no clinician; not eligible")
-            rs_status['eligible'] = False
-            rs_status['intervention_qnr_eligible'] = False
-            rs_status['errors'].append("No clinician")
 
         if ignore_QB_status:
             # Bootstrap issues, can't yet check QB_Status.
@@ -591,22 +585,5 @@ def patient_research_study_status(
         if needing_full or resume_ids:
             # work to be done in this study
             rs_status['ready'] = True
-
-        # Apply business rules specific to EMPRO
-        if rs == EMPRO_RS_ID and 0 in results:
-            if results[0]['ready']:
-                # Clear ready status when base has pending work
-                rs_status['ready'] = False
-                rs_status['errors'].append('Pending work in base study')
-            elif not patient.email_ready()[0]:
-                # Avoid errors from automated emails, that is, email required
-                rs_status['ready'] = False
-                rs_status['errors'].append('User lacks valid email address')
-            elif rs_status['ready']:
-                # As user may have just entered ready status on EMPRO
-                # move trigger_states.state to due
-                if not skip_initiate:
-                    from ..trigger_states.empro_states import initiate_trigger
-                    initiate_trigger(patient.id)
 
     return results

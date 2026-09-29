@@ -72,7 +72,6 @@ from ..models.organization import (
     UserOrganization,
 )
 from ..models.overall_status import OverallStatus
-from ..models.research_study import EMPRO_RS_ID, ResearchStudy
 from ..models.role import ALL_BUT_WRITE_ONLY, ROLE
 from ..models.table_preference import TablePreference
 from ..models.url_token import BadSignature, SignatureExpired, verify_token
@@ -213,15 +212,6 @@ class ShortcutAliasForm(FlaskForm):
             except NoResultFound:
                 raise validators.ValidationError("Code not found")
 
-
-@portal.route('/substudy-tailored-content')
-@oauth.require_oauth()
-def substudy_tailored_content():
-    return send_from_directory(
-        safe_join(current_app.static_folder, 'templates'),
-        'substudy_tailored_content.html',
-        cache_timeout=-1
-    )
 
 @portal.route('/go', methods=['GET', 'POST'])
 def specific_clinic_entry():
@@ -597,11 +587,6 @@ def initial_queries():
             r = ROLE.STAFF.value if r == ROLE.STAFF_ADMIN.value else r
             role = r
     terms = get_terms(user.locale_code, org, role)
-    substudy_terms = None
-    enrolled_in_substudy = EMPRO_RS_ID in ResearchStudy.assigned_to(user)
-    if enrolled_in_substudy:
-        substudy_terms = get_terms(locale_code=user.locale_code, org=org,
-                                   role=role, research_study_id=EMPRO_RS_ID)
 
     # need this at all time now for ui
     consent_agreements = Organization.consent_agreements(
@@ -609,7 +594,6 @@ def initial_queries():
 
     return render_template(
         'initial_queries.html', user=user, terms=terms,
-        substudy_terms=substudy_terms,
         consent_agreements=consent_agreements)
 
 
