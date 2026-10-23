@@ -2013,6 +2013,20 @@ class User(db.Model, UserMixin):
 
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
+    def role_change_allowed(self, role_list):
+        """Few users are allowed to change other's roles"""
+        if self.has_role(ROLE.ADMIN.value):
+            return True
+
+        if self.has_role(ROLE.SERVICE.value):
+            # service accounts are allowed to set low tier roles only
+            allowed_roles = {'patient', 'partner', 'write_only'}
+            requested_roles = set([r.name for r in role_list])
+            if requested_roles.issubset(allowed_roles):
+                return True
+
+        return False
+
     def has_role(self, *roles):
         """Given one or more roles by name, true if user has at least one"""
         users_roles = set((r.name for r in self.roles))

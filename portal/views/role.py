@@ -1,9 +1,10 @@
 """Role(s) API"""
 from flask import Blueprint, abort, jsonify, request
+from flask_user import roles_required
 
 from ..database import db
 from ..extensions import oauth
-from ..models.role import Role
+from ..models.role import Role, ROLE
 from ..models.user import current_user, get_user
 from .crossdomain import crossdomain
 
@@ -104,6 +105,7 @@ def roles(user_id):
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('POST',))
 @crossdomain()
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 @oauth.require_oauth()
 def add_roles(user_id):
     """Add roles to user, returns simple JSON defining user roles
@@ -164,6 +166,9 @@ def add_roles(user_id):
 
     role_list = [Role.query.filter_by(name=role.get('name')).one()
                  for role in request.json.get('roles')]
+    if not current_user().role_change_allowed(role_list=role_list):
+        abort(403, f"Insufficient permissions to add role {request.json.get('roles')} to user({user_id})")
+
     user.add_roles(role_list, acting_user=current_user())
     db.session.commit()
 
@@ -241,6 +246,7 @@ def delete_roles(user_id):
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('PUT',))
 @crossdomain()
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
 @oauth.require_oauth()
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles
@@ -296,6 +302,9 @@ def set_roles(user_id):
 
     role_list = [Role.query.filter_by(name=role.get('name')).one()
                  for role in request.json.get('roles')]
+    if not current_user().role_change_allowed(role_list=role_list):
+        abort(403, f"Insufficient permissions to set role {request.json.get('roles')} on user({user_id})")
+
     user.update_roles(role_list, acting_user=current_user())
     db.session.commit()
 

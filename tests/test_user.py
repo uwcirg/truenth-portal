@@ -471,6 +471,12 @@ class TestUser(TestCase):
         assert len(new_user.roles) == 1
         assert new_user.locale_code == language
         assert new_user.locale_name == language_name
+        # confirm special roles aren't allowed
+        roles = {"roles": [{"name": ROLE.STAFF_ADMIN.value}]}
+        response = self.client.put(
+            '/api/user/{}/roles'.format(user_id),
+            content_type='application/json', data=json.dumps(roles))
+        assert response.status_code == 403
 
     def test_tz_set_on_account_creation(self):
         org = Organization(id=101, name='org', timezone='US/Pacific')
