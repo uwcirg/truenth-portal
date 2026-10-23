@@ -2020,7 +2020,7 @@ class User(db.Model, UserMixin):
 
         if self.has_role(ROLE.SERVICE.value):
             # service accounts are allowed to set low tier roles only
-            allowed_roles = {'patient', 'partner', 'write_only'}
+            allowed_roles = {'access_on_verify', 'patient', 'partner', 'write_only'}
             requested_roles = set([r.name for r in role_list])
             if requested_roles.issubset(allowed_roles):
                 return True
