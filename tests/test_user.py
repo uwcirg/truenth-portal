@@ -822,6 +822,10 @@ class TestUser(TestCase):
         with pytest.raises(Unauthorized):
             user.check_role(**kwargs)
 
+        kwargs = {'permission': 'edit', 'other_id': user.id}
+        with pytest.raises(Unauthorized):
+            member_of.check_role(**kwargs)
+
         kwargs = {'permission': 'view', 'other_id': u2.id}
         with pytest.raises(Unauthorized):
             user.check_role(**kwargs)
