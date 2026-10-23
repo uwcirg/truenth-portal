@@ -1995,9 +1995,9 @@ class User(db.Model, UserMixin):
                             return True
 
         if (self.has_role(ROLE.STAFF_ADMIN.value) and
-                other.has_role(ROLE.STAFF_ADMIN.value) or
+                (other.has_role(ROLE.STAFF_ADMIN.value) or
                 other.has_role(ROLE.STAFF.value) or
-                other.has_role(ROLE.CLINICIAN.value)):
+                other.has_role(ROLE.CLINICIAN.value))):
             # Staff admin can do anything to staff at or below their level
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
@@ -2012,6 +2012,20 @@ class User(db.Model, UserMixin):
                     return True
 
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
+
+    def role_change_allowed(self, role_list):
+        """Few users are allowed to change other's roles"""
+        if self.has_role(ROLE.ADMIN.value):
+            return True
+
+        if self.has_role(ROLE.SERVICE.value):
+            # service accounts are allowed to set low tier roles only
+            allowed_roles = {'access_on_verify', 'patient', 'partner', 'write_only'}
+            requested_roles = set([r.name for r in role_list])
+            if requested_roles.issubset(allowed_roles):
+                return True
+
+        return False
 
     def has_role(self, *roles):
         """Given one or more roles by name, true if user has at least one"""
