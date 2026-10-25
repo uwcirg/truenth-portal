@@ -29,7 +29,7 @@ cachelib==0.13.0
     #   flask-session
 celery==5.3.1
     # via portal (setup.cfg)
-certifi==2025.7.14
+certifi==2026.10.19
     # via requests
 charset-normalizer==3.4.2
     # via requests
