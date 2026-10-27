@@ -400,12 +400,12 @@ def access_via_token(token, next_step=None):
         # If user does not have PROMOTE_WITHOUT_IDENTITY_CHALLENGE,
         # challenge the user identity, followed by a redirect to the
         # appropriate page.
-        session['challenge.user_id'] = user.id
         if not all((user.birthdate, user.first_name, user.last_name)):
             current_app.logger.error(
                 "{} w/o all (birthdate, first_name, last_name); can't "
                 "verify".format(user))
             abort(400, "invalid state - can't continue")
+        session['challenge.user_id'] = user.id
 
         if ROLE.ACCESS_ON_VERIFY.value in has:
             # Send user to verify, and then follow post login flow
@@ -440,10 +440,6 @@ def access_via_token(token, next_step=None):
 
 class ChallengeIdForm(FlaskForm):
     retry_count = HiddenField('retry count', default=0)
-    next_url = HiddenField('next')
-    user_id = HiddenField('user')
-    merging_accounts = HiddenField('merging_accounts')
-    access_on_verify = HiddenField('access_on_verify')
     first_name = StringField(
         'First Name', validators=[validators.input_required()])
     last_name = StringField(
@@ -453,22 +449,12 @@ class ChallengeIdForm(FlaskForm):
 
 
 @portal.route('/challenge', methods=['GET', 'POST'])
-def challenge_identity(
-        user_id=None, next_url=None, merging_accounts=False,
-        access_on_verify=False, request_path=None):
+def challenge_identity(request_path=None):
     """Challenge the user to verify themselves
 
     Can't expose the parameters for security reasons - use the session,
-    namespace each variable i.e. session['challenge.user_id'] unless
-    calling as a function.
+    namespace each variable i.e. session['challenge.user_id'].
 
-    :param user_id: the user_id to verify - invited user or the like
-    :param next_url: destination url on successful challenge completion
-    :param merging_accounts: boolean value, set true IFF on success, the
-        user account will be merged into a new account, say from a weak
-        authenicated WRITE_ONLY invite account
-    :param access_on_verify: boolean value, set true IFF on success, the
-        user should be logged in once validated, i.e. w/o a password
     :param request_path: the requested url prior to redirection to here
         necessary in no cookie situations, to redirect user back
 
@@ -484,23 +470,17 @@ def challenge_identity(
         return redirect(url_for(
             'portal.require_cookies', target=request_path))
 
-    if request.method == 'GET':
-        # Pull parameters from session if not defined
-        if not (user_id and next_url):
-            user_id = session.get('challenge.user_id')
-            next_url = session.get('challenge.next_url')
-            merging_accounts = session.get(
-                'challenge.merging_accounts', False)
-            access_on_verify = session.get(
-                'challenge.access_on_verify', False)
+    # Always pull parameters from session, don't trust form data
+    user_id = session.get('challenge.user_id')
+    next_url = session.get('challenge.next_url')
+    merging_accounts = session.get('challenge.merging_accounts', False)
+    access_on_verify = session.get('challenge.access_on_verify', False)
 
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
         if form.next_url.data:
             validate_origin(form.next_url.data)
-        if not form.user_id.data:
-            abort(400, "missing user in identity challenge")
-        user = unchecked_get_user(form.user_id.data)
+        user = unchecked_get_user(user_id)
     else:
         user = unchecked_get_user(user_id)
         form = ChallengeIdForm(
