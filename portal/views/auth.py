@@ -317,6 +317,25 @@ def login_user_with_provider(request, provider):
     original_image_url = user.image_url
     user.image_url = user_info.image_url
 
+    # Don't allow any elevated accounts in via IdP as it circumvents 2FA
+    if user.has_role(
+            ROLE.ADMIN.value,
+            ROLE.ANALYST.value,
+            ROLE.APPLICATION_DEVELOPER.value,
+            ROLE.CLINICIAN.value,
+            ROLE.CONTENT_MANAGER.value,
+            ROLE.INTERVENTION_STAFF.value,
+            ROLE.PRIMARY_INVESTIGATOR.value,
+            ROLE.RESEARCHER.value,
+            ROLE.SERVICE.value,
+            ROLE.STAFF.value,
+            ROLE.STAFF_ADMIN.value,
+        ):
+        auditable_event(
+            "Preventing elevated account from IdP login",
+            user_id=user.id, subject_id=user.id, context='login')
+        abort(403)
+
     # Finally, commit all of our changes
     db.session.commit()
 
