@@ -605,7 +605,9 @@ def add_user_organizations(user_id):
                 409,
                 "POST restricted to organizations not already assigned to "
                 "user")
-        user.organizations.append(org)
+        org_list = [o for o in user.organizations]
+        org_list.append(org)
+        user.update_orgs(org_list, acting_user=current_user())
         auditable_event(
             message='Added {}'.format(org), user_id=current_user().id,
             subject_id=user.id, context='organization')
