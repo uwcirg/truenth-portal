@@ -41,9 +41,9 @@ def reset_password_view_function(token):
     if verified and verified == user_id:
         return reset_password(token)
 
-    next_url = url_for('user.reset_password', token=token)
-    return challenge_identity(
-        user_id=user_id, next_url=next_url, request_path=request.url)
+    session['challenge.user_id'] = user_id
+    session['challenge.next_url'] = url_for('user.reset_password', token=token)
+    return challenge_identity(request_path=request.url)
 
 
 class LockoutLoginForm(LoginForm):
