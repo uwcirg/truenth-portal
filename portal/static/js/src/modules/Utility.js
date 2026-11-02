@@ -442,3 +442,22 @@ export function alphanumericSorter(a, b) {
     //The localeCompare() method returns 1 if a reference string comes before, -1 it comes after or 0 if the reference string is the same as the given string.
     //see relevant discussion here, https://stackoverflow.com/questions/4340227/sort-mixed-alpha-numeric-array
 }
+
+export function getSafeLocalUrl(rawURL, fallback) {
+  fallback = fallback || "/";
+  if (!rawURL) return fallback;
+  try {
+    // Resolve relative paths against the current origin.
+    var url = new URL(rawURL, window.location.origin);
+    if (
+      (url.protocol === "https:" || url.protocol === "http:") &&
+      url.origin === window.location.origin
+    ) {
+        console.log("url ", url.pathname + url.search + url.hash);
+      return url.pathname + url.search + url.hash; // same-origin only
+    }
+  } catch (e) {
+    // Malformed URL: fall through
+  }
+  return fallback;
+}

@@ -1,4 +1,4 @@
-import Utility from "./modules/Utility.js";
+import Utility, { getSafeLocalUrl } from "./modules/Utility.js";
 (function() {
     var CookieMonster = window.CookieMonster = function() {
         this.modalElementId = "modalCookieEnableWarning";
@@ -148,7 +148,7 @@ import Utility from "./modules/Utility.js";
     CookieMonster.prototype.checkSuccessTargetRedirect = function() {
         var targetRedirectElement = document.getElementById("cookieCheckTargetUrl");
         if (targetRedirectElement && targetRedirectElement.value) {
-            window.location.replace(targetRedirectElement.value);
+            window.location.replace(getSafeLocalUrl(targetRedirectElement.value));
             return true;
         }
         return false;
