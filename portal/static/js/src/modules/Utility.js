@@ -453,7 +453,6 @@ export function getSafeLocalUrl(rawURL, fallback) {
       (url.protocol === "https:" || url.protocol === "http:") &&
       url.origin === window.location.origin
     ) {
-        console.log("url ", url.pathname + url.search + url.hash);
       return url.pathname + url.search + url.hash; // same-origin only
     }
   } catch (e) {
