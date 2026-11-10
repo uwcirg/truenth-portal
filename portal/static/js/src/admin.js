@@ -229,6 +229,14 @@ let requestTimerId = 0;
               self.filterOptionsList = results.options;
             }
             self.accessed = true;
+            let rowData = results?.rows;
+            if (rowData && rowData.length) {
+              rowData.forEach((result) => {
+                if (!result) return true;
+                result = Utility.escapeObjectValues(result);
+              });
+              results.rows = rowData;
+            }
             params.success(results);
           })
           .fail(function (xhr, status) {
