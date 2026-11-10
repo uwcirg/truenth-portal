@@ -352,10 +352,13 @@ def configure_healthcheck(app):
     # Initializes the /healthcheck API that returns
     # the health of the service's dependencies based
     # on the results of the given checks
-    app.healthcheck = HealthCheck(
-        app=app,
-        path='/healthcheck',
+    health = HealthCheck(
         checkers=HEALTH_CHECKS,
         failed_status=HEALTHCHECK_FAILURE_STATUS_CODE,
-        log_on_failure=False,
+    )
+    app.healthcheck = health
+    app.add_url_rule(
+        '/healthcheck',
+        'healthcheck_status',
+        view_func=lambda: health.run(),
     )
