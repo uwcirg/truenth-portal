@@ -982,6 +982,11 @@ def assessment_update(patient_id):
     response.update({'message': 'previous questionnaire response found'})
     existing_qnr = existing_qnr.first()
 
+    # confirm the referenced QNR belongs to the authorized patient
+    if existing_qnr.subject_id != patient_id:
+        msg = (f"identified({identifier}) QuestionnaireResponse isn't owned by named patient({patient_id})")
+        return jsonify(msg), 403
+
     # remove this QNR from the report data cache, so it can be subsequently updated
     invalidate_qnr_research_data(existing_qnr)
 
