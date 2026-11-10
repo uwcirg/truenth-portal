@@ -8,8 +8,6 @@
 
     <form  id="challengeForm" action="/challenge" method="post" class="form tnth-form to-validate" role="form" data-toggle="validator">
 
-         {{ form.hidden_tag() }}
-
          <input type="hidden" id="birthdate" name="birthdate" value="{{form.birthdate.data if form.birthdate.data}}" />
 
         <div id="identityVerificationContainer">
