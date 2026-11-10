@@ -196,6 +196,7 @@ def test_client_bad_add(
 
 def test_client_edit(client, test_user_login, test_client):
     """Test editing a client application"""
+    test_user_login()
     test_url = 'http://tryme.com'
     origins = "{} {}".format(test_client.application_origins, test_url)
     response = client.post(
@@ -225,6 +226,7 @@ def test_client_edit(client, test_user_login, test_client):
 
 def test_callback_validation(client, test_user_login, test_client):
     """Confirm only valid urls can be set"""
+    test_user_login()
     response = client.post(
         '/client/{0}'.format(test_client.client_id),
         data=dict(

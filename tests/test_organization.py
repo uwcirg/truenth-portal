@@ -703,7 +703,10 @@ def test_user_org_get(
 
 
 def test_user_org_post(
-        shallow_org_tree, prep_org_w_identifier, test_user_login, client):
+        shallow_org_tree, prep_org_w_identifier, test_user_login, system_user, client):
+    system_user = db.session.merge(system_user)
+    test_user_login(acting_user_id=system_user.id)
+
     data = {'organizations': [
         {'reference': 'api/organization/123-45?system={}'.format(US_NPI)},
         {'reference': 'api/organization/1001'}
@@ -732,8 +735,13 @@ def test_user_org_bogus_identifier(
 
 
 def test_user_org_invalid_timezone_post(
-        shallow_org_tree, test_user_login, client):
+        shallow_org_tree, test_user_login, system_user, client):
     # only one org in list can be marked with `apply_to_user`
+
+    # make use of system user to get around permission checks of adding orgs
+    system_user = db.session.merge(system_user)
+    test_user_login(acting_user_id=system_user.id)
+
     data = {'organizations': [
         {'reference': 'api/organization/102', 'timezone': "apply_to_user"},
         {'reference': 'api/organization/1001', 'timezone': "apply_to_user"}
@@ -747,7 +755,7 @@ def test_user_org_invalid_timezone_post(
 
 
 def test_user_org_apply_defaults(
-        shallow_org_tree, test_user, test_user_login, client):
+        shallow_org_tree, test_user, test_user_login, service_user, client):
     # apply org timezone and language defaults to user
     sib = Organization.query.get(102)
     sib.timezone = 'Europe/Rome'
@@ -755,6 +763,9 @@ def test_user_org_apply_defaults(
     parent.default_locale = 'en_AU'
     with SessionScope(db):
         db.session.commit()
+
+    service_user = db.session.merge(service_user)
+    test_user_login(acting_user_id=service_user.id)
 
     data = {'organizations': [
         {'reference': 'api/organization/102', 'timezone': "apply_to_user"},
