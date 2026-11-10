@@ -390,12 +390,38 @@ var Utility = (function() {
             }
         });
     };
+
+    UtilityObj.prototype.escapeHTML = function (str) {
+      if (!str) return "";
+      return str.replace(
+        /[&<>'"]/g,
+        (tag) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "'": "&#39;",
+            '"': "&quot;",
+          })[tag] || tag,
+      );
+    }
+    UtilityObj.prototype.escapeObjectValues = function (obj) {
+      if (!obj) return obj;
+      return Object.fromEntries(
+        Object.entries(obj).map(([key, value]) => [
+          key,
+          typeof value === "string" ? escapeHTML(value) : value,
+        ]),
+      );
+    }
     return new UtilityObj();
 })();
 export default Utility;
 export var getExportFileName = Utility.getExportFileName; /* expose common functions */
 export var getUrlParameter= Utility.getUrlParameter;
 export var capitalize = Utility.capitalize;
+export const escapeHTML = Utility.escapeHTML;
+export const escapeObjectValues = Utility.escapeObjectValues;
 /*
  * sorting an array of object by a field name, in ascending order
  */
