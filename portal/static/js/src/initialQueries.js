@@ -4,6 +4,7 @@ import tnthAjax from "./modules/TnthAjax.js";
 import {validateDateInputFields} from "./modules/TnthDate.js";
 import Utility from "./modules/Utility.js";
 import Consent from "./modules/Consent.js";
+import { ALLOWED_HOSTS } from "./data/common/consts.js";
 
 (function() { /*global $ Utility disableHeaderFooterLinks */
     var FieldsChecker = function(dependencies) { //helper class to keep track of missing fields based on required/needed core data
@@ -781,13 +782,17 @@ import Consent from "./modules/Consent.js";
             if (!types) {
                 return;
             }
-            var arrTypes = types.split(","), dataUrl = $(this).attr("data-url");
+            var dataAttrURL = $(this).attr("data-url");
+            var arrTypes = types.split(","),
+              dataUrl = dataAttrURL
+                ? Utility.getSafeLocalUrl(dataAttrURL, "", ALLOWED_HOSTS)
+                : Utility.getSafeLocalUrl($("#termsURL").data().url, "", ALLOWED_HOSTS);
             arrTypes.forEach(function(type) {
                 if ($(".terms-checkbox-container [data-agree='true'][data-tou-type='" + type + "']").length > 0) { //if already agreed, don't post again
                     return true;
                 }
                 var theTerms = {};
-                theTerms["agreement_url"] = dataUrl ? dataUrl : $("#termsURL").data().url;
+                theTerms["agreement_url"] = dataUrl;
                 theTerms["type"] = type;
                 var org = $("#userOrgs input[name='organization']:checked"),
                     userOrgId = org.val();
