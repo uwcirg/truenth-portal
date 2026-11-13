@@ -29,3 +29,4 @@ export var REQUIRED_PI_ROLES_WARNING_MESSAGE =
                 <li><b>Admin Staff</b></li>
                 <li><b>Clinician</b></li>
             </ul>`);
+export var ALLOWED_HOSTS = ["cirg.washington.edu", "truenth.org"];

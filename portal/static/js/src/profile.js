@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import tnthAjax from "./modules/TnthAjax.js";
 import tnthDates from "./modules/TnthDate.js";
 import OrgTool from "./modules/OrgTool.js";
@@ -8,6 +9,7 @@ import ClinicalQuestions from "./modules/ClinicalQuestions.js";
 import Consent from "./modules/Consent.js";
 import {sortArrayByField, getUrlParameter} from "./modules/Utility.js";
 import {
+  ALLOWED_HOSTS,
   EPROMS_SUBSTUDY_ID,
   EPROMS_SUBSTUDY_TITLE,
   EPROMS_SUBSTUDY_QUESTIONNAIRE_IDENTIFIER,
@@ -1889,8 +1891,21 @@ export default (function() {
                         return parseInt(item.id) === parseInt(messageId);
                     });
                     targetMessages.forEach(function(item) {
-                        $("#emailBodyModal .body-content").html(item.body);
+                        // this should strip script tag automatically
+                        const cleanBody = DOMPurify.sanitize(item.body, {
+                          USE_PROFILES: { html: true },
+                          FORBID_TAGS: [
+                            "form",
+                            "iframe",
+                            "object",
+                            "embed",
+                          ],
+                        });
+                        $("#emailBodyModal .body-content").html(cleanBody);
                         $("#emailBodyModal .body-content a").each(function() { // email content contains clickable link/button - need to prevent click event of those from being triggered
+                             // no access to window.opener
+                            $(this).attr("rel", "noopener noreferrer");
+                            $(this).attr("href", "/");
                             $(this).on("click", function(e) {
                                 e.preventDefault();
                                 return false;
@@ -1908,9 +1923,11 @@ export default (function() {
                 if (!data.error) {
                     var self = this;
                     if (data.messages && data.messages.length > 0) {
-                        (data.messages).forEach(function(item) {
-                            item.subject = `<i id="messageLoader_${item.id}" class="message-loader fa fa-spinner fa-spin tnth-hide"></i>
-                                           <a id="messageLink_${item.id}" class="item-link" data-user-id="${userId}" data-item-id="${item.id}"><u>${item.subject}</u></a>`;
+                        data.messages.forEach(function (item) {
+                          item.subject = DOMPurify.sanitize(
+                            `<i id="messageLoader_${item.id}" class="message-loader fa fa-spinner fa-spin tnth-hide"></i>
+                             <a id="messageLink_${item.id}" class="item-link" data-user-id="${userId}" data-item-id="${item.id}"><u>${item.subject}</u></a>`
+                          );
                         });
                         $("#emailLogContent").html("<table id='profileEmailLogTable'></table>");
                         //noting here that displaying sent_date date/time as is, in GMT
@@ -2335,8 +2352,8 @@ export default (function() {
                         if (data.user_documents && data.user_documents.length > 0) {
                             var fData = [];
                             (data.user_documents).forEach(function(item) {
-                                item.filename = self.escapeHtml(item.filename);
-                                item.document_type = self.escapeHtml(item.document_type);
+                                item.filename = Utility.escapeHTML(item.filename);
+                                item.document_type = Utility.escapeHTML(item.document_type);
                                 item.uploaded_at = self.modules.tnthDates.formatDateString(item.uploaded_at, "iso");
                                 item.actions = `<a title="${i18next.t("Download")}" href="${'/api/user/' + String(item.user_id) + '/user_documents/' + String(item.id)}"><i class="fa fa-download"></i></a>`;
                                 fData.push(item);
@@ -3237,7 +3254,11 @@ export default (function() {
                                 this.getConsentEditDisplayIconHTML({
                                     organization_id: currentConsentItem.organization_id,
                                     statusText: "unknown",
-                                    agreement_url: currentConsentItem.agreement_url,
+                                    agreement_url: Utility.getSafeLocalUrl(
+                                      currentConsentItem.agreement_url,
+                                      "",
+                                      ALLOWED_HOSTS,
+                                    ),
                                     research_study_id: EPROMS_SUBSTUDY_ID
                                 }
                         , "profileConsentListModal"),
@@ -3255,7 +3276,7 @@ export default (function() {
                     "_class": "indent"
                 }, {
                     content: (function(item) {
-                        var viewLinkHTML = `<span class="agreement">&nbsp;&nbsp;<a href="${decodeURIComponent(item.agreement_url)}" target="_blank"><em>${i18next.t("View")}</em></a></span>`;
+                        var viewLinkHTML = `<span class="agreement">&nbsp;&nbsp;<a href="${decodeURIComponent(Utility.getSafeLocalUrl(item.agreement_url, "", ALLOWED_HOSTS))}" target="_blank"><em>${i18next.t("View")}</em></a></span>`;
                         var s = viewLinkHTML + self.getLREditIconHTML(item);
                         if (self.isDefaultConsent(item)) {
                             s = i18next.t("Sharing information with clinics") + viewLinkHTML;
@@ -3434,6 +3455,7 @@ export default (function() {
                                     item.truenth_url_text = (String(i18next.t("{projectName} Terms of Use")).replace("{projectName}", "TrueNTH USA"));
                                     item.view = i18next.t("View");
                                     item.type = fType;
+                                    item.agreement_url = Utility.getSafeLocalUrl(item.agreement_url, "", ALLOWED_HOSTS);
                                     self.consent.touObj.push(item);
                                 }
                             });
@@ -3607,17 +3629,6 @@ export default (function() {
                     field.each(function() {$(this).prop("type", "tel");});
                 }
             },
-            escapeHtml: function (text) {
-                if (text === null || text !== "undefined" || String(text).length === 0) {
-                    return text;
-                }
-                return text.replace(/[\"&'\/<>]/g, function (a) {
-                    return {
-                        '"': "&quot;", "&": "&amp;", "'": "&#39;",
-                        "/": "&#47;",  "<": "&lt;",  ">": "&gt;"
-                    }[a];
-                });
-            }
         },
         refresh: function() {
             window.location.reload();
