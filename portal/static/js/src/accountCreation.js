@@ -6,6 +6,7 @@ import OrgTool from "./modules/OrgTool.js";
 import ProcApp from "./modules/Procedures.js";
 import {CurrentUserObj} from "./mixins/CurrentUser.js";
 import {
+  ALLOWED_HOSTS,
   REQUIRED_PI_ROLES,
   REQUIRED_PI_ROLES_WARNING_MESSAGE,
 } from "./data/common/consts.js";
@@ -627,8 +628,16 @@ import {
             }
             return consentOrgId;
         };
-        this.getConsentAgreementUrl = function(parentOrg) {
-            return $("#" + parentOrg + "_agreement_url").val() || $("#stock_consent_url").val();
+        this.getConsentAgreementUrl = function (parentOrg) {
+          const agreementURL = $("#" + parentOrg + "_agreement_url").val() || "";
+          const stockURL = $("#stock_consent_url").val() || "";
+          return (
+            Utility.getSafeLocalUrl(
+                agreementURL || stockURL || "/legal/stock-org-consent/placeholder",
+                "",
+                ALLOWED_HOSTS
+            )
+          );
         };
         this.getConsents = function() {
             var orgs = {}, consents = [], CONSENT_WITH_TOP_LEVEL_ORG = false, self = this;
@@ -644,18 +653,22 @@ import {
                     return false;
                 }
                 orgs[consentOrgId] = true;
-                var agreement = self.getConsentAgreementUrl(getParentOrgId(this));
-                agreement = String(agreement).replace("placeholder", encodeURIComponent($(this).attr("data-parent-name")));
+                var agreementURL = self.getConsentAgreementUrl(getParentOrgId(this));
+                agreementURL = String(agreementURL).replace(
+                  "placeholder",
+                  encodeURIComponent($(this).attr("data-parent-name")),
+                );
+                console.log("agreement URL ", agreementURL);
                 var ct = $("#consentDate").val();
-                if (!agreement) {
-                    return true;
+                if (!agreementURL) {
+                  return true;
                 }
                 var consentItem = {};
                 if (ct) {
                     consentItem["acceptance_date"] = ct;
                 }
                 consentItem["organization_id"] = consentOrgId;
-                consentItem["agreement_url"] = agreement;
+                consentItem["agreement_url"] = agreementURL;
                 consentItem["staff_editable"] = true;
                 consentItem["include_in_reports"] = true;
                 consentItem["send_reminders"] = true;
