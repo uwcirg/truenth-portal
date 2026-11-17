@@ -7,6 +7,7 @@ const TerserWebpackPlugin = require("terser-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const crypto = require("crypto");
 const JsSrcPath = "./static/js/src";
+const JsFlaskPath = "./static/js/flask_user";
 const templateDirectory = "static/templates/";
 const crypto_orig_createHash = crypto.createHash;
 crypto.createHash = (algorithm) =>
@@ -31,6 +32,7 @@ module.exports = (env, argv) => {
       admin: JsSrcPath + "/admin.js",
       assessmentReport: JsSrcPath + "/assessmentReport.js",
       bootstrapTableExtensions: JsSrcPath + "/bootstrapTableExtensions.js",
+      confirmIdentity: JsFlaskPath + "/ConfirmIdentity.js",
       CookieMonster: JsSrcPath + "/CookieMonster.js",
       coredata: JsSrcPath + "/coredata.js",
       initialQueries: JsSrcPath + "/initialQueries.js",
@@ -54,8 +56,8 @@ module.exports = (env, argv) => {
       websiteConsentScript: JsSrcPath + "/websiteConsentScript.js",
     },
     output: {
-      filename: "[name].bundle.js",
-      chunkFilename: "[name].bundle.js",
+      filename: "[name].bundle.js?",
+      chunkFilename: "[name].bundle.js" ,
       path: path.resolve(__dirname, "static/js/dist"),
       publicPath:
         "/static/js/dist/" /* where the bundled files are updated, relative to root - specify this to make sure chunks (including the dynamically generated ones) are being generated in the correct directory */,
@@ -143,7 +145,7 @@ module.exports = (env, argv) => {
         filename: path.join(
           __dirname,
           templateDirectory,
-          "substudy_tailored_content.html"
+          "substudy_tailored_content.html",
         ),
         // favicon: path.join(__dirname, templateDirectory, "favicon.ico"),
         chunks: [emproResourcesAlias],

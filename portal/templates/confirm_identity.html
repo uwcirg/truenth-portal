@@ -11,7 +11,8 @@
                 <div class="body-content">
                     <div>{{_("I confirm that I am a participant in the IRONMAN Registry Study and am completing this questionnaire myself.")}}</div>
                 </div>
-                <div id="confirmationErrorMessage" class="error-message"></div>
+                <br/>
+                <div id="confirmationErrorMessage" class="error-message wrap-words"></div>
             </div>
             <div class="modal-footer">
                 <button id="btnConfirmIdentity" class="btn btn-default">{{_("Yes")}}</button>
@@ -21,6 +22,6 @@
         </div>
     </div>
 {% endblock %}
-{%- block additional_scripts %}<script src="{{ url_for('static', filename='js/flask_user/ConfirmIdentity.js') }}"></script>{% endblock -%}
+{%- block additional_scripts %}<script src="{{ url_for('static', filename='js/dist/confirmIdentity.bundle.js') }}"></script></script>{% endblock -%}
 {%- from "flask_user/_macros.html" import footer -%}
 {%- block footer %}{% endblock -%}
