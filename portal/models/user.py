@@ -2025,6 +2025,11 @@ class User(db.Model, UserMixin):
             if requested_roles.issubset(allowed_roles):
                 return True
 
+        if self.has_role(ROLE.STAFF_ADMIN.value):
+            allowed_roles = {'staff', 'staff_admin'}
+            if requested_roles.issubset(allowed_roles):
+                return True
+
         return False
 
     def has_role(self, *roles):

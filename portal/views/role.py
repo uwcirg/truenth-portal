@@ -246,7 +246,7 @@ def delete_roles(user_id):
 
 @role_api.route('/api/user/<int:user_id>/roles', methods=('PUT',))
 @crossdomain()
-@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value])
+@roles_required([ROLE.ADMIN.value, ROLE.SERVICE.value, ROLE.STAFF_ADMIN.value])
 @oauth.require_oauth()
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles
