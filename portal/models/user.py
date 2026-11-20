@@ -2026,7 +2026,7 @@ class User(db.Model, UserMixin):
                 return True
 
         if self.has_role(ROLE.STAFF_ADMIN.value):
-            allowed_roles = {'staff', 'staff_admin', 'test'}
+            allowed_roles = {'staff', 'staff_admin', 'test', 'write_only'}
             if requested_roles.issubset(allowed_roles):
                 return True
 
