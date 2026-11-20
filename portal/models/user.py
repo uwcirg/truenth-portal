@@ -2018,15 +2018,15 @@ class User(db.Model, UserMixin):
         if self.has_role(ROLE.ADMIN.value):
             return True
 
+        requested_roles = set([r.name for r in role_list])
         if self.has_role(ROLE.SERVICE.value):
             # service accounts are allowed to set low tier roles only
             allowed_roles = {'access_on_verify', 'patient', 'partner', 'write_only'}
-            requested_roles = set([r.name for r in role_list])
             if requested_roles.issubset(allowed_roles):
                 return True
 
         if self.has_role(ROLE.STAFF_ADMIN.value):
-            allowed_roles = {'staff', 'staff_admin'}
+            allowed_roles = {'staff', 'staff_admin', 'test'}
             if requested_roles.issubset(allowed_roles):
                 return True
 
