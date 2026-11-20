@@ -1567,6 +1567,10 @@ class User(db.Model, UserMixin):
 
         remove_if_not_requested = {role.id: role for role in self.roles}
         for role in role_list:
+            # Only admins can add admin
+            if role.name == ROLE.ADMIN.value:
+                if not acting_user.has_role(ROLE.ADMIN.value):
+                    abort(400, "Only admins can add admin role")
             # Don't allow others to add service to their accounts
             if role.name == ROLE.SERVICE.value:
                 abort(400, "Service role is restricted to service accounts")
@@ -1995,9 +1999,9 @@ class User(db.Model, UserMixin):
                             return True
 
         if (self.has_role(ROLE.STAFF_ADMIN.value) and
-                other.has_role(ROLE.STAFF_ADMIN.value) or
+                (other.has_role(ROLE.STAFF_ADMIN.value) or
                 other.has_role(ROLE.STAFF.value) or
-                other.has_role(ROLE.CLINICIAN.value)):
+                other.has_role(ROLE.CLINICIAN.value))):
             # Staff admin can do anything to staff at or below their level
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
@@ -2012,6 +2016,25 @@ class User(db.Model, UserMixin):
                     return True
 
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
+
+    def role_change_allowed(self, role_list):
+        """Few users are allowed to change other's roles"""
+        if self.has_role(ROLE.ADMIN.value):
+            return True
+
+        requested_roles = set([r.name for r in role_list])
+        if self.has_role(ROLE.SERVICE.value):
+            # service accounts are allowed to set low tier roles only
+            allowed_roles = {'access_on_verify', 'patient', 'partner', 'write_only'}
+            if requested_roles.issubset(allowed_roles):
+                return True
+
+        if self.has_role(ROLE.STAFF_ADMIN.value):
+            allowed_roles = {'staff', 'staff_admin', 'test', 'write_only'}
+            if requested_roles.issubset(allowed_roles):
+                return True
+
+        return False
 
     def has_role(self, *roles):
         """Given one or more roles by name, true if user has at least one"""
