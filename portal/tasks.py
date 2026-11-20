@@ -425,8 +425,10 @@ def update_tous_task(**kwargs):
 @celery.task(queue=LOW_PRIORITY)
 @scheduled_task
 def token_watchdog(**kwargs):
-    """Clean up stale tokens and alert service sponsors if nearly expired"""
+    """Clean up stale reports and tokens. alert service sponsors if nearly expired"""
     from .models.auth import token_janitor
+    from .models.questionnaire_response import report_dir_janitor
+    report_dir_janitor()
     error_emails = token_janitor()
     if error_emails:
         return '\nUnable to reach recipient(s): {}'.format(
