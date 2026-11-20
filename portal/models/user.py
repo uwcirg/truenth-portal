@@ -1567,6 +1567,10 @@ class User(db.Model, UserMixin):
 
         remove_if_not_requested = {role.id: role for role in self.roles}
         for role in role_list:
+            # Only admins can add admin
+            if role.name == ROLE.ADMIN.value:
+                if not acting_user.has_role(ROLE.ADMIN.value):
+                    abort(400, "Only admins can add admin role")
             # Don't allow others to add service to their accounts
             if role.name == ROLE.SERVICE.value:
                 abort(400, "Service role is restricted to service accounts")
