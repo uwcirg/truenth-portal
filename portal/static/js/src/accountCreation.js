@@ -726,13 +726,13 @@ import {
             });
         };
         this.handleNoEmail = function() {
-            $("#noEmail").on("click, change", function() {
+            $("#noEmail").on("click change", function() {
                 if ($(this).is(":checked")) {
                     $("#erroremail").css("visibility", "hidden");
                     $("#email").val("").attr("disabled", true).removeAttr("required").removeAttr("data-customemail");
                     setTimeout(function() {
                         $("#erroremail").text("");
-                        $("#email").closest("form-group").removeClass("has-error");
+                        $("#email").closest(".form-group").removeClass("has-error");
                         $("#email").css("border-color", "#ccc");
                     }, 600);
                 }
