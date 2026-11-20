@@ -1,6 +1,8 @@
 import tnthAjax from "./modules/TnthAjax.js";
 import SYSTEM_IDENTIFIER_ENUM from "./modules/SYSTEM_IDENTIFIER_ENUM.js";
 import Procedure from "./modules/Procedures.js";
+import { getSafeLocalUrl } from "./modules/Utility.js";
+
 (function() {  /*global $, tnthAjax, SYSTEM_IDENTIFIER_ENUM, i18next */
     var CoreDataObj = function() {
         this.subjectId = null;
@@ -137,10 +139,13 @@ import Procedure from "./modules/Procedures.js";
             this.initContinueButtonEvent();
         };
         this.getReturnAddress = function() {
-            return $("#procReturnAddress").val() || "/";
+            return getSafeLocalUrl($("#procReturnAddress").val()) || "/";
         };
         this.getAPIUrl = function() {
-            return $("procAPIUrl").val() || "/api/coredata/acquire";
+            const procURL = $("procAPIUrl").val();
+            return (
+              procURL ? getSafeLocalUrl(procURL) : "/api/coredata/acquire"
+            );
         };
         this.setError = function(message) {
             $("#coreDataError").html(message || "");
