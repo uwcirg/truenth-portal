@@ -82,7 +82,7 @@
                                 {% if category=='error' %}
                                     {% set category='danger' %}
                                 {% endif %}
-                                <p class="text-{{category}}">{{ message|safe }}</p>
+                                <p class="text-{{category}} wrap-words">{{ message|safe }}</p>
                             {%- endfor %}
                           </div>
                           <div class="modal-footer">
