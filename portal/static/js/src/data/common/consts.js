@@ -29,7 +29,8 @@ export var REQUIRED_PI_ROLES_WARNING_MESSAGE =
                 <li><b>Admin Staff</b></li>
                 <li><b>Clinician</b></li>
             </ul>`);
-//<meta name="allowed-hosts" content="cirg.washington.edu,truenth.org">, hosts can come from a config variable
+// <meta name="allowed-hosts" content="cirg.washington.edu,truenth.org"> in the template
+// allowed host domains can come from a config variable
 export const ALLOWED_HOSTS = (function () {
   const meta = document.querySelector('meta[name="allowed-hosts"]');
   const hosts = meta
