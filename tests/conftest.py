@@ -668,21 +668,21 @@ def test_user_login(
         initialize_static, app, client,
         music_org, test_user):
     """Only use if the function requires user login before other tasks.
-    login can be a location specific,
+    login can be location specific,
     calling login() manually if that is the case.
+
+    Pass acting_user_id to log in as a user other than TEST_USER_ID,
+    e.g. a staff user acting on TEST_USER_ID as the subject.
     """
-    user_id = TEST_USER_ID,
-    follow_redirects = True
-
-    app.config.from_object(TestConfig)
-
-    oauth_info = {'user_id': user_id}
-
-    yield client.get(
+    def _login(acting_user_id=TEST_USER_ID):
+        app.config.from_object(TestConfig)
+        return client.get(
             'test/oauth',
-            query_string=oauth_info,
-            follow_redirects=follow_redirects
-    )
+            query_string={'user_id': acting_user_id},
+            follow_redirects=True,
+        )
+
+    yield _login
 
     db.session.remove()
     db.engine.dispose()

@@ -1485,16 +1485,24 @@ class User(db.Model, UserMixin):
             change their own org affiliations.
 
             """
+            if acting_user.has_role(ROLE.ADMIN.value, ROLE.SERVICE.value):
+                return True
+
             if (
-                not acting_user.has_role(
-                    ROLE.ADMIN.value, ROLE.APPLICATION_DEVELOPER.value)
-                and acting_user.has_role(
-                    ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)
+                acting_user.has_role(ROLE.STAFF.value, ROLE.STAFF_ADMIN.value)
                 and user.id == acting_user.id
             ):
                 raise ValueError(
                     "staff can't change their own organization affiliations")
-            return True
+
+            # confirm acting user has authority to add to requested org
+            ot = OrgTree()
+            for org in acting_user.organizations:
+                if ot.at_or_below_ids(org.id, [org.id]):
+                    return True
+            raise ValueError(
+                f"acting user({acting_user.id}) does not have access to organization({org.id})"
+                f" and therefore can't add user({user.id})")
 
         remove_if_not_requested = {org.id: org for org in
                                    self.organizations}
