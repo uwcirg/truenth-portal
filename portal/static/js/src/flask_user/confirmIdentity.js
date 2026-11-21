@@ -1,4 +1,4 @@
-import { getSafeLocalUrl } from "../src/modules/Utility.js";
+import { getSafeLocalUrl } from "../modules/Utility.js";
 
 $(document).ready(function() {
     $("#confirmIdentityModal").modal({

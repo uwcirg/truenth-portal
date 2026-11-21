@@ -7,7 +7,7 @@ const TerserWebpackPlugin = require("terser-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const crypto = require("crypto");
 const JsSrcPath = "./static/js/src";
-const JsFlaskPath = "./static/js/flask_user";
+const JsSrcFlaskPath = "./static/js/src/flask_user";
 const templateDirectory = "static/templates/";
 const crypto_orig_createHash = crypto.createHash;
 crypto.createHash = (algorithm) =>
@@ -32,7 +32,7 @@ module.exports = (env, argv) => {
       admin: JsSrcPath + "/admin.js",
       assessmentReport: JsSrcPath + "/assessmentReport.js",
       bootstrapTableExtensions: JsSrcPath + "/bootstrapTableExtensions.js",
-      confirmIdentity: JsFlaskPath + "/ConfirmIdentity.js",
+      confirmIdentity: JsSrcFlaskPath + "/confirmIdentity.js",
       CookieMonster: JsSrcPath + "/CookieMonster.js",
       coredata: JsSrcPath + "/coredata.js",
       initialQueries: JsSrcPath + "/initialQueries.js",
