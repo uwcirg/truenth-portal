@@ -50,16 +50,12 @@
               <tr id="data_row_{{user.id}}" {%if user.deleted%}class="rowlink-skip deleted-user-row"{%endif%} {% if user.has_role(ROLE.TEST.value) %}data-test-role="true"{% endif %}>  <!-- setting css class for test patient rows, allow distinction from others -->
                   <td>{{user.id}}</td>
                   <td>
-                    {% if user.deleted %}
-                    {{user.id}}
-                    {% else %}
-                    <a href="{{ url_for('.staff_profile', user_id=user.id) }}" class="profile-link">{{ user.id }}</a>
-                    {% endif %}
+                    {{ user.id | escape}}
                   </td>
-                  <td>{{ user.first_name if user.first_name }}</td>
-                  <td>{{ user.last_name if user.last_name }}</td>
-                  <td class="email-data-field">{{ user.email if user.email }}</td>
-                  <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name}}</span><br/>{% endfor %}</td>
+                  <td>{{ user.first_name | escape if user.first_name }}</td>
+                  <td>{{ user.last_name | escape if user.last_name }}</td>
+                  <td class="email-data-field">{{ user.email | escape if user.email }}</td>
+                  <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="medium-text">{{org.name | escape}}</span><br/>{% endfor %}</td>
                   {{deletedUserCell(user, allowReactivate=allowReactivate)}}
                   <td>{% if user.deleted %}deactivated{%else%}activated{%endif%}</td> <!-- invisible column field, for keeping track of row activation status -->
               </tr>
