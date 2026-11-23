@@ -62,6 +62,11 @@ class TestDemographics(TestCase):
             (org.id, org.name) for org in Organization.query.filter(
                 Organization.id > 0).limit(2)]
 
+        # due to limits on adding users to organization - directly grant access
+        user = db.session.merge(self.test_user)
+        user.add_organization(org_name)
+        user.add_organization(org2_name)
+
         pract = self.add_practitioner(first_name='Indiana', last_name='Jones')
         pract_id = pract.id
         pi = self.add_primary_investigator(first_name='Bob', last_name='S')
@@ -414,6 +419,10 @@ class TestDemographics(TestCase):
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
         org_id, org_name = org.id, org.name
+
+        # due to limits on adding users to organization - directly grant access
+        user = db.session.merge(self.test_user)
+        user.add_organization(org_name)
 
         # create OrganizationIdentifier and add to org
         org_id_system = "testsystem"

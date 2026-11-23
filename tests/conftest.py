@@ -689,6 +689,23 @@ def test_user_login(
 
 
 @pytest.fixture
+def service_user_login(
+        initialize_static, app, client,
+        music_org, service_user):
+    """Only use if the function requires service login before other tasks. """
+
+    app.config.from_object(TestConfig)
+    yield client.get(
+        'test/oauth',
+        query_string={'user_id': service_user.id},
+        follow_redirects=True
+    )
+
+    db.session.remove()
+    db.engine.dispose()
+
+
+@pytest.fixture
 def local_login(client, initialize_static, music_org):
     def local_login(email, password, follow_redirects=True):
         url = url_for('user.login')
