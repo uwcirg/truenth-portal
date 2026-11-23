@@ -6,6 +6,7 @@ from ..database import db
 from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.clinical_constants import CC
+from ..models.observation import Observation
 from ..models.user import current_user, get_user
 from ..models.value_quantity import ValueQuantity
 from .crossdomain import crossdomain
@@ -444,6 +445,80 @@ def clinical_set(patient_id):
         result, user_id=current_user().id, subject_id=patient.id,
         context='observation')
     return jsonify(message=result)
+
+
+@clinical_api.route('/patient/<int:patient_id>/clinical/<int:observation_id>',
+                    methods=('PUT',))
+@crossdomain()
+@oauth.require_oauth()
+def clinical_update(patient_id, observation_id):
+    """Updates a FHIR Resource Observation clinical entry
+
+    Submit a minimal FHIR doc in JSON format. NB, only a subset
+    are persisted in the portal including {"name"(CodeableConcept),
+    "valueQuantity", "status", "issued", "performer"} - others will be ignored.
+
+    Returns json of the updated version in the response.
+
+    Any fields that are not specified in the json request, will not be changed.
+
+    Raises 401 if logged-in user lacks permission to edit requested
+    patient.
+
+    ---
+    operationId: setPatientObservation
+    tags:
+      - Clinical
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - name: observation_id
+        in: path
+        description: Clinical Observation ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: FHIRObservation
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response_details
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: details of the change
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+    security:
+      - ServiceToken: []
+
+    """
+    patient = get_user(patient_id, 'edit')
+    if not request.json:
+        abort(400, "No update data provided")
+    observation = Observation.query.filter_by(id=observation_id).first()
+    if not observation_id or not observation:
+        abort(400, "No Observation found for provided ID")
+    result = observation.update_from_fhir(request.json)
+    auditable_event(
+        'updated observation {}'.format(observation_id),
+        user_id=current_user().id, subject_id=patient.id,
+        context='observation')
+    return jsonify(result)
 
 
 def clinical_api_shortcut_set(patient_id, codeable_concept):
