@@ -414,6 +414,44 @@ var Utility = (function() {
         ]),
       );
     }
+
+    UtilityObj.prototype.getSafeLocalUrl = function (rawURL, fallback = "/", allowedHosts) {
+      fallback = fallback || "/";
+      if (!rawURL) return fallback;
+
+      var url;
+      try {
+        // Resolve relative paths against the current origin.
+        url = new URL(String(rawURL).trim(), window.location.origin);
+      } catch (e) {
+        return fallback; // malformed URL
+      }
+
+      // Block javascript:, data:, etc.
+      if (url.protocol !== "https:" && url.protocol !== "http:")
+        return fallback;
+
+      // Block embedded credentials (https://user:pass@host)
+      if (url.username || url.password) return fallback;
+
+      // Same origin: return a relative URL
+      if (url.origin === window.location.origin) {
+        return url.pathname + url.search + url.hash;
+      }
+
+      // External: only allowlisted hosts, https only
+      if (url.protocol === "https:" && allowedHosts && allowedHosts.length) {
+        var host = url.hostname.toLowerCase();
+        var allowed = allowedHosts.some(function (domain) {
+          domain = String(domain).toLowerCase();
+          return host === domain || host.endsWith("." + domain);
+        });
+        if (allowed) return url.href;
+      }
+
+      return fallback;
+    }
+
     return new UtilityObj();
 })();
 export default Utility;
@@ -422,6 +460,7 @@ export var getUrlParameter= Utility.getUrlParameter;
 export var capitalize = Utility.capitalize;
 export const escapeHTML = Utility.escapeHTML;
 export const escapeObjectValues = Utility.escapeObjectValues;
+export const getSafeLocalUrl = Utility.getSafeLocalUrl;
 /*
  * sorting an array of object by a field name, in ascending order
  */
@@ -467,22 +506,4 @@ export function alphanumericSorter(a, b) {
     return a.toString().localeCompare(b.toString(), "en", { numeric: true });
     //The localeCompare() method returns 1 if a reference string comes before, -1 it comes after or 0 if the reference string is the same as the given string.
     //see relevant discussion here, https://stackoverflow.com/questions/4340227/sort-mixed-alpha-numeric-array
-}
-
-export function getSafeLocalUrl(rawURL, fallback) {
-  fallback = fallback || "/";
-  if (!rawURL) return fallback;
-  try {
-    // Resolve relative paths against the current origin.
-    var url = new URL(rawURL, window.location.origin);
-    if (
-      (url.protocol === "https:" || url.protocol === "http:") &&
-      url.origin === window.location.origin
-    ) {
-      return url.pathname + url.search + url.hash; // same-origin only
-    }
-  } catch (e) {
-    // Malformed URL: fall through
-  }
-  return fallback;
 }

@@ -34,9 +34,9 @@
                                 <span class= "domainText">{{item.code[0].display}}</span>
                                 {{item.text}}
                             </TD>
-                            <TD class="item question" v-html="item.text" v-else></TD>
+                            <TD class="item question" v-text="item.text" v-else></TD>
                             <TD class="cell item" v-for="(d, index) in item.data" :key="'answer_'+qindex+'_'+index" :data-column-index="index+1">
-                                <span class="answer" v-html="d.a" v-bind:class="d.cssClass"></span>
+                                <span class="answer" v-text="d.a" v-bind:class="d.cssClass"></span>
                             </TD>
                         </TR>
                     </TBODY>
