@@ -21,8 +21,8 @@
 							</THEAD>
 							<TBODY>
 								<TR v-for="(item,index) in data" :key="index">
-									<TD v-html="item.q"></TD>
-									<TD v-html="item.a"></TD>
+									<TD v-text="item.q"></TD>
+									<TD v-text="item.a"></TD>
 								</TR>
 							</TBODY>
 						</table>
