@@ -523,11 +523,11 @@ def challenge_identity(request_path=None):
 
     # identity confirmed
     session['challenge_verified_user_id'] = user.id
-    if form.merging_accounts.data == 'True':
+    if merging_accounts:
         user.mask_email()
         db.session.commit()
         session['invited_verified_user_id'] = user.id
-    if form.access_on_verify.data == 'True':
+    if access_on_verify:
         # Log user in as they have now verified
         login_user(user=user, auth_method='url_authenticated_and_verified')
     validate_origin(next_url)
