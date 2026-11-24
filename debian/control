@@ -6,7 +6,7 @@ Maintainer: CIRG, University of Washington <truenth-dev@uw.edu>
 # http://initd.org/psycopg/docs/install.html#binary-install-from-pypi
 # Todo: investigate using binary in python-psycopg2 debian package
 # Todo: remove all python2 dependencies when dh-virtualenv is python3 by default
-Build-Depends: debhelper (>= 9), python3, dh-virtualenv, libpq-dev, python3-dev, python3-pip, python3-setuptools, python3-setuptools-scm, python3-venv, python3-wheel
+Build-Depends: debhelper (>= 9), python3, dh-virtualenv, libpq-dev, python3-dev, python3-pip, python3-setuptools, python3-venv, python3-wheel
 Standards-Version: 3.9.5
 
 Package: portal

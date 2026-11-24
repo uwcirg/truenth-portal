@@ -6,7 +6,7 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: python:3.9
+    container: python:3.13
     # start tests after all services report healthy
     services:
       postgres:
