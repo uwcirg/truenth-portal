@@ -703,7 +703,7 @@ def test_user_org_get(
 
 
 def test_user_org_post(
-        shallow_org_tree, prep_org_w_identifier, test_user_login, client):
+        shallow_org_tree, prep_org_w_identifier, service_user_login, client):
     data = {'organizations': [
         {'reference': 'api/organization/123-45?system={}'.format(US_NPI)},
         {'reference': 'api/organization/1001'}
@@ -732,7 +732,7 @@ def test_user_org_bogus_identifier(
 
 
 def test_user_org_invalid_timezone_post(
-        shallow_org_tree, test_user_login, client):
+        shallow_org_tree, service_user_login, client):
     # only one org in list can be marked with `apply_to_user`
     data = {'organizations': [
         {'reference': 'api/organization/102', 'timezone': "apply_to_user"},
@@ -747,7 +747,7 @@ def test_user_org_invalid_timezone_post(
 
 
 def test_user_org_apply_defaults(
-        shallow_org_tree, test_user, test_user_login, client):
+        shallow_org_tree, test_user, service_user_login, client):
     # apply org timezone and language defaults to user
     sib = Organization.query.get(102)
     sib.timezone = 'Europe/Rome'
