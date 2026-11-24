@@ -478,8 +478,6 @@ def challenge_identity(request_path=None):
 
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
-        if form.next_url.data:
-            validate_origin(form.next_url.data)
         user = unchecked_get_user(user_id)
     else:
         user = unchecked_get_user(user_id)
@@ -525,14 +523,15 @@ def challenge_identity(request_path=None):
 
     # identity confirmed
     session['challenge_verified_user_id'] = user.id
-    if form.merging_accounts.data == 'True':
+    if merging_accounts:
         user.mask_email()
         db.session.commit()
         session['invited_verified_user_id'] = user.id
-    if form.access_on_verify.data == 'True':
+    if access_on_verify:
         # Log user in as they have now verified
         login_user(user=user, auth_method='url_authenticated_and_verified')
-    return redirect(form.next_url.data)
+    validate_origin(next_url)
+    return redirect(next_url)
 
 
 @portal.route('/confirm-identity', methods=['GET', 'POST'])
